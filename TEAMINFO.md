@@ -12,7 +12,7 @@
 
 | Name | Martikel Nummer | Rolle | Git-Handle (optional) |
 |---|---|---|---|
-| Patil, Yash Umesh | <5506523> | <Rolle> | GitHub: `` |
+| Patil, Yash Umesh | <5506523> | <Rolle> | GitHub: `PatilYash0110` |
 | | <> | <Rolle> | GitHub: `` |
 | | <> | <Rolle> | GitHub: `` |
 | | <> | <Rolle> | GitHub: `` |
