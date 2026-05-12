@@ -35,4 +35,8 @@
 ## Repository
 
 - **URL:** <https://github.com/patilyash0110/Projekt-1>
+- Sichtbarkeit: privat (Betreuer als Member: Yash Patil)
+
+## Eingesetzte KI-Werkzeuge (vorläufige Planung)
+- Claude Code
 
