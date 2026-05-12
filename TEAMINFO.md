@@ -10,14 +10,14 @@
 
 ## Team
 
-| Name | Martikel Nummer | Rolle | Git-Handle (optional) |
+| Name | Studiengang | Rolle | Git-Handle (optional) |
 |---|---|---|---|
-| Patil, Yash Umesh | <5506523> | <Rolle> | GitHub: `PatilYash0110` |
-| | <> | <Rolle> | GitHub: `` |
-| | <> | <Rolle> | GitHub: `` |
-| | <> | <Rolle> | GitHub: `` |
-| | <> | <Rolle> | GitHub: `` |
-| | <> | <Rolle> | GitHub: `` |
+| Patil, Yash Umesh | WI B.Sc.  | <Rolle> | GitHub: `PatilYash0110` |
+| | WI B.Sc.  | <Rolle> | GitHub: `` |
+| | WI B.Sc.  | <Rolle> | GitHub: `` |
+| | WI B.Sc.  | <Rolle> | GitHub: `` |
+| | WI B.Sc.  | <Rolle> | GitHub: `` |
+| | WI B.Sc.  | <Rolle> | GitHub: `` |
 
 
 **Rollen-Empfehlung (frei änderbar):** Projektleiter:in, Software Architect, Spec/Requirements Lead, Implementation Lead, QA/Test Lead, DevOps/Build Lead.
