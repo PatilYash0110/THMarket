@@ -10,13 +10,15 @@
 
 ## Team
 
-| Name | Studiengang | Rolle | Git-Handle (optional) |
+| Name | Martikel Nummer | Rolle | Git-Handle (optional) |
 |---|---|---|---|
-| Patil, Yash Umesh | <Studiengang> | <Rolle> | GitHub: `patilyash0110` |
+| Patil, Yash Umesh | <5506523> | <Rolle> | GitHub: `` |
+| | <> | <Rolle> | GitHub: `` |
+| | <> | <Rolle> | GitHub: `` |
+| | <> | <Rolle> | GitHub: `` |
+| | <> | <Rolle> | GitHub: `` |
+| | <> | <Rolle> | GitHub: `` |
 
-> **Spalte „Git-Handle" (optional):** Nur ausfüllen, wenn die Git-Commit-Identität nicht auf den Klarnamen gesetzt ist und Commits unter einem Plattform-Username (GitHub/GitLab) laufen. Damit bleibt die Zuordnung Commit → Person nachvollziehbar. Details und Alternativen: [`tutorials/git-identity.md`](tutorials/git-identity.md).
-
-> **Datenschutz-Hinweis:** Im öffentlichen Repository erscheinen hier ausschließlich Name, Studiengang, Rolle und (optional) der ohnehin öffentliche Git-Plattform-Handle. **Keine** Matrikel-Nummern, **keine** privaten Telefonnummern, **keine** individuellen E-Mail-Adressen. Die **vollständige Mitgliederliste** mit Matrikel-Nummern und THM-E-Mails wird durch die/den Projektleiter:in **per Mail** an den Betreuer übermittelt — spätestens zu **M0+**, bei Änderungen aktualisiert spätestens zur **M3**-Abgabe.
 
 **Rollen-Empfehlung (frei änderbar):** Projektleiter:in, Software Architect, Spec/Requirements Lead, Implementation Lead, QA/Test Lead, DevOps/Build Lead.
 
@@ -33,9 +35,4 @@
 ## Repository
 
 - **URL:** <https://github.com/patilyash0110/Projekt-1>
-- **Sichtbarkeit:** öffentlich
 
-## Eingesetzte KI-Werkzeuge (vorläufige Planung)
-
-- <z.B. GitHub Copilot für Code-Vervollständigung>
-- <z.B. Claude Code / ChatGPT für Refactoring und Doku-Entwürfe>
