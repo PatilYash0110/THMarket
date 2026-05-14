@@ -13,7 +13,7 @@
 | Name | Studiengang | Rolle | Git-Handle (optional) |
 |---|---|---|---|
 | Patil, Yash Umesh | WI B.Sc.  | <Rolle> | GitHub: `PatilYash0110` |
-| | WI B.Sc.  | <Rolle> | GitHub: `` |
+| | WI B.Sc.  | <Rolle> | GitHub: `nivbl10` |
 | | WI B.Sc.  | <Rolle> | GitHub: `` |
 | | WI B.Sc.  | <Rolle> | GitHub: `` |
 | | WI B.Sc.  | <Rolle> | GitHub: `` |
