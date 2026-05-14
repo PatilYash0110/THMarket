@@ -34,6 +34,6 @@ Lösung: THMarket ist eine geschlossene, verifizierte Web Applikation exklusiv f
 - Sichtbarkeit: public (Betreuer als Member: Yash Patil)
 
 ## Eingesetzte KI-Werkzeuge (vorläufige Planung)
-- Claude Code --> Github Management
-- Gemini --> Tool für Entwicklung
+- Claude Code --> Github Management, Code Vervollständigung
+- Gemini --> Tool für Entwicklung, Code Vervollständigung
 
