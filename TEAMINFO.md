@@ -8,7 +8,7 @@ THMarket
 
 Problem: Öffentliche Plattformen wie eBay Kleinanzeigen oder Facebook Gruppen sind oft unzuverlässig, unübersichtlich und bergen das Risiko von Betrug oder Spam.
 
-Lösung: THMarket ist eine geschlossene, verifizierte Web Applikation exklusiv für Studierende und Angehörige der THM. Die Plattform kombiniert ein sicheres Inserat System für den Handel von Studienmaterialien, Möbeln oder Elektronik mit einem Echtzeit-Chat.
+Lösung: THMarket ist eine geschlossene, verifizierte Web Applikation exklusiv für Studierende und Angehörige der THM. Die Plattform kombiniert ein sicheres Inserat System für den Handel von Studienmaterialien, Möbeln oder Elektronik mit einem Echtzeit Chat.
 
 ## Team
 
@@ -23,19 +23,17 @@ Lösung: THMarket ist eine geschlossene, verifizierte Web Applikation exklusiv f
 
 ## Technologien (voraussichtlich)
 
-- **Sprache(n):** <z.B. Java 21, TypeScript 5>
-- **Frameworks:** <z.B. Spring Boot, React, Vue>
-- **Persistenz:** <z.B. PostgreSQL, SQLite>
-- **Build/Tooling:** <z.B. Maven, Gradle, Vite>
-- **Sonstiges:** <z.B. Docker, Auth-Provider, externe APIs>
-
-> Diese Liste ist eine Momentaufnahme — Änderungen im Projektverlauf sind erlaubt und in der Architekturbeschreibung (M2) endgültig festzulegen.
+- **Sprache(n):** JavaScript, Python, SQL
+- **Frameworks:** React, Fast API, Socket.io
+- **Persistenz:** PostgreSQL
+- **Build/Tooling:** Vite
 
 ## Repository
 
 - **URL:** <https://github.com/patilyash0110/Projekt-1>
-- Sichtbarkeit: privat (Betreuer als Member: Yash Patil)
+- Sichtbarkeit: public (Betreuer als Member: Yash Patil)
 
 ## Eingesetzte KI-Werkzeuge (vorläufige Planung)
-- Claude Code
+- Claude Code --> Github Management
+- Gemini --> Tool für Entwicklung
 
