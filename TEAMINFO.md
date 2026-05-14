@@ -14,7 +14,7 @@
 |---|---|---|---|
 | Patil, Yash Umesh | WI B.Sc.  | <Rolle> | GitHub: `PatilYash0110` |
 | | WI B.Sc.  | <Rolle> | GitHub: `nivbl10` |
-| | WI B.Sc.  | <Rolle> | GitHub: `` |
+| | WI B.Sc.  | <Rolle> | GitHub: `abdullahalhussein25-dot` |
 | | WI B.Sc.  | <Rolle> | GitHub: `` |
 | | WI B.Sc.  | <Rolle> | GitHub: `` |
 | | WI B.Sc.  | <Rolle> | GitHub: `` |
