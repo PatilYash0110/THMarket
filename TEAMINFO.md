@@ -2,25 +2,24 @@
 
 ## Projekttitel
 
-<Kurzer, prägnanter Titel des Projekts>
+<THMarktplatz>
 
 ## Kurzbeschreibung
 
-<2–4 Sätze: Was soll die Software leisten? Für wen? Welches Problem löst sie?>
+<Problem: Öffentliche Plattformen wie eBay Kleinanzeigen oder Facebook-Gruppen sind oft unzuverlässig, unübersichtlich und bergen das Risiko von Betrug oder Spam. Zudem fehlt ein lokaler Bezug zu den Standorten der Hochschule >
+
+<Lösung: THMarktplatz ist eine geschlossene, verifizierte Web-Applikation exklusiv für Studierende und Angehörige der THM. Die Plattform kombiniert ein sicheres Inserat-System für den Handel von Studienmaterialien, Möbeln oder Elektronik mit einem datenschutzkonformen Echtzeit-Chat.>
 
 ## Team
 
 | Name | Studiengang | Rolle | Git-Handle (optional) |
 |---|---|---|---|
-| Patil, Yash Umesh | WI B.Sc.  | <Rolle> | GitHub: `PatilYash0110` |
-| Blecher, Marvin | WI B.Sc.  | <Rolle> | GitHub: `nivbl10` |
-| Alhussein, Abdullah | WI B.Sc.  | <Rolle> | GitHub: `abdullahalhussein25-dot` |
-| Babeker Ramos, Jacob | WI B.Sc.  | <Rolle> | GitHub: `jabara1771` |
-| Le, Duc Anh | WI B.Sc.  | <Rolle> | GitHub: `` |
-| | WI B.Sc.  | <Rolle> | GitHub: `` |
+| Le, Duc Anh | WI B.Sc.  | <Projektleiter, Software Architect> | GitHub: `Duc612-jaques` |
+| Patil, Yash Umesh | WI B.Sc.  | <Software Architect, Requirements Lead> | GitHub: `PatilYash0110` |
+| Blecher, Marvin | WI B.Sc.  | <Software Architect, Requirements Lead> | GitHub: `nivbl10` |
+| Alhussein, Abdullah | WI B.Sc.  | <Software Architect, Build Lead> | GitHub: `abdullahalhussein25-dot` |
+| Babeker Ramos, Jacob | WI B.Sc.  | <Software Architect, Test Lead> | GitHub: `jabara1771` |
 
-
-**Rollen-Empfehlung (frei änderbar):** Projektleiter:in, Software Architect, Spec/Requirements Lead, Implementation Lead, QA/Test Lead, DevOps/Build Lead.
 
 ## Technologien (voraussichtlich)
 
