@@ -2,7 +2,7 @@
 
 ## Projekttitel
 
-<THMarktplatz>
+THMarktplatz
 
 ## Kurzbeschreibung
 
