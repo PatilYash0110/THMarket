@@ -6,9 +6,9 @@
 
 ## Kurzbeschreibung
 
-<Problem: Öffentliche Plattformen wie eBay Kleinanzeigen oder Facebook-Gruppen sind oft unzuverlässig, unübersichtlich und bergen das Risiko von Betrug oder Spam. Zudem fehlt ein lokaler Bezug zu den Standorten der Hochschule >
+Problem: Öffentliche Plattformen wie eBay Kleinanzeigen oder Facebook Gruppen sind oft unzuverlässig, unübersichtlich und bergen das Risiko von Betrug oder Spam.
 
-<Lösung: THMarktplatz ist eine geschlossene, verifizierte Web-Applikation exklusiv für Studierende und Angehörige der THM. Die Plattform kombiniert ein sicheres Inserat-System für den Handel von Studienmaterialien, Möbeln oder Elektronik mit einem datenschutzkonformen Echtzeit-Chat.>
+Lösung: THMarktplatz ist eine geschlossene, verifizierte Web Applikation exklusiv für Studierende und Angehörige der THM. Die Plattform kombiniert ein sicheres Inserat System für den Handel von Studienmaterialien, Möbeln oder Elektronik mit einem Echtzeit-Chat.
 
 ## Team
 
