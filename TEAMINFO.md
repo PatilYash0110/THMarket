@@ -30,7 +30,7 @@ Lösung: THMarket ist eine geschlossene, verifizierte Web Applikation exklusiv f
 
 ## Repository
 
-- **URL:** <https://github.com/patilyash0110/Projekt-1>
+- **URL:** <https://github.com/patilyash0110/THMarket>
 - Sichtbarkeit: public (Betreuer als Member: carstenlucke)
 
 ## Eingesetzte KI-Werkzeuge (vorläufige Planung)
