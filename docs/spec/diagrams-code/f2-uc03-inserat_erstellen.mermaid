@@ -1,0 +1,21 @@
+sequenceDiagram
+    autonumber
+    actor Nutzer as Eingeloggter Nutzer
+    participant System as THMarket
+    participant DB as Datenbank
+    
+    Nutzer->>System: Klickt auf "Inserat erstellen"
+    System-->>Nutzer: Zeigt Inserat-Formular an
+    Nutzer->>System: Füllt Daten aus (Titel, Preis, etc.) & lädt Bilder hoch
+    System->>System: Validiert Eingaben und Bilder
+    
+    alt Validierung erfolgreich
+        System->>DB: Speichert Inserat und Bilder
+        DB-->>System: Bestätigung
+        System-->>Nutzer: Erfolgsmeldung und Veröffentlichung
+    else Fehlende Pflichtfelder
+        System-->>Nutzer: Zeigt Fehlermeldung an
+        opt Abbruch
+            Nutzer->>System: Bricht Vorgang ab
+        end
+    end
