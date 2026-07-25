@@ -1,0 +1,21 @@
+sequenceDiagram
+    autonumber
+    actor Nutzer as Studierender (Gast)
+    participant System as THMarket
+    participant Mail as E-Mail Dienst
+    
+    Nutzer->>System: Klickt auf "Jetzt registrieren"
+    System-->>Nutzer: Zeigt Registrierungsformular an
+    Nutzer->>System: Gibt THM E-Mail und Passwort ein
+    System->>System: Prüft Eingaben und THM-Domain
+    
+    alt Gültige THM-Adresse und noch frei
+        System->>System: Legt unverifiziertes Konto an
+        System->>Mail: Löst Bestätigungs-E-Mail aus
+        Mail-->>Nutzer: Sendet E-Mail mit Verifizierungslink
+        Nutzer->>System: Öffnet den Verifizierungslink
+        System->>System: Konto wird verifiziert
+        System-->>Nutzer: Weiterleitung zum Login (UC01)
+    else E-Mail bereits vergeben oder keine THM-Adresse
+        System-->>Nutzer: Zeigt Fehlermeldung an / Registrierung abgelehnt
+    end
