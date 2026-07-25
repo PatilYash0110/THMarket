@@ -52,7 +52,7 @@
 
 | Baustein | Titel | Status | Datei |
 |---|---|---|---|
-| N1 | Nichtfunktionale Anforderungen | 🛠 | `` |
+| N1 | Nichtfunktionale Anforderungen | ✅ | [`N1-nichtfunktional.md`](N1-nichtfunktional.md) |
 | N2 | Querschnittskonzepte | 🛠 | `` |
 
 ### 7. Ergänzende Bausteine
