@@ -1,0 +1,16 @@
+sequenceDiagram
+    autonumber
+    actor Admin as Administrator
+    participant System as THMarket
+    
+    Admin->>System: Öffnet die Benutzerübersicht (Adminbereich)
+    System-->>Admin: Zeigt Liste der Nutzerkonten an
+    Admin->>System: Wählt ein spezifisches Konto
+    
+    alt Änderungen vornehmen
+        Admin->>System: Ändert, sperrt oder löscht Konto
+        System->>System: Speichert die Änderung dauerhaft
+        System-->>Admin: Bestätigt Ausführung
+    else Vorgang abbrechen
+        Admin->>System: Bricht Vorgang ohne Speicherung ab
+    end
