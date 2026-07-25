@@ -1,0 +1,17 @@
+sequenceDiagram
+    autonumber
+    actor Nutzer as Interessent
+    participant System as THMarket (Socket.io)
+    actor Anbieter as Empfänger
+    
+    Nutzer->>System: Klickt auf "Anbieter kontaktieren"
+    System-->>Nutzer: Öffnet (neue) Konversation
+    Nutzer->>System: Verfasst Nachricht und sendet ab
+    System->>System: Speichert Nachricht in Datenbank
+    
+    alt Empfänger ist online
+        System->>Anbieter: Überträgt Nachricht in Echtzeit
+        Anbieter-->>System: Sieht Nachricht in Konversationsübersicht
+    else Empfänger ist offline
+        System->>System: Nachricht wird für späteren Login gespeichert
+    end
