@@ -1,0 +1,17 @@
+sequenceDiagram
+    autonumber
+    actor Nutzer as Eingeloggter Nutzer
+    participant System as THMarket
+    participant DB as Datenbank
+    
+    Nutzer->>System: Klickt auf ein Inserat
+    System->>DB: Ruft Detaildaten inklusive Bilder ab
+    
+    alt Inserat existiert
+        DB-->>System: Liefert Inseratdaten
+        System-->>Nutzer: Zeigt Detailansicht an
+        System-->>Nutzer: Bietet Aktionen an (Favorisieren, Kontaktieren, Melden)
+    else Inserat zwischenzeitlich gelöscht
+        DB-->>System: Keine Daten gefunden
+        System-->>Nutzer: Zeigt Hinweis an
+    end
