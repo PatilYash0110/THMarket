@@ -1,0 +1,17 @@
+sequenceDiagram
+    autonumber
+    actor Nutzer as Eingeloggter Nutzer
+    participant System as THMarket
+    
+    Nutzer->>System: Klickt bei einem Inserat auf "Melden"
+    System-->>Nutzer: Blendet Meldeformular ein
+    Nutzer->>System: Wählt Grund und gibt opt. Beschreibung an
+    
+    alt Eingabe gültig
+        System->>System: Validiert und speichert Meldung
+        System-->>Nutzer: Zeigt Bestätigung an
+    else Eingabe ungültig
+        System-->>Nutzer: Zeigt Fehlermeldung an
+    else Nutzer bricht ab
+        Nutzer->>System: Bricht Formular ab
+    end
