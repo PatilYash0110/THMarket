@@ -1,0 +1,16 @@
+sequenceDiagram
+    autonumber
+    actor Nutzer as Eingeloggter Nutzer
+    participant System as THMarket
+    
+    Nutzer->>System: Öffnet "Meine Inserate"
+    System-->>Nutzer: Zeigt eigene Inserate an
+    Nutzer->>System: Wählt ein Inserat aus
+    
+    alt Inserat bearbeiten/löschen
+        Nutzer->>System: Bearbeitet Angaben oder löscht Inserat
+        System->>System: Validiert und speichert Änderung / löscht Daten
+        System-->>Nutzer: Bestätigt Ausführung
+    else Vorgang abbrechen
+        Nutzer->>System: Bricht ohne zu speichern ab
+    end
