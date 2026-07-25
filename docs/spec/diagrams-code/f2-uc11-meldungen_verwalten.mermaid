@@ -1,0 +1,17 @@
+sequenceDiagram
+    autonumber
+    actor Admin as Administrator
+    participant System as THMarket
+    
+    Admin->>System: Öffnet die Meldungsübersicht
+    System-->>Admin: Zeigt offene Meldungen an
+    Admin->>System: Wählt eine Meldung aus
+    Admin->>System: Prüft das gemeldete Inserat
+    
+    alt Entscheidung treffen
+        Admin->>System: Entfernt Inserat / lehnt ab / markiert als bearbeitet
+        System->>System: Speichert Entscheidung
+        System-->>Admin: Bestätigt Ausführung
+    else Vorgang abbrechen
+        Admin->>System: Schließt Vorgang ohne Entscheidung
+    end
