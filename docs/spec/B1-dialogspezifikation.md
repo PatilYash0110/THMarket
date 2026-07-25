@@ -8,3 +8,19 @@ Die Dialoglandkarte stellt vereinfacht dar, welche Dialoge es gibt und wie zwisc
 *Abbildung 8: Dialoglandkarte der THMarket-Anwendung*
 
 ## 4.2 Dialogspezifikation
+### 4.2.1 Login-Dialog
+
+#### Allgemeine Beschreibung
+
+- **Zweck des Dialogs:** Anmeldung registrierter, verifizierter Nutzer zur Nutzung der Plattform
+- **Anwendungsfall:** „Benutzer meldet sich an“
+- **Ergebnis:** Erfolgreiche Anmeldung führt zur Weiterleitung auf den Marktplatz
+- **Sichtbar für:** Alle nicht angemeldeten Nutzer (Gäste)
+- **Besonderheiten:** Link zur Registrierung, Dark-Mode-Schalter
+
+#### Navigationsmöglichkeiten
+
+- Über „Noch kein Konto? Jetzt registrieren“ zum Registrierungsdialog
+- Nach erfolgreichem Login zum Marktplatz
+
+#### Statik – Formular: Login-Formular (Felder)
