@@ -1,0 +1,16 @@
+sequenceDiagram
+    autonumber
+    actor Nutzer as Eingeloggter Nutzer
+    participant System as THMarket
+    participant DB as Datenbank
+    
+    Nutzer->>System: Gibt Suchbegriff ein / wählt Filter
+    System->>System: Übernimmt und prüft Eingaben
+    System->>DB: Fragt passende Inserate ab
+    DB-->>System: Liefert Ergebnisse
+    
+    alt Treffer vorhanden
+        System-->>Nutzer: Zeigt Ergebnisse im Hauptbereich an
+    else Keine Treffer
+        System-->>Nutzer: Zeigt Hinweis "Keine Inserate gefunden" an
+    end

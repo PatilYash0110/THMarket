@@ -1,0 +1,14 @@
+sequenceDiagram
+    autonumber
+    actor Nutzer as Eingeloggter Nutzer
+    participant System as THMarket
+    
+    Nutzer->>System: Klickt bei Inserat auf "Favorit speichern"
+    
+    alt Inserat noch nicht favorisiert
+        System->>System: Speichert Zuordnung im Nutzerprofil
+        System-->>Nutzer: Aktualisiert Favoritenliste sofort
+    else Inserat ist bereits favorisiert
+        System->>System: Entfernt Zuordnung aus Nutzerprofil
+        System-->>Nutzer: Aktualisiert Favoritenliste sofort
+    end
