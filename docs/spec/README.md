@@ -29,8 +29,8 @@
 
 | Baustein | Titel | Status | Datei |
 |---|---|---|---|
-| D1 | Datenmodell | 🛠 | `` |
-| D2 | Datentypenkatalog | 🛠 | `` |
+| D1 | Datenmodell | ✅ | `D1-datenmodell.md` |
+| D2 | Datentypenkatalog | ✅ | `D2-datentypenkatalog.md` |
 
 ### 4. Benutzeroberfläche
 
