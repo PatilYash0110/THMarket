@@ -1,11 +1,28 @@
+
+
+- [4. Benutzerschnittstelle](#4-benutzerschnittstelle)
+  - [4.1 Dialoglandkarte](#41-dialoglandkarte)
+  - [4.2 Dialogspezifikation](#42-dialogspezifikation)
+    - [4.2.1 Login-Dialog](#421-login-dialog)
+    - [4.2.2 Registrierungs-Dialog](#422-registrierungs-dialog)
+    - [4.2.3 Marktplatz-Dialog (Dashboard)](#423-marktplatz-dialog-dashboard)
+    - [4.2.4 Inseratdetail-Dialog](#424-inseratdetail-dialog)
+    - [4.2.5 Inserat-erstellen-Dialog](#425-inserat-erstellen-dialog)
+    - [4.2.6 Chat-Dialog](#426-chat-dialog)
+    - [4.2.7 Profil-Dialog (Meine Inserate & Favoriten)](#427-profil-dialog-meine-inserate--favoriten)
+    - [4.2.8 Adminbereich-Dialog](#428-adminbereich-dialog)
+
+
 # 4. Benutzerschnittstelle
 ## 4.1 Dialoglandkarte
 Die Dialoglandkarte zeigt die Struktur und Navigation der THMarket-Anwendung. Sie gliedert sich in drei Bereiche: öffentlich zugängliche Seiten (Login und Registrierung), den Benutzerbereich nach Login (Marktplatz, Inseratdetail, Inserat erstellen, Chat, Profil/Meine Inserate & Favoriten) sowie administrative Funktionen (Benutzerverwaltung, Meldungen, Logs).
 Die Dialoglandkarte stellt vereinfacht dar, welche Dialoge es gibt und wie zwischen ihnen navigiert werden kann – etwa vom Login zum Marktplatz oder vom Marktplatz zur Inseratdetailseite und von dort in den Chat. Die genauen Abläufe, Auslöser und Wirkungen werden in Kapitel 4.2 beschrieben.
 **Hinweis:** Ein Logout ist grundsätzlich von jedem Dialog aus möglich. Um die Darstellung nicht zu überladen, wird diese Möglichkeit nicht an jeder Stelle einzeln dargestellt, sondern gilt als durchgängig verfügbar.
-![Dialoglandkarte der THMarket-Anwendung](b1-dialoglandkarte.png)
+<p align="center">
+  <img src="b1-dialoglandkarte.png" alt="Dialoglandkarte der THMarket-Anwendung" width="900">
+</p>
 
-*Abbildung 8: Dialoglandkarte der THMarket-Anwendung*
+<p align="center"><em>Abbildung 8: Übersicht der Dialoglandkarte der Benutzeroberfläche</em></p>
 
 ## 4.2 Dialogspezifikation
 ### 4.2.1 Login-Dialog
