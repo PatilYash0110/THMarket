@@ -5,6 +5,7 @@ Das Datenmodell von THMarket strukturiert die zentralen Informationen und deren 
 Jedem Inserat ist eine Kategorie zugeordnet, und jedes Inserat kann mehrere Bilder besitzen, die in einer eigenen Entität verwaltet werden. Über die Zwischentabelle Favorit wird die n:m-Beziehung zwischen Benutzer und Inserat abgebildet, da ein Benutzer mehrere Inserate favorisieren kann und ein Inserat von mehreren Benutzern favorisiert werden kann.
 
 Für den Chat wird pro Inserat und Interessent eine Konversation angelegt, die den Käufer, den Verkäufer und das Inserat referenziert. Zu jeder Konversation gehören mehrere Nachrichten mit Sender, Inhalt und Zeitstempel. Meldungen zu Inseraten werden in einer eigenen Entität gespeichert, die das gemeldete Inserat und den meldenden Nutzer referenziert und Grund, Status sowie Zeitstempel enthält.
-![Datenmodell von THMarket (Chen-Notation)](s2-datenmodell.svg)
+
+![Datenmodell von THMarket (Chen-Notation)](d1-datenmodell.svg)
 
 *Abbildung 7: Datenmodell von THMarket (ER-Diagramm, Chen-Notation)* 
