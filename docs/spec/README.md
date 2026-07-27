@@ -44,9 +44,9 @@
 
 | Baustein | Titel | Status | Datei |
 |---|---|---|---|
-| S1 | Nachbarsysteme | ✅ | `` |
+| S1 | Nachbarsysteme | ✅ | [`S1-nachbarsysteme.md`](S1-nachbarsysteme.md) |
 | S2 | Datenmigration | ⛔ | — |
-| S3 | Inbetriebnahme | ✅ | `` |
+| S3 | Inbetriebnahme | ✅ | [`S3-inbetriebname.md`](S3-inbetriebnahme.md) |
 
 ### 6. Querschnittliche Aspekte
 
