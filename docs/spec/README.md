@@ -36,7 +36,7 @@
 
 | Baustein | Titel | Status | Datei |
 |---|---|---|---|
-| B1 | Dialogspezifikation | 🛠 | `` |
+| B1 | Dialogspezifikation | ✅ | [`B1-dialogspezifikation.md`](B1-dialogspezifikation.md) |
 | B2 | Stapelverarbeitung | 🛠 | — |
 | B3 | Druckausgabe | 🛠 | — |
 
