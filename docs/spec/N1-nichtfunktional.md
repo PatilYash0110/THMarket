@@ -1,6 +1,4 @@
-# 6. Nichtfunktionale Anforderungen & Konzepte
-
-## 6.1 Nichtfunktionale Anforderungen
+# N1 Nichtfunktionale Anforderungen
 
 Die nichtfunktionalen Anforderungen definieren die Qualitätsmerkmale von THMarket in Bezug auf Leistung, Sicherheit, Benutzerfreundlichkeit und Wartbarkeit.
 
