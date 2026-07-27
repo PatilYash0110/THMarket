@@ -21,9 +21,9 @@
 
 | Baustein | Titel | Status | Datei |
 |---|---|---|---|
-| F1 | Geschäftsprozesse | 🛠 | `` |
-| F2 | Anwendungsfälle | 🛠 | `` |
-| F3 | Anwendungsfunktionen | 🛠 | `` |
+| F1 | Geschäftsprozesse | ✅ | [`F1-geschaeftsprozesse.md`](F1-geschaeftsprozesse.md) |
+| F2 | Anwendungsfälle | ✅ | [`F2-anwendungsfaelle.md`](F2-anwendungsfaelle.md) |
+| F3 | Anwendungsfunktionen | ✅ | [`F3-anwendungsfunktionen.md`](F3-anwendungsfunktionen.md) |
 
 ### 3. Daten
 
