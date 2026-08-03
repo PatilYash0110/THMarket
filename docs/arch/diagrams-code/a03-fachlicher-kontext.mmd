@@ -1,0 +1,14 @@
+graph LR
+    Nutzer(("Gast oder<br/>Verifizierter Nutzer"))
+    Admin(("Admin"))
+    subgraph System["System THMarket (Blackbox)"]
+        THM["THMarket"]
+    end
+    Gemini["Gemini-API<br/>(KI-Beschreibung)"]
+    Cloudinary["Cloudinary<br/>(Bildspeicher)"]
+    SMTP["SMTP-Mailserver<br/>(Verifizierung)"]
+    Nutzer -->|"nutzt"| THM
+    Admin -->|"administriert"| THM
+    THM -->|"Bild + Prompt / Text"| Gemini
+    THM -->|"Bild-Upload / URL"| Cloudinary
+    THM -->|"Verifizierungs-Mail"| SMTP
