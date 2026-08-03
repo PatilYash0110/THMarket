@@ -1,0 +1,17 @@
+graph LR
+    subgraph Client["Client"]
+        Browser["Browser<br/>(React / Vite)"]
+    end
+    subgraph Server["NestJS-Server (Render)"]
+        API["THMarket Backend<br/>(REST + Socket.io)"]
+    end
+    DB[("PostgreSQL<br/>(Neon)")]
+    Gemini["Gemini-API"]
+    Cloudinary["Cloudinary"]
+    SMTP["SMTP-Mailserver"]
+    Browser -->|"HTTPS / REST"| API
+    Browser -->|"WebSocket (Socket.io)"| API
+    API -->|"SQL"| DB
+    API -->|"HTTPS / JSON"| Gemini
+    API -->|"HTTPS"| Cloudinary
+    API -->|"SMTP"| SMTP
