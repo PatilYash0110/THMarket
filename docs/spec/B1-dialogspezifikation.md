@@ -19,7 +19,7 @@ Die Dialoglandkarte zeigt die Struktur und Navigation der THMarket-Anwendung. Si
 Die Dialoglandkarte stellt vereinfacht dar, welche Dialoge es gibt und wie zwischen ihnen navigiert werden kann – etwa vom Login zum Marktplatz oder vom Marktplatz zur Inseratdetailseite und von dort in den Chat. Die genauen Abläufe, Auslöser und Wirkungen werden in Kapitel 4.2 beschrieben.
 **Hinweis:** Ein Logout ist grundsätzlich von jedem Dialog aus möglich. Um die Darstellung nicht zu überladen, wird diese Möglichkeit nicht an jeder Stelle einzeln dargestellt, sondern gilt als durchgängig verfügbar.
 <p align="center">
-  <img src="b1-dialoglandkarte.png" alt="Dialoglandkarte der THMarket-Anwendung" width="900">
+  <img src="B1-dialogspezifikation_01-dialoglandkarte.png" alt="Dialoglandkarte der THMarket-Anwendung" width="900">
 </p>
 
 <p align="center"><em>Abbildung 8: Übersicht der Dialoglandkarte der Benutzeroberfläche</em></p>
