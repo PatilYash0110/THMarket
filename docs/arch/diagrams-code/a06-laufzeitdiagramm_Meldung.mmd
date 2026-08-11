@@ -1,0 +1,13 @@
+%% Abbildung 16: Laufzeitsicht - Meldung
+sequenceDiagram
+    actor U as Nutzer
+    actor Adm as Administrator
+    participant R as Melde-/Admin-Modul
+    participant DB as Datenbank
+    U->>R: Inserat/Nutzer melden (+ ggf. Chat, mit Einwilligung)
+    R->>DB: Meldung speichern (Status = offen)
+    Adm->>R: Admin Panel öffnen
+    R->>DB: Meldungen (Warteschlange)
+    Adm->>R: Maßnahme wählen (Verwarnung / ausblenden / Sperre)
+    R->>DB: Massnahme ausführen + Audit Log
+    R->>DB: Meldung = erledigt
