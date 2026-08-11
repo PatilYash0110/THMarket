@@ -1,0 +1,19 @@
+%% Abbildung 12: Laufzeitsicht - Registrierung & Verifizierung
+sequenceDiagram
+    actor S as THM-Student
+    participant FE as Frontend
+    participant API as AuthController
+    participant SVC as AuthService
+    participant DB as Datenbank
+    participant M as SMTP
+    S->>FE: Formular (E-Mail, Passwort)
+    FE->>API: POST /auth/register
+    API->>SVC: register(dto)
+    SVC->>SVC: THM-Domain pruefen (.thm.de)
+    SVC->>SVC: Passwort hashen, Token erzeugen
+    SVC->>DB: User anlegen (isVerified = false)
+    SVC->>M: Verifizierungs-E-Mail senden
+    M-->>S: E-Mail mit Bestaetigungslink
+    S->>API: GET /auth/verify?token
+    API->>DB: isVerified = true
+    API-->>FE: Bestaetigung (Pop-up)
