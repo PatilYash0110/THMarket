@@ -1,0 +1,31 @@
+@startuml
+title Bausteinsicht — Ebene 2: Whitebox Inserat Management
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam monochrome true
+skinparam ArrowColor #333333
+skinparam folderBackgroundColor #ECECEC
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam nodesep 55
+skinparam ranksep 70
+top to bottom direction
+rectangle "Inserat Management  (Whitebox — Ebene 2)" as LM {
+  folder "Inserat Verwaltung" as a
+  folder "Bild Upload" as b
+  folder "KI Beschreibung" as c
+  folder "Suche & Filter" as d
+  folder "Favoriten" as e
+}
+database "Datenbank" as db
+folder "Cloudinary" as cloud
+folder "Google Gemini API" as gemini
+
+b .down.> a : Bild-URLs
+c .down.> a : Entwurf
+b -down-> cloud : Bild-Upload
+c -down-> gemini : KI-Beschreibung
+a -down-> db
+d -down-> db
+e -down-> db
+@enduml
