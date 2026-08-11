@@ -1,11 +1,11 @@
 %% Abbildung 14: Laufzeitsicht - Echtzeit-Chat
 sequenceDiagram
-    actor A as Kaeufer
-    actor B as Verkaeufer
+    actor A as Käufer
+    actor B as Verkäufer
     participant WS as Socket.io-Gateway
     participant DB as Datenbank
     A->>WS: connect (JWT im Handshake)
-    WS->>WS: Token pruefen
+    WS->>WS: Token prüfen
     A->>WS: sendMessage(conversationId, text)
     WS->>DB: Nachricht speichern
     WS-->>B: Nachricht in Echtzeit
