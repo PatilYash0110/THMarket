@@ -1,6 +1,6 @@
 %% Abbildung 15: Laufzeitsicht - Mock-Kauf
 sequenceDiagram
-    actor K as Kaeufer
+    actor K as Käufer
     participant FE as Frontend
     participant P as PaymentsController
     participant SVC as PaymentsService
@@ -11,8 +11,8 @@ sequenceDiagram
     alt Methode = Simulation
         SVC->>SVC: Zahlung simulieren (kein Geldfluss)
     else Methode = In-App-Guthaben
-        SVC->>DB: Guthaben des Verkaeufers erhoehen
+        SVC->>DB: Guthaben des Verkäufers erhöhen
     end
     SVC->>DB: Transaktion speichern, Inserat = VERKAUFT
-    SVC-->>FE: Kaufbestaetigung
-    Note over DB: Verkaeufer sieht Kauf in "Verkaeufe"
+    SVC-->>FE: Kaufbestätigung
+    Note over DB: Verkäufer sieht Kauf in "Verkäufe"
