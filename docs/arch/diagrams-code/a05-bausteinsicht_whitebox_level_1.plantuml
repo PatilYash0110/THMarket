@@ -1,0 +1,38 @@
+@startuml
+title Bausteinsicht — Ebene 1 (Whitebox THMarket)
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam monochrome true
+skinparam ArrowColor #333333
+skinparam folderBackgroundColor #ECECEC
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam nodesep 55
+skinparam ranksep 70
+top to bottom direction
+
+rectangle "THMarket  (Whitebox — Ebene 1)" as SYS {
+  folder "User Management" as um
+  folder "Inserat Management" as lm
+  folder "Kommunikation" as com
+  folder "Transaktion Management" as tm
+  folder "Admin Management" as am
+  database "Datenbank" as db
+
+  um -down-> db
+  lm -down-> db
+  com -down-> db
+  tm -down-> db
+  am -down-> db
+}
+
+folder "Gmail SMTP" as smtp
+folder "Cloudinary" as cloud
+folder "Google Gemini API" as gemini
+folder "Neon PostgreSQL" as neon
+
+um -down-> smtp : Verifizierungs-Mail
+lm -down-> cloud : Bild-Upload
+lm -down-> gemini : KI-Beschreibung
+db -down-> neon : Datenhaltung
+@enduml
