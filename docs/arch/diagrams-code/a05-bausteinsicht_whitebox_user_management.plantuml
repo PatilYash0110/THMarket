@@ -1,0 +1,28 @@
+@startuml
+title Bausteinsicht — Ebene 2: Whitebox User Management
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam monochrome true
+skinparam ArrowColor #333333
+skinparam folderBackgroundColor #ECECEC
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam nodesep 55
+skinparam ranksep 70
+top to bottom direction
+rectangle "User Management  (Whitebox — Ebene 2)" as UM {
+  folder "Registrierung" as a
+  folder "E-Mail Verifizierung" as b
+  folder "Login (JWT)" as c
+  folder "Profil & Guthaben" as d
+  folder "JWT Guard / Rollen" as e
+}
+database "Datenbank" as db
+folder "Gmail SMTP" as smtp
+
+b -down-> smtp : Verifizierungs-Mail
+a -down-> db
+b -down-> db
+c -down-> db
+d -down-> db
+@enduml
