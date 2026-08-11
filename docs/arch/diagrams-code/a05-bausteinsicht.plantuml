@@ -1,0 +1,117 @@
+@startuml
+title Bausteinsicht — Zerlegungsübersicht (Verfeinerungsebenen 0 → 2)
+
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam monochrome true
+skinparam ArrowColor #333333
+skinparam folderBackgroundColor #ECECEC
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 80
+
+top to bottom direction
+
+' ===================== Ebene 0 =====================
+rectangle "Ebene 0 — Systemkontext" as L0 {
+  actor "THM Student" as student
+  actor "Administrator" as admin
+  folder "THMarket" as sys
+  
+  folder "Neon PostgreSQL" as neon
+  folder "Cloudinary" as cloud
+  folder "Google Gemini API" as gemini
+  folder "Gmail SMTP" as smtp
+
+  student -down-> sys
+  admin -down-> sys
+  
+  sys -down-> neon
+  sys -down-> cloud
+  sys -down-> gemini
+  sys -down-> smtp
+}
+
+' ===================== Ebene 1 =====================
+rectangle "Ebene 1 — THMarket" as L1 {
+  folder "Admin Management" as am
+  folder "Transaktion Management" as tm
+  folder "Kommunikation" as com
+  folder "Inserat Management" as lm
+  folder "User Management" as um
+  
+  database "Datenbank" as db
+
+  am -down-> um
+  am -down-> lm
+  am -down-> com
+
+  tm -right-> um
+  tm -right-> lm
+
+  com -down-> um
+  com -down-> lm
+  
+  lm -down-> um
+
+  ' Database connections
+  am -down-> db
+  tm -down-> db
+  com -down-> db
+  lm -down-> db
+  um -down-> db
+}
+
+' ===================== Ebene 2 =====================
+rectangle "Ebene 2 — Detailansichten" as L2 {
+    together {
+      rectangle "User Management\n(Whitebox)" as L2UM {
+        folder "Registrierung" as um1
+        folder "E-Mail Verifizierung" as um2
+        folder "Login (JWT)" as um3
+        folder "Profil & Guthaben" as um4
+        folder "JWT Guard / Rollen" as um5
+      }
+
+      rectangle "Inserat Management\n(Whitebox)" as L2LM {
+        folder "Inserat Verwaltung" as lm1
+        folder "Bild Upload" as lm2
+        folder "KI Beschreibung" as lm3
+        folder "Suche & Filter" as lm4
+        folder "Favoriten" as lm5
+      }
+
+      rectangle "Kommunikation\n(Whitebox)" as L2COM {
+        folder "Konversationsverwaltung" as com1
+        folder "Nachrichtenversand" as com2
+        folder "Nachrichten Persistenz" as com3
+      }
+
+      rectangle "Transaction Management\n(Whitebox)" as L2TM {
+        folder "Mock Zahlung" as tm1
+        folder "Guthaben Verwaltung" as tm2
+        folder "Bewertungen" as tm3
+      }
+
+      rectangle "Admin Management\n(Whitebox)" as L2AM {
+        folder "Meldungsverwaltung" as am1
+        folder "Maßnahmen" as am2
+        folder "Audit Log" as am3
+      }
+    }
+}
+
+
+L0 -[hidden]down-> L1
+L1 -[hidden]down-> L2
+
+
+sys .down.> L1 : verfeinert
+um  .down.> L2UM : verfeinert
+lm  .down.> L2LM : verfeinert
+com .down.> L2COM : verfeinert
+tm  .down.> L2TM : verfeinert
+am  .down.> L2AM : verfeinert
+
+@enduml
