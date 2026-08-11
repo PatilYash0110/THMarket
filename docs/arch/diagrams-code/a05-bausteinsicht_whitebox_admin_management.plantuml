@@ -1,0 +1,24 @@
+@startuml
+title Bausteinsicht — Ebene 2: Whitebox Admin Management
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam monochrome true
+skinparam ArrowColor #333333
+skinparam folderBackgroundColor #ECECEC
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam nodesep 55
+skinparam ranksep 70
+top to bottom direction
+rectangle "Admin Management  (Whitebox — Ebene 2)" as AM {
+  folder "Meldungsverwaltung" as a
+  folder "Maßnahmen" as b
+  folder "Audit Log" as c
+}
+database "Datenbank" as db
+
+b -down-> c : protokolliert
+a -down-> db
+b -down-> db
+c -down-> db
+@enduml
