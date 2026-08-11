@@ -1,0 +1,20 @@
+%% Abbildung 13: Laufzeitsicht - Inserat mit KI-Beschreibung
+sequenceDiagram
+    actor S as THM-Student
+    participant FE as Frontend
+    participant L as ListingsController
+    participant C as Cloudinary
+    participant AI as AiService
+    participant G as Google Gemini
+    participant DB as Datenbank
+    S->>FE: Bilder hochladen
+    FE->>L: POST /listings/images
+    L->>C: Bilder speichern (EXIF entfernt)
+    C-->>L: Bild-URLs
+    L->>AI: generateDescription(urls)
+    AI->>G: Bilder -> Titel/Beschreibung/Kategorie
+    G-->>AI: JSON-Entwurf
+    AI-->>FE: Entwurf (editierbar)
+    S->>FE: anpassen & veroeffentlichen
+    FE->>L: POST /listings
+    L->>DB: Inserat speichern (Status = AKTIV)
