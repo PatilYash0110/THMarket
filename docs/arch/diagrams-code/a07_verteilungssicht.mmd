@@ -1,0 +1,22 @@
+%% Abbildung 17: Verteilungssicht
+flowchart LR
+    client["Endgeraet<br/>Browser (SPA)"]
+    subgraph Vercel
+        fe["Frontend<br/>React/Vite"]
+    end
+    subgraph Render
+        be["Backend<br/>NestJS"]
+    end
+    subgraph Neon
+        db[("PostgreSQL")]
+    end
+    cl["Cloudinary"]
+    gm["Google Gemini API"]
+    sm["Gmail SMTP"]
+    client -->|HTTPS| fe
+    client -->|"HTTPS / WSS"| be
+    fe -->|API| be
+    be -->|TLS| db
+    be --> cl
+    be --> gm
+    be --> sm
