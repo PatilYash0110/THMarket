@@ -1,0 +1,14 @@
+%% Abbildung 11: Laufzeitsicht - Allgemeiner Ablauf
+sequenceDiagram
+    actor U as Nutzer
+    participant FE as Frontend
+    participant C as Controller
+    U->>FE: Aktion (Button-Klick)
+    FE->>C: REQUEST /endpoint
+    alt Erfolg
+        C-->>FE: Response OK
+        FE-->>U: Ergebnis anzeigen
+    else Fehler
+        C-->>FE: Response Fehler
+        FE-->>U: Fehlermeldung anzeigen
+    end
