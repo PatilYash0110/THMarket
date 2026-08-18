@@ -22,6 +22,8 @@ Zwischen den fünf Modulen gibt es außerdem fachliche Abhängigkeiten, die in d
 - **Transaktion Management** braucht User Management und Inserat Management — um zu wissen, wer kauft, wer verkauft und welches Inserat gekauft wird.
 - **Kommunikation** braucht ebenfalls User Management und Inserat Management — der Chat findet zwischen zwei Nutzern über ein bestimmtes Inserat statt.
 - **Inserat Management** braucht seinerseits User Management, um den Anbieter eines Inserats zu kennen.
+![Whitebox THMarket Ebene 1](diagram_images/a05-bausteinsicht_whitebox_level_1.png)
+ 
 *(Quelltext: `diagrams-code/a05-bausteinsicht_whitebox_level_1.plantuml`)*
  
 **Die fünf Module im Überblick:**
@@ -75,6 +77,8 @@ Die E-Mail Verifizierung spricht zusätzlich mit Gmail SMTP, um den Bestätigung
 Der JWT Guard / Rollen-Teil prüft Anfragen anhand des Tokens, hat dafür aber keine eigene, direkte Datenbankverbindung eingezeichnet — er arbeitet mit den Daten, die Login bzw.
 Registrierung bereits abgelegt haben.
  
+![Whitebox User Management](diagram_images/a05-bausteinsicht_whitebox_user_management.png)
+ 
 *(Quelltext: `diagrams-code/a05-bausteinsicht_whitebox_user_management.plantuml`)*
  
 ### 5.2.2 Whitebox „Inserat Management"
@@ -85,6 +89,8 @@ Bild Upload liefert der Inserat Verwaltung die Bild-URLs, KI Beschreibung liefer
 Bild Upload spricht dafür mit Cloudinary, KI Beschreibung mit der Google Gemini API.
 Inserat Verwaltung, Suche & Filter und Favoriten greifen jeweils direkt auf die Datenbank zu.
  
+![Whitebox Inserat Management](diagram_images/a05-bausteinsicht_whitebox_inserat_management.png)
+ 
 *(Quelltext: `diagrams-code/a05-bausteinsicht_whitebox_inserat_management.plantuml`)*
  
 ### 5.2.3 Whitebox „Kommunikation"
@@ -93,6 +99,8 @@ Besteht aus drei Teilen: **Konversationsverwaltung**, **Nachrichtenversand** und
  
 Der Nachrichtenversand übergibt jede einzelne Nachricht in Echtzeit an die Nachrichten Persistenz, die sie dauerhaft in der Datenbank ablegt.
 Auch die Konversationsverwaltung greift eigenständig auf die Datenbank zu, um Konversationen anzulegen und Teilnehmer zuzuordnen.
+ 
+![Whitebox Kommunikation](diagram_images/a05-bausteinsicht_whitebox_kommunikation.png)
  
 *(Quelltext: `diagrams-code/a05-bausteinsicht_whitebox_kommunikation.plantuml`)*
  
@@ -104,6 +112,8 @@ Im Guthaben-Modus ruft die Mock Zahlung die Guthaben Verwaltung auf, damit diese
 Unabhängig vom gewählten Modus setzt die Mock Zahlung außerdem das betroffene Inserat in der Datenbank auf den Status VERKAUFT.
 Guthaben Verwaltung und Bewertungen greifen jeweils eigenständig auf die Datenbank zu.
  
+![Whitebox Transaktion Management](diagram_images/a05-bausteinsicht_whitebox_transaktion_management.png)
+ 
 *(Quelltext: `diagrams-code/a05-bausteinsicht_whitebox_transaktion_management.plantuml`)*
  
 ### 5.2.5 Whitebox „Admin Management"
@@ -112,5 +122,7 @@ Besteht aus drei Teilen: **Meldungsverwaltung**, **Maßnahmen** und **Audit Log*
  
 Jede Maßnahme, die der Admin ergreift, wird vom Audit-Log-Teil protokolliert — die Maßnahmen-Komponente schreibt also nicht nur die eigentliche Aktion, sondern stößt zusätzlich den Log-Eintrag an.
 Meldungsverwaltung, Maßnahmen und Audit Log greifen alle jeweils eigenständig auf die Datenbank zu.
+ 
+![Whitebox Admin Management](diagram_images/a05-bausteinsicht_whitebox_admin_management.png)
  
 *(Quelltext: `diagrams-code/a05-bausteinsicht_whitebox_admin_management.plantuml`)*
