@@ -28,6 +28,8 @@ sequenceDiagram
 ```
 
 *Abbildung 11: Laufzeitsicht — Allgemeiner Ablauf*
+
+![Allgemeiner Ablauf](diagram_images/a06-laufzeitdiagramm_allgemeiner_ablauf.png)
 *(Quelltext: `diagrams-code/a06-laufzeitdiagramm_allgemeiner_ablauf.mmd`)*
 
 ## 6.2 Registrierung & Verifizierung
@@ -63,6 +65,8 @@ sequenceDiagram
 ```
 
 *Abbildung 12: Laufzeitsicht — Registrierung & Verifizierung*
+
+![Registrierung & Verifizierung](diagram_images/a06-laufzeitdiagramm_registrierung_verifizierung.png)
 *(Quelltext: `diagrams-code/a06-laufzeitdiagramm_registrierung_verifizierung.mmd`)*
 
 ## 6.3 Inserat mit KI-Beschreibung
@@ -98,6 +102,8 @@ sequenceDiagram
 ```
 
 *Abbildung 13: Laufzeitsicht — Inserat mit KI-Beschreibung*
+
+![Inserat mit KI-Beschreibung](diagram_images/a06-laufzeitdiagramm_Inserat_KI_Beschreibung.png)
 *(Quelltext: `diagrams-code/a06-laufzeitdiagramm_Inserat_KI_Beschreibung.mmd`)*
 
 ## 6.4 Echtzeit-Chat
@@ -123,6 +129,8 @@ sequenceDiagram
 ```
 
 *Abbildung 14: Laufzeitsicht — Echtzeit-Chat*
+
+![Echtzeit-Chat](diagram_images/a06-laufzeitdiagramm_echtzeit_chat.png)
 *(Quelltext: `diagrams-code/a06-laufzeitdiagramm_echtzeit_chat.mmd`)*
 
 ## 6.5 Mock-Kauf
@@ -156,6 +164,8 @@ sequenceDiagram
 ```
 
 *Abbildung 15: Laufzeitsicht — Mock-Kauf*
+
+![Mock-Kauf](diagram_images/a06-laufzeitdiagramm_mock_kauf.png)
 *(Quelltext: `diagrams-code/a06-laufzeitdiagramm_mock_kauf.mmd`)*
 
 ## 6.6 Meldung
@@ -184,6 +194,8 @@ sequenceDiagram
 ```
 
 *Abbildung 16: Laufzeitsicht — Meldung*
+
+![Meldung](diagram_images/a06-laufzeitdiagramm_Meldung.png)
 *(Quelltext: `diagrams-code/a06-laufzeitdiagramm_Meldung.mmd`)*
 
 ## 6.7 Zusammenfassung
