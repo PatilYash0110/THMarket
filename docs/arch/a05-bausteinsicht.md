@@ -86,7 +86,7 @@ Registrierung bereits abgelegt haben.
 Besteht aus fünf Teilen: **Inserat Verwaltung**, **Bild Upload**, **KI Beschreibung**, **Suche & Filter** und **Favoriten**.
  
 Bild Upload liefert der Inserat Verwaltung die Bild-URLs, KI Beschreibung liefert ihr den Beschreibungsentwurf — beide sind also Zulieferer für die eigentliche Inserat Verwaltung, nicht eigenständige Endpunkte für den Nutzer.
-Bild Upload spricht dafür mit Cloudinary, KI Beschreibung mit der Google Gemini API.
+Bild Upload spricht dafür mit Cloudinary (dabei werden EXIF-Metadaten, u. a. GPS-Standortdaten, aus den Bildern entfernt), KI Beschreibung mit der Google Gemini API.
 Inserat Verwaltung, Suche & Filter und Favoriten greifen jeweils direkt auf die Datenbank zu.
  
 ![Whitebox Inserat Management](diagram_images/a05-bausteinsicht_whitebox_inserat_management.png)
