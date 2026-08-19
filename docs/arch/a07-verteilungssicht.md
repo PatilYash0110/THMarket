@@ -2,7 +2,7 @@
 
 Die Verteilungssicht beschreibt die Betriebsumgebung von THMarket auf kostenlosen Cloud-Tarifen. Die Softwarebausteine werden auf verschiedene Infrastruktur-Komponenten verteilt, um Wartbarkeit und einen kostenfreien Betrieb zu gewährleisten.
 
-[Abbildung 11: Verteilungssicht – Clientgeräte, Vercel (Frontend), Render (NestJS), Neon (Postgres), externe Dienste]
+![Verteilungssicht](diagram_images/a07-verteilungssicht.png)
 
 *Abbildung 11: Verteilungssicht Übersicht*
 
