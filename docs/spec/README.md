@@ -14,7 +14,7 @@
 
 | Baustein | Titel | Status | Datei |
 |---|---|---|---|
-| P1 | Ziele und Rahmenbedingungen | ✅ | [`P1-ziele-rahmenbedingungen.md`](P1-ziele-rahmenbedingungen) |
+| P1 | Ziele und Rahmenbedingungen | ✅ | [`P1-ziele-rahmenbedingungen.md`](P1-ziele-rahmenbedingungen.md) |
 | P2 | Architekturüberblick | ✅ | [`P2-architekturueberblick.md`](P2-architekturueberblick.md) |
 
 ### 2. Prozesse und Funktionen
