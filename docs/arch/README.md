@@ -22,7 +22,7 @@ Referenz-Template: https://arc42.org/.
 | 4 | Lösungsstrategie | ✅ | [`a04-loesungsstrategie.md`](a04-loesungsstrategie.md) |
 | 5 | Bausteinsicht | ✅ | [`a05-bausteinsicht.md`](a05-bausteinsicht.md) |
 | 6 | Laufzeitsicht | ✅ | [`a06-laufzeitsicht.md`](a06-laufzeitsicht.md) |
-| 7 | Verteilungssicht | ✅ | |
+| 7 | Verteilungssicht | ✅ | [`a07-verteilungssicht.md`] (a07-verteilungssicht.md) |
 | 8 | Querschnittliche Konzepte | 🛠 | |
 | 9 | Architekturentscheidungen (ADRs) | 🛠 | |
 | 10 | Qualitätsanforderungen | ✅ | |
