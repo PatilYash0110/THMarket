@@ -25,6 +25,6 @@ Referenz-Template: https://arc42.org/.
 | 7 | Verteilungssicht | ✅ | [`a07-verteilungssicht.md`](a07-verteilungssicht.md) |
 | 8 | Querschnittliche Konzepte | 🛠 | |
 | 9 | Architekturentscheidungen (ADRs) | 🛠 | |
-| 10 | Qualitätsanforderungen | ✅ | |
-| 11 | Risiken und technische Schulden | ✅ | |
-| 12 | Glossar | ✅ | |
+| 10 | Qualitätsanforderungen | ✅ | [`a10-qualitaetsanforderungen.md`](a10-qualitaetsanforderungen.md) |
+| 11 | Risiken und technische Schulden | ✅ | [`a11-risiken-und-technische-schulden.md`](a11-risiken-und-teschnische-schulden.md) |
+| 12 | Glossar | ✅ | [`a12-glossar.md`](a12-glossar.md)  |
