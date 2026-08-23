@@ -262,3 +262,26 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 | 16 | Qualitäten | Nur berechtigte Admins dürfen Zugriff haben. Entscheidungen sind sofort wirksam und werden protokolliert. |
 
 *Tabelle 12: Use Case UC11 – Meldungen & Inserate moderieren (Admin)*
+
+### UC12 – Kauf abschließen
+
+| Nr. | Abschnitt | Inhalt / Erläuterung |
+| --- | --- | --- |
+| 01 | Bezeichner | UC12 |
+| 02 | Name | Kauf abschließen |
+| 03 | Autoren | Projektteam |
+| 04 | Priorität | Hoch. Kernfunktion für den Abschluss eines Handels. |
+| 05 | Kritikalität | Mittel. Wichtig für den Ablauf, aber ohne echten Geldfluss. |
+| 06 | Verantwortlicher | Backend-Team (Logik, Speicherung), Frontend-Team (Kauf- und Bewertungsformular) |
+| 07 | Beschreibung | Ein eingeloggter Nutzer schließt den Kauf eines fremden Inserats ab. Er wählt einen Zahlungsmodus (Simulation oder In-App-Guthaben). Das System speichert die Transaktion und markiert das Inserat als verkauft. Im Anschluss kann der Käufer den Verkäufer bewerten. |
+| 08 | Auslösendes Ereignis | Der Nutzer klickt bei einem fremden Inserat auf „Kaufen“. |
+| 09 | Akteure | Eingeloggte Nutzer (als Käufer). |
+| 10 | Vorbedingung | Der Nutzer ist eingeloggt und betrachtet ein Inserat, dessen Anbieter er nicht selbst ist. |
+| 11 | Nachbedingung | Die Transaktion ist gespeichert, das Inserat ist als verkauft markiert; bei Nutzung des In-App-Guthabens wurde der Betrag verrechnet. |
+| 12 | Ergebnis | Der Kauf ist abgeschlossen; optional wurde eine Bewertung abgegeben. |
+| 13 | Hauptszenario | 1. Der Nutzer klickt bei einem Inserat auf „Kaufen“. 2. Der Kauf-Dialog öffnet sich. 3. Der Nutzer wählt einen Zahlungsmodus. 4. Der Nutzer bestätigt den Kauf. 5. Das System speichert die Transaktion und markiert das Inserat als verkauft. 6. Der Nutzer kann optional eine Bewertung abgeben. |
+| 14 | Alternativszenarien | Der Nutzer bricht den Kauf ab – keine Speicherung. Er verzichtet auf die Bewertung – der Kauf bleibt trotzdem gültig. |
+| 15 | Ausnahme Szenario | Datenbank nicht erreichbar – der Kauf wird nicht gespeichert und eine Fehlermeldung wird angezeigt. |
+| 16 | Qualitäten | Es findet keine echte Zahlungsabwicklung statt. Der Kaufabschluss soll in maximal drei Sekunden erfolgen. |
+
+*Tabelle 13: Use Case UC12 – Kauf abschließen*
