@@ -4,7 +4,7 @@ THMarket ist die Vermittlungsplattform zwischen Studierenden der THM. Um die App
 
 Ist man eingeloggt, kann man Inserate erstellen, durchsuchen und über den Chat mit anderen Nutzern schreiben. Zusätzlich gibt es einen Admin, der Nutzerkonten verwaltet und sich um gemeldete Inserate kümmert.
 
-![Systemkontextdiagramm der THMarket-Anwendung](p2-systemkontextdiagramm.jpg)
+![Systemkontextdiagramm der THMarket-Anwendung](p2-systemkontextdiagramm.png)
 
 *Abbildung 1: Systemkontextdiagramm der THMarket-Anwendung*
 
