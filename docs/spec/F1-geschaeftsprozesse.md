@@ -35,6 +35,8 @@ Typische Aktionen:
 - Favorit speichern
 - Chat mit anderen Nutzern führen
 - Inserat melden
+- Insersat kaufen
+- Verkäufer bewerten
 - Eigene Inserate verwalten (bearbeiten/löschen)
 
 #### 4. Admin
@@ -44,7 +46,7 @@ Der Admin ist ein spezieller Akteur mit erweiterten Verwaltungs- und Kontrollrec
 Typische Aktionen:
 
 - Nutzerkonten verwalten (bearbeiten, sperren, löschen)
-- Gemeldete Inserate prüfen und ggf. entfernen
+- Gemeldete Inserate prüfen und Maßnahmen ergreifen (Verwarnung, Ausblenden, Sperre)
 - Meldungen bearbeiten
 - Logs/Aktivitäten einsehen
 
@@ -54,11 +56,11 @@ Typische Aktionen:
 
 ### Typischer Geschäftsprozess
 
-Der typische Ablauf beginnt mit dem Aufruf der Anwendung und der Weiterleitung auf die Login-Seite. Dort meldet sich der Nutzer entweder mit bestehenden Zugangsdaten an oder legt über die Registrierung ein neues Konto an, das anschließend per E-Mail-Verifizierung bestätigt werden muss. Nach erfolgreichem Login gelangt der Nutzer auf den Marktplatz, auf dem Inserate angezeigt, durchsucht und geöffnet werden können. Von dort sind alle weiteren Kernfunktionen wie Inserat erstellen, Favorit speichern, Chat und Melden erreichbar.
+Der typische Ablauf beginnt mit dem Aufruf der Anwendung und der Weiterleitung auf die Login-Seite. Dort meldet sich der Nutzer entweder mit bestehenden Zugangsdaten an oder legt über die Registrierung ein neues Konto an, das anschließend per E-Mail-Verifizierung bestätigt werden muss. Nach erfolgreichem Login gelangt der Nutzer auf den Marktplatz, auf dem Inserate angezeigt, durchsucht und geöffnet werden können. Von dort sind alle weiteren Kernfunktionen wie Inserat erstellen, Favorit speichern, Chat, Kaufen und Melden erreichbar.
 
-Eine Zahlungsabwicklung findet innerhalb von THMarket nicht statt. Interessent und Anbieter einigen sich über den integrierten Chat auf die Bezahlung und die Übergabe des Gegenstands. Die eigentliche Bezahlung und Übergabe erfolgen außerhalb des Systems.
+Kommt ein Kauf zustande, schließt der Käufer diesen über den simulierten Kauf-Dialog ab; eine Anbindung an einen echten Zahlungsdienstleister gibt es nicht. Die eigentliche Übergabe des Gegenstands klären Interessent und Anbieter über den integrierten Chat und regeln sie außerhalb des Systems.
 
-Gemeldete Inserate werden im Adminbereich angezeigt. Ein Administrator prüft die Meldung und kann das betroffene Inserat entfernen, die Meldung ablehnen oder als bearbeitet markieren.
+Gemeldete Inserate werden im Adminbereich angezeigt. Ein Administrator prüft die Meldung und kann eine Verwarnung aussprechen, das Inserat ausblenden oder den Nutzer sperren.
 
 ![Aktivitätsdiagramm zur Marktplatznutzung nach dem Login](f1-aktivitaetsdiagramm-marktplatznutzung.jpg)
 
