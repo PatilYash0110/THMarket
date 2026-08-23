@@ -8,9 +8,10 @@
     - [4.2.3 Marktplatz-Dialog (Dashboard)](#423-marktplatz-dialog-dashboard)
     - [4.2.4 Inseratdetail-Dialog](#424-inseratdetail-dialog)
     - [4.2.5 Inserat-erstellen-Dialog](#425-inserat-erstellen-dialog)
-    - [4.2.6 Chat-Dialog](#426-chat-dialog)
-    - [4.2.7 Profil-Dialog (Meine Inserate & Favoriten)](#427-profil-dialog-meine-inserate--favoriten)
-    - [4.2.8 Adminbereich-Dialog](#428-adminbereich-dialog)
+    - [4.2.6 Kauf-Dialog](#426-kauf-dialog)
+    - [4.2.7 Chat-Dialog](#427-chat-dialog)
+    - [4.2.8 Profil-Dialog (Meine Inserate & Favoriten)](#428-profil-dialog-meine-inserate--favoriten)
+    - [4.2.9 Adminbereich-Dialog](#429-adminbereich-dialog)
 
 
 # 4. Benutzerschnittstelle
@@ -138,6 +139,7 @@ Der Marktplatz ist die Startseite nach dem Login. Hier werden die aktuellen Inse
 | Kategorie | Dropdown | Nein | „Alle“ | Auswahl aus Liste | `Kategorie.name` |
 | Angebotstyp | Dropdown | Nein | „Alle“ | Verkauf / Miete | `Inserat.typ` |
 | Preis von/bis | Zahlenfeld | Nein | Nein | numerisch, ≥ 0 | `Inserat.preis` |
+| Campus | Dropdown | Nein | „Alle“ | Auswahl aus Liste | `Inserat.campus` |
 
 *Tab. 25: Dialogspezifikation Marktplatz-Dialog – Felder*
 
@@ -184,6 +186,7 @@ Die Detailansicht zeigt alle Informationen zu einem Inserat: Bildergalerie, Tite
 | Favorit speichern | Button „Favorit“ | Inserat wird der Favoritenliste hinzugefügt oder daraus entfernt | `Favorit.user_id`, `Favorit.inserat_id` | UC06 – Favorit speichern |
 | Anbieter kontaktieren | Button „Kontaktieren“ | Öffnet oder erstellt eine Konversation und öffnet den Chat | `Konversation.*` | UC07 – Chat mit Nutzer führen |
 | Inserat melden | Button „Melden“ | Öffnet das Meldeformular | `Meldung.*` | UC08 – Inserat melden |
+| Kaufen | Button „Kaufen“ | Öffnet den Kauf-Dialog | `Transaktion.*` | UC12 – Kauf abschließen (neu) |
 
 *Tab. 27: Dialogspezifikation Inseratdetail-Dialog – Aktionsliste*
 #### Zustände
@@ -222,6 +225,7 @@ In diesem Dialog legt der Nutzer ein neues Inserat an. Er gibt Titel, Beschreibu
 | Kategorie | Dropdown | Ja | „Bitte wählen“ | Auswahl treffen | `Kategorie.id` |
 | Angebotstyp | Dropdown | Ja | „Verkauf“ | Verkauf / Miete | `Inserat.typ` |
 | Preis | Zahlenfeld | Ja | Nein | numerisch, ≥ 0 | `Inserat.preis` |
+| Campus | Dropdown | Ja | „Bitte wählen“ | Auswahl treffen | `Inserat.campus` |
 | Bilder | Datei-Upload | Ja | Nein | Format und Größe | `Bild.*` |
 
 *Tab. 28: Dialogspezifikation Inserat-erstellen-Dialog – Felder*
@@ -232,6 +236,7 @@ In diesem Dialog legt der Nutzer ein neues Inserat an. Er gibt Titel, Beschreibu
 |---|---|---|---|---|
 | Inserat speichern | Button „Veröffentlichen“ | Validierung → Inserat und Bilder werden gespeichert oder Fehler angezeigt | `Inserat.*`, `Bild.*` | UC03 – Inserat erstellen |
 | Bild hinzufügen | Datei-Upload | Bild wird der Vorschau hinzugefügt | `Bild.*` | UC03 – Inserat erstellen |
+| Beschreibung vorschlagen | Button „Vorschlag generieren“ | Externer Dienst erzeugt Vorschlag für Titel/Beschreibung/Kategorie aus den Bildern | `Inserat.titel`, `Inserat.beschreibung`, `Kategorie.id` | UC03 – Inserat erstellen |
 | Abbrechen | Button „Abbrechen“ | Rückkehr zum Marktplatz ohne Speicherung | Kein Bezug | Kein Bezug |
 
 *Tab. 29: Dialogspezifikation Inserat-erstellen-Dialog – Aktionsliste*
@@ -241,7 +246,61 @@ In diesem Dialog legt der Nutzer ein neues Inserat an. Er gibt Titel, Beschreibu
 - Fehler: Leere Pflichtfelder oder ungültige Bilder → feldspezifische Fehlermeldungen
 - Erfolg: Bestätigung und Weiterleitung
 
-### 4.2.6 Chat-Dialog
+### 4.2.6 Kauf-Dialog
+
+Im Kauf-Dialog schließt der Käufer den Erwerb eines Inserats ab. Er wählt einen Zahlungsmodus (Simulation oder In-App-Guthaben). Nach Abschluss der Transaktion kann der Käufer den Verkäufer bewerten.
+
+> Mockup des Kauf-Dialogs wird noch ergänzt.
+
+*Abbildung 17: Mockup „Kauf abschließen“*
+
+#### Allgemeine Beschreibung
+
+- **Zweck des Dialogs:** Abschluss eines simulierten Kaufs und optionale Bewertung
+- **Anwendungsfall:** „Benutzer schließt einen Kauf ab“
+- **Ergebnis:** Transaktion wird gespeichert, Inserat als verkauft markiert
+- **Sichtbar für:** Eingeloggte Nutzer, die nicht selbst Anbieter des Inserats sind
+- **Besonderheiten:** Zwei Zahlungsmodi, anschließende Bewertungsmöglichkeit
+
+#### Navigationsmöglichkeiten
+
+- Über „Kaufen“ im Inseratdetail-Dialog → zu diesem Dialog
+- Nach Abschluss → zurück zur Inseratdetailseite oder zum Marktplatz
+
+#### Statik – Formular: Kauf-Formular (Felder)
+
+| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Bezug zum Datenmodell |
+|---|---|---|---|---|---|
+| Zahlungsmodus | Radiobutton | Ja | „Simulation“ | Auswahl treffen | `Transaktion.zahlungsmodus` |
+
+*Tab. 35: Dialogspezifikation Kauf-Dialog – Felder*
+
+#### Statik – Formular: Bewertungsformular (Felder)
+
+| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Bezug zum Datenmodell |
+|---|---|---|---|---|---|
+| Sterne | Sternebewertung | Ja | Nein | 1 bis 5 | `Bewertung.sterne` |
+| Kommentar | Textbereich | Nein | Nein | Freitext | `Bewertung.kommentar` |
+
+*Tab. 36: Dialogspezifikation Kauf-Dialog – Bewertungsfelder*
+
+#### Dynamik – Aktionsliste
+
+| Aktion | Auslöser | Wirkung | Bezug zum Datenmodell | Bezug zum Use Case |
+|---|---|---|---|---|
+| Kauf abschließen | Button „Kauf bestätigen“ | Transaktion wird gespeichert, Inserat als verkauft markiert | `Transaktion.*`, `Inserat.status` | UC12 – Kauf abschließen (neu) |
+| Bewertung abgeben | Button „Bewertung senden“ | Bewertung wird gespeichert | `Bewertung.*` | UC12 – Kauf abschließen (neu) |
+| Abbrechen | Button „Abbrechen“ | Rückkehr ohne Kaufabschluss | Kein Bezug | Kein Bezug |
+
+*Tab. 37: Dialogspezifikation Kauf-Dialog – Aktionsliste*
+
+#### Zustände
+
+- Standard: Zahlungsmodus-Auswahl möglich
+- Erfolg: Bestätigung, anschließend Bewertungsformular
+- Fehler: Datenbank nicht erreichbar → Fehlermeldung, Kauf wird nicht gespeichert
+
+### 4.2.7 Chat-Dialog
 
 Der Chat-Dialog ermöglicht die Echtzeit-Kommunikation zwischen Interessent und Anbieter zu einem Inserat. Links werden die vorhandenen Konversationen angezeigt, rechts der Nachrichtenverlauf der ausgewählten Konversation. Nachrichten werden über Socket.io in Echtzeit übertragen.
 
@@ -285,7 +344,7 @@ Der Chat-Dialog ermöglicht die Echtzeit-Kommunikation zwischen Interessent und 
 - Empfänger offline: Nachricht wird gespeichert und später zugestellt
 - Fehler: Verbindungsabbruch → Hinweis, dass die Nachricht nicht gesendet werden konnte
 
-### 4.2.7 Profil-Dialog (Meine Inserate & Favoriten)
+### 4.2.8 Profil-Dialog (Meine Inserate & Favoriten)
 
 Im Profildialog verwaltet der Nutzer seine eigenen Inserate und sieht seine Favoriten. Eigene Inserate können bearbeitet, als abgeschlossen markiert oder gelöscht werden. Über die Favoritenliste gelangt der Nutzer schnell zu gemerkten Inseraten.
 
@@ -319,7 +378,7 @@ Im Profildialog verwaltet der Nutzer seine eigenen Inserate und sieht seine Favo
 - Standard: Eigene Inserate und Favoriten werden angezeigt
 - Keine Inserate oder Favoriten vorhanden → entsprechender Hinweis
 
-### 4.2.8 Adminbereich-Dialog
+### 4.2.9 Adminbereich-Dialog
 
 Der Adminbereich stellt autorisierten Administratoren erweiterte Verwaltungsfunktionen zur Verfügung. Über eine Sidebar wechselt der Administrator zwischen Benutzerverwaltung, Meldungen und Logs beziehungsweise Aktivitäten. Der Bereich ist nur nach dem Login mit Adminrechten sichtbar.
 
@@ -350,7 +409,7 @@ Der Adminbereich stellt autorisierten Administratoren erweiterte Verwaltungsfunk
 |---|---|---|---|---|
 | Bereich wechseln | Klick auf Sidebar | Anzeige des gewählten Verwaltungsbereichs | Kein Bezug | UC10 / UC11 |
 | Nutzer bearbeiten, sperren oder löschen | Buttons in der Benutzerverwaltung | Änderung, Sperrung oder Löschung des Nutzers | `Benutzer.*` | UC10 – Nutzerkonten verwalten |
-| Meldung bearbeiten | Buttons im Bereich „Meldungen“ | Inserat entfernen, Meldung ablehnen oder als bearbeitet markieren | `Meldung.*`, `Inserat.id` | UC11 – Meldungen und Inserate moderieren |
+| Meldung bearbeiten | Buttons im Bereich „Meldungen“ | Verwarnung aussprechen, Inserat ausblenden oder Nutzer sperren | `Meldung.*`, `Inserat.id`, `Benutzer.id` | UC11 – Meldungen und Inserate moderieren |
 | Logs lesen | Bereich „Logs / Aktivitäten“ | Anzeige der Login-Logs | Kein Bezug | UC10 – Nutzerkonten verwalten |
 
 *Tab. 34: Dialogspezifikation Adminbereich – Aktionsliste*
