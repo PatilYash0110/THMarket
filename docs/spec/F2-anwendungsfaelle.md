@@ -250,13 +250,13 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 | 04 | Priorität | Mittel bis hoch. Wichtig für die Qualität der Plattform. |
 | 05 | Kritikalität | Mittel. Nicht systemkritisch, aber betriebsrelevant. |
 | 06 | Verantwortlicher | Backend-Team (Logik), Frontend-Team (Admin-Oberfläche) |
-| 07 | Beschreibung | Der Administrator sieht im Adminbereich offene Meldungen zu Inseraten und kann diese prüfen. Er kann das gemeldete Inserat entfernen, die Meldung ablehnen oder als bearbeitet markieren. |
+| 07 | Beschreibung | Der Administrator sieht im Adminbereich offene Meldungen zu Inseraten und kann diese prüfen. Er kann eine Verwarnung aussprechen, das Inserat ausblenden oder den Nutzer sperren. |
 | 08 | Auslösendes Ereignis | Der Admin öffnet den Bereich „Meldungen“. |
 | 09 | Akteure | Administrator. |
 | 10 | Vorbedingung | Der Admin ist eingeloggt und hat Berechtigung zur Bearbeitung von Meldungen. |
 | 11 | Nachbedingung | Die betroffene Meldung ist bearbeitet; das Inserat wurde ggf. entfernt. |
 | 12 | Ergebnis | Die Meldung wurde verarbeitet und der Zustand der Plattform aktualisiert. |
-| 13 | Hauptszenario | 1. Der Admin öffnet die Meldungsübersicht. 2. Der Admin wählt eine Meldung. 3. Der Admin prüft das gemeldete Inserat. 4. Der Admin trifft eine Entscheidung (entfernen / ablehnen / als bearbeitet markieren). 5. Die Entscheidung wird gespeichert. |
+| 13 | Hauptszenario | 1. Der Admin öffnet die Meldungsübersicht. 2. Der Admin wählt eine Meldung. 3. Der Admin prüft das gemeldete Inserat. 4. Der Admin trifft eine Entscheidung (Verwarnung / ausblenden / Sperre). 5. Die Entscheidung wird gespeichert. |
 | 14 | Alternativszenarien | Der Admin schließt den Vorgang ohne Entscheidung. |
 | 15 | Ausnahme Szenario | Die Datenbank ist nicht erreichbar. Die Meldung kann nicht bearbeitet werden; eine Fehlermeldung wird angezeigt. |
 | 16 | Qualitäten | Nur berechtigte Admins dürfen Zugriff haben. Entscheidungen sind sofort wirksam und werden protokolliert. |
