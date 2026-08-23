@@ -8,4 +8,4 @@ Für den Chat wird pro Inserat und Interessent eine Konversation angelegt, die d
 
 ![Datenmodell von THMarket (Chen-Notation)](d1-datenmodell.svg)
 
-*Abbildung 7: Datenmodell von THMarket (ER-Diagramm, Chen-Notation)* 
+*Abbildung 7: Datenmodell von THMarket (ER-Diagramm)* 
