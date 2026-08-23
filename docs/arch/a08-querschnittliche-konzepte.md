@@ -2,9 +2,33 @@
 
 ## 8.1 Persistenz
 
-- PostgreSQL (Neon) als persistente Datenbasis; Zugriff ausschließlich über Prisma (PrismaService).
-- Schemaänderungen über Prisma-Migrationen.
-- Passwörter mit bcrypt gehasht (kein Klartext).
+### Ziel
+
+Einheitliches Muster für Datenbankzugriffe (CRUD) und sichere Passwortspeicherung.
+
+### Technische Umsetzung
+
+- PostgreSQL als persistente Datenbasis; Zugriff über Prisma.
+- Kern-Entitäten: Benutzer, Inserat, Bild, Kategorie, Favorit, Konversation, Nachricht, Meldung, Transaktion, Bewertung.
+- Passwörter werden mit bcrypt/argon2 gehasht; niemals im Klartext gespeichert.
+- Zugriff auf externe Dienste (Gemini, Cloudinary) wird nicht persistiert; nur resultierende Bild-URLs und Texte werden gespeichert.
+
+### Datenmodell (vereinfacht)
+
+| Entität | Wichtige Felder | Beziehung |
+|---|---|---|
+| Benutzer | id, email, username, password_hash, verifiziert, rolle, guthaben, erstellt_am | 1:n zu Inserat, Nachricht |
+| Inserat | id, user_id, kategorie_id, titel, beschreibung, preis, typ, zustand, status, campus, erstellt_am | n:1 zu Benutzer; 1:n zu Bild |
+| Bild | id, inserat_id, pfad, reihenfolge | n:1 zu Inserat |
+| Kategorie | id, name | 1:n zu Inserat |
+| Favorit | user_id, inserat_id, erstellt_am | n:m zwischen Benutzer und Inserat |
+| Konversation | id, inserat_id, kaeufer_id, verkaeufer_id, erstellt_am | n:1 zu Inserat; 1:n zu Nachricht |
+| Nachricht | id, konversation_id, sender_id, inhalt, gesendet_am, gelesen | n:1 zu Konversation, Benutzer |
+| Meldung | id, inserat_id, gemeldeter_nutzer_id, konversation_id, melder_id, grund, status, erstellt_am | n:1 zu Inserat/Benutzer/Konversation |
+| Transaktion | id, inserat_id, kaeufer_id, verkaeufer_id, zahlungsmodus, status, erstellt_am | n:1 zu Inserat, Benutzer (x2) |
+| Bewertung | id, transaktion_id, bewertender_id, bewerteter_id, sterne, kommentar, erstellt_am | n:1 zu Transaktion, Benutzer (x2) |
+
+*Tabelle 21: Kern-Datenmodell der THMarket-Anwendung*
 
 ## 8.2 Sicherheit & Datenschutz
 
@@ -31,6 +55,7 @@ Das Backend stellt REST-Endpunkte bereit; der Chat läuft über WebSocket-Events
 | POST | `/reviews` | Bewertung abgeben | `{transactionId, rating, kommentar}` → `{success}` |
 | POST | `/reports` | Meldung erstellen | `{targetId, grund, conversationId?}` → `{success}` |
 | POST | `/admin/actions` | Admin-Maßnahme | `{reportId, typ}` → `{success}` + Audit-Log |
+| POST | /payments/checkout | Kauf abschließen |
 
 *Tabelle 20: Übersicht der API-Endpunkte*
 
