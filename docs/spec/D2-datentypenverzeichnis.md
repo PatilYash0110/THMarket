@@ -10,6 +10,7 @@
 | password_hash | TEXT/HASH | Gehashtes und gesalzenes Passwort |
 | verifiziert | BOOLEAN | Gibt an, ob die E-Mail-Adresse bestätigt wurde |
 | rolle | TEXT | Rolle des Benutzers (z. B. „user" oder „admin") |
+| guthaben | NUMERIC | In-App-Guthaben des Benutzers für Mock-Zahlungen |
 | erstellt_am | TIMESTAMP | Zeitpunkt der Registrierung |
 
 ### Entität: Inserat
@@ -24,6 +25,7 @@
 | preis | NUMERIC | Preis bzw. Mietpreis |
 | typ | TEXT | Angebotstyp: „Verkauf" oder „Miete" |
 | zustand | TEXT | Zustand des Artikels (z. B. neu, gebraucht) |
+| campus | TEXT | Campus-Standort des Inserats (Gießen, Friedberg, Wetzlar) |
 | status | TEXT | Status des Inserats (z. B. aktiv, abgeschlossen) |
 | erstellt_am | TIMESTAMP | Zeitpunkt der Erstellung |
 
@@ -78,10 +80,37 @@
 |---|---|---|
 | id | INTEGER | Eindeutige ID der Meldung (Primärschlüssel) |
 | inserat_id | INTEGER | Fremdschlüssel auf das gemeldete Inserat |
+| gemeldeter_nutzer_id | INTEGER | Fremdschlüssel auf Benutzer (nur bei Meldung eines Nutzers) |
+| konversation_id | INTEGER | Fremdschlüssel auf Konversation (nur bei Meldung mit Einwilligung) |
 | melder_id | INTEGER | Fremdschlüssel auf Benutzer (Melder) |
 | grund | TEXT | Grund der Meldung |
 | beschreibung | TEXT | Optionale nähere Beschreibung |
 | status | TEXT | Bearbeitungsstatus (offen, bearbeitet, abgelehnt) |
 | erstellt_am | TIMESTAMP | Zeitpunkt der Meldung |
+
+### Entität: Transaktion
+
+| Attribut | Datentyp | Beschreibung |
+|---|---|---|
+| id | INTEGER | Eindeutige ID der Transaktion (Primärschlüssel) |
+| inserat_id | INTEGER | Fremdschlüssel auf das gekaufte Inserat |
+| kaeufer_id | INTEGER | Fremdschlüssel auf Benutzer (Käufer) |
+| verkaeufer_id | INTEGER | Fremdschlüssel auf Benutzer (Verkäufer) |
+| zahlungsmodus | TEXT | Simulation oder In-App-Guthaben |
+| erstellt_am | TIMESTAMP | Zeitpunkt des Kaufabschlusses |
+
+### Entität: Bewertung
+
+### Entität: Bewertung
+
+| Attribut | Datentyp | Beschreibung |
+|---|---|---|
+| id | INTEGER | Eindeutige ID der Bewertung (Primärschlüssel) |
+| transaktion_id | INTEGER | Fremdschlüssel auf die zugehörige Transaktion |
+| bewertender_id | INTEGER | Fremdschlüssel auf Benutzer (bewertende Person) |
+| bewerteter_id | INTEGER | Fremdschlüssel auf Benutzer (bewertete Person) |
+| sterne | INTEGER | Bewertung von 1 bis 5 Sternen |
+| kommentar | TEXT | Optionaler Kommentar zur Bewertung |
+| erstellt_am | TIMESTAMP | Zeitpunkt der Bewertung |
 
 Mit diesem Datentypenverzeichnis sind alle für das System relevanten Attribute klar definiert. Es stellt sicher, dass die Daten konsistent, validierbar und entsprechend den funktionalen Anforderungen verarbeitet werden können.
