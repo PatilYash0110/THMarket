@@ -82,7 +82,7 @@ Weitere externe Nachbarsysteme sind für die derzeit beschriebene Version von TH
 
 Insbesondere sind nicht Bestandteil von THMarket:
 
-- Zahlungsabwicklung,
+- Anbindung an einen echten Zahlungsdienstleister (der Kauf wird lediglich simuliert),
 - Versand- oder Logistikanbindung.
 
 ## S1.6 Querverweise

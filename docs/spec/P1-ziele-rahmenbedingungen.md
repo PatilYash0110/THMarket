@@ -30,7 +30,7 @@ Ein paar Dinge haben wir bewusst nicht umgesetzt bzw. nur eingeschränkt:
 
 | Punkt | Beschreibung |
 |---|---|
-| Zahlungsabwicklung | Es gibt keine Bezahlfunktion in der App. Käufer und Verkäufer klären das über den Chat, die Übergabe passiert außerhalb der Plattform. |
+| Echte Zahlungsabwicklung | Es gibt keine Anbindung an einen echten Zahlungsdienstleister. Der Kauf wird innerhalb der App simuliert; die tatsächliche Bezahlung und Übergabe der Ware klären Käufer und Verkäufer außerhalb der Plattform. |
 | Versand / Logistik | Kein Versand- oder Liefersystem. Wie die Ware übergeben wird, müssen die Nutzer selbst regeln. |
 | Öffentlicher Zugang | Ohne verifizierte THM-Mail kommt man nicht rein, die Plattform ist nicht öffentlich. |
 | Mobile App | Nur im Browser nutzbar, keine eigene App fürs Handy. |
