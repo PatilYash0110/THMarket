@@ -25,6 +25,6 @@ Wir haben die App modular aufgebaut, damit man später leicht weitere Funktionen
 - **Build-Tool:** Vite
 - **Externe Dienste:** Cloudinary (Bildspeicher), Google Gemini API (KI-Beschreibung), Gmail SMTP (E-Mail-Verifizierung)
 
-![Architekturüberblick der THMarket-Anwendung](p2-architekturueberblick.jpg)
+![Architekturüberblick der THMarket-Anwendung](p2-architekturueberblick.png)
 
 *Abbildung 2: Architekturüberblick der THMarket-Anwendung*
