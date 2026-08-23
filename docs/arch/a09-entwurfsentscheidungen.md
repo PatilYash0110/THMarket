@@ -1,8 +1,19 @@
 # 9. Architekturentscheidungen
 
-Dieses Dokument hält die wichtigsten Architekturentscheidungen des Projekts fest. Jede Entscheidung dokumentiert Kontext, betrachtete Optionen und Begründung.
+Dieses Dokument hält die wichtigsten Architekturentscheidungen des Projekts fest. Jede Entscheidung dokumentiert Kontext, betrachtete Optionen, Begründung und Konsequenzen.
 
-Für detaillierte Alternativenvergleiche siehe [`adr/*.md`](adr/).
+## Übersicht
+
+- [ADR-001: Modularer Monolith statt Microservices](#adr-001-modularer-monolith-statt-microservices)
+- [ADR-002: Fachliche statt technischer Modulgliederung](#adr-002-fachliche-statt-technischer-modulgliederung)
+- [ADR-003: Prisma als ORM](#adr-003-prisma-als-orm)
+- [ADR-004: Klassischer Prisma-Generator statt Standard-Generator](#adr-004-klassischer-prisma-generator-statt-standard-generator)
+- [ADR-005: KI-Unterstützung nur für Textfelder, keine Preisschätzung](#adr-005-ki-unterstützung-nur-für-textfelder-keine-preisschätzung)
+- [ADR-006: Simulierte Zahlung statt echter Zahlungsabwicklung](#adr-006-simulierte-zahlung-statt-echter-zahlungsabwicklung)
+- [ADR-007: Private Chats ohne Admin-Zugriff](#adr-007-private-chats-ohne-admin-zugriff)
+- [ADR-008: Socket.io für Echtzeit-Chat](#adr-008-socketio-für-echtzeit-chat)
+- [ADR-009: Monorepo mit Feature-Branch-Workflow](#adr-009-monorepo-mit-feature-branch-workflow)
+- [ADR-010: Deployment auf Vercel / Render / Neon](#adr-010-deployment-auf-vercel--render--neon)
 
 ---
 
@@ -23,6 +34,8 @@ Für detaillierte Alternativenvergleiche siehe [`adr/*.md`](adr/).
 
 **Begründung:** Für den Projektumfang von THMarket ist ein Monolith angemessen. Microservices würden unnötigen Betriebs- und Kommunikations-Overhead verursachen, ohne einen echten Vorteil zu bieten.
 
+**Konsequenzen:** Alle Module laufen im selben Prozess und teilen sich eine Datenbankverbindung; eine spätere unabhängige Skalierung einzelner Module wäre nur mit größerem Umbau möglich.
+
 ---
 
 ## ADR-002: Fachliche statt technischer Modulgliederung
@@ -41,6 +54,8 @@ Für detaillierte Alternativenvergleiche siehe [`adr/*.md`](adr/).
 **Entscheidung:** Option B – fachliche Module.
 
 **Begründung:** Klare Verantwortlichkeiten pro Modul erleichtern Entwicklung und Nachvollziehbarkeit, gerade im Team mit mehreren Bearbeitern pro Bereich.
+
+**Konsequenzen:** Technisch wiederverwendbare Logik (z. B. Validierung, Fehlerbehandlung) muss bewusst in geteilten Hilfsbausteinen gehalten werden, statt automatisch durch eine technische Schicht getrennt zu sein.
 
 ---
 
@@ -61,6 +76,8 @@ Für detaillierte Alternativenvergleiche siehe [`adr/*.md`](adr/).
 
 **Begründung:** Prisma bietet eine bessere Migrations- und Typ-Erfahrung als TypeORM und trennt Datenmodell und SQL klarer voneinander.
 
+**Konsequenzen:** Ein zusätzlicher Build-Schritt (Prisma-Generator) ist bei jeder Schemaänderung nötig; der neue Prisma-7-Standardgenerator verursachte Import-/Typprobleme, weshalb auf die klassische Generator-Variante umgestellt wurde (siehe ADR-004).
+
 ---
 
 ## ADR-004: Klassischer Prisma-Generator statt Standard-Generator
@@ -79,6 +96,8 @@ Für detaillierte Alternativenvergleiche siehe [`adr/*.md`](adr/).
 **Entscheidung:** Option B – klassischer Generator.
 
 **Begründung:** Die klassische Variante lief im Projekt stabil, während der neue Standard-Generator zu Import-/Typproblemen führte.
+
+**Konsequenzen:** Bei zukünftigen Prisma-Updates muss geprüft werden, ob die klassische Generator-Variante weiterhin unterstützt wird.
 
 ---
 
@@ -99,6 +118,8 @@ Für detaillierte Alternativenvergleiche siehe [`adr/*.md`](adr/).
 
 **Begründung:** Eine Preisschätzung allein aus Bildern ist unzuverlässig und hätte die Qualität der KI-Unterstützung insgesamt verschlechtert.
 
+**Konsequenzen:** Nutzer müssen den Preis weiterhin manuell eingeben; falsche Preisvorschläge und daraus resultierende Nutzerverwirrung werden dadurch vermieden.
+
 ---
 
 ## ADR-006: Simulierte Zahlung statt echter Zahlungsabwicklung
@@ -117,6 +138,8 @@ Für detaillierte Alternativenvergleiche siehe [`adr/*.md`](adr/).
 **Entscheidung:** Option B – simulierte Zahlung.
 
 **Begründung:** Für den experimentellen Rahmen des Projekts ist keine echte Finanzregulatorik nötig; die Simulation reicht aus, um den Ablauf zu demonstrieren.
+
+**Konsequenzen:** Es fließt kein echtes Geld; Käufer und Verkäufer müssen die tatsächliche Bezahlung und Übergabe außerhalb der Plattform selbst klären.
 
 ---
 
@@ -137,6 +160,8 @@ Für detaillierte Alternativenvergleiche siehe [`adr/*.md`](adr/).
 
 **Begründung:** Datenschutz hat Vorrang; Moderation erfolgt ausschließlich über gemeldete Konversationen mit Einwilligung des Meldenden.
 
+**Konsequenzen:** Missbrauch in nicht gemeldeten Chats kann nicht proaktiv erkannt werden; die Plattform verlässt sich auf die Meldefunktion der Nutzer.
+
 ---
 
 ## ADR-008: Socket.io für Echtzeit-Chat
@@ -156,6 +181,8 @@ Für detaillierte Alternativenvergleiche siehe [`adr/*.md`](adr/).
 
 **Begründung:** Socket.io bietet eine robuste WebSocket-Abstraktion mit Räumen (für einzelne Konversationen) und Fallback-Mechanismen, die eine Eigenimplementierung nicht ohne Weiteres leisten würde.
 
+**Konsequenzen:** Eine zusätzliche Abhängigkeit muss gepflegt werden; im Gegenzug entfällt viel Eigenimplementierung für Verbindungsmanagement und Fallbacks.
+
 ---
 
 ## ADR-009: Monorepo mit Feature-Branch-Workflow
@@ -173,7 +200,9 @@ Für detaillierte Alternativenvergleiche siehe [`adr/*.md`](adr/).
 
 **Entscheidung:** Option B – Monorepo mit Feature-Branch-Workflow.
 
-**Begründung:** Ein gemeinsames Repository vereinfacht die Versionierung im Team; Squash-Merge-Pull-Requests halten den Commit-Verlauf übersichtlich und einzelne Features sind bei Bedarf revertierbar.
+**Begründung:** Ein gemeinsames Repository vereinfacht die Versionierung im Team; Squash-Merge-Pull-Requests halten den Commit-Verlauf übersichtlich.
+
+**Konsequenzen:** Alle Teammitglieder arbeiten im selben Repository, was bei parallelen Änderungen an denselben Dateien zu Merge-Konflikten führen kann.
 
 ---
 
@@ -192,4 +221,6 @@ Für detaillierte Alternativenvergleiche siehe [`adr/*.md`](adr/).
 
 **Entscheidung:** Option B – Vercel / Render / Neon.
 
-**Begründung:** Die kostenlosen Tarife ermöglichen einfachen Betrieb ohne eigene Serververwaltung, passend zum studentischen Rahmen des Projekts. Der gelegentliche Kaltstart bei Render wird in Kauf genommen.
+**Begründung:** Die kostenlosen Tarife ermöglichen einfachen Betrieb ohne eigene Serververwaltung, passend zum studentischen Rahmen des Projekts.
+
+**Konsequenzen:** Nach Inaktivität kann die erste Anfrage an das Backend durch den Render-Kaltstart 30–50 Sekunden dauern; für eine spätere Produktivnutzung wäre ein bezahlter Tarif nötig.
