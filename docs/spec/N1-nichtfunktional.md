@@ -68,3 +68,31 @@ Die nichtfunktionalen Anforderungen definieren die Qualitätsmerkmale von THMark
 | **Priorität** | Hoch |
 | **Abhängigkeiten** | Backend-Validierung, Datenbank/Speicher |
 | **Konflikte** | Strengere Prüfung kann den Upload-Vorgang verlängern. |
+
+
+---
+
+### NFA-06: Standortdaten-Bereinigung bei Bild-Uploads
+
+| Eigenschaft | Beschreibung |
+| :--- | :--- |
+| **Kurzbeschreibung** | Standortdaten (z. B. GPS-Metadaten) werden aus hochgeladenen Bildern entfernt, bevor sie gespeichert werden. |
+| **Quelle** | Datenschutzanforderungen, Architektur |
+| **Prüfkriterium** | Stichprobenprüfung gespeicherter Bilder zeigt keine Standort-Metadaten mehr. |
+| **Priorität** | Hoch |
+| **Abhängigkeiten** | Backend-Verarbeitung, Bildspeicherdienst |
+| **Konflikte** | Zusätzliche Verarbeitung kann den Upload-Vorgang geringfügig verlängern. |
+
+
+---
+
+### NFA-07: Ausfallverhalten des externen KI-Beschreibungsdienstes
+
+| Eigenschaft | Beschreibung |
+| :--- | :--- |
+| **Kurzbeschreibung** | Ist der externe KI-Beschreibungsdienst nicht erreichbar, bleibt das Erstellen eines Inserats über die manuelle Eingabe uneingeschränkt möglich. |
+| **Quelle** | Architektur, Robustheitsanforderung |
+| **Prüfkriterium** | Bei simuliertem Ausfall des Dienstes kann ein Inserat ohne Vorschlag vollständig erstellt werden; eine verständliche Fehlermeldung wird angezeigt. |
+| **Priorität** | Mittel |
+| **Abhängigkeiten** | Externer KI-Beschreibungsdienst, Backend-Fehlerbehandlung |
+| **Konflikte** | Kein direkter Konflikt erkennbar. |
