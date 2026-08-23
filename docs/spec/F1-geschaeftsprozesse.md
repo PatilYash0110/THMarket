@@ -62,7 +62,7 @@ Kommt ein Kauf zustande, schließt der Käufer diesen über den simulierten Kauf
 
 Gemeldete Inserate werden im Adminbereich angezeigt. Ein Administrator prüft die Meldung und kann eine Verwarnung aussprechen, das Inserat ausblenden oder den Nutzer sperren.
 
-![Aktivitätsdiagramm zur Marktplatznutzung nach dem Login](f1-aktivitaetsdiagramm-marktplatznutzung.jpg)
+![Aktivitätsdiagramm zur Marktplatznutzung nach dem Login](f1-aktivitaetsdiagramm-marktplatznutzung.png)
 
 *Abbildung 4: Aktivitätsdiagramm „Marktplatznutzung nach Login beim App-Start“*
 
