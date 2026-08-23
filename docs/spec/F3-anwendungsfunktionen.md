@@ -17,3 +17,11 @@ Der Chat basiert auf Socket.io. Eingehende Nachrichten werden über eine bidirek
 ### 4. Sitzungs- und Zugriffsverwaltung
 
 Nach dem Login wird eine Sitzung verwaltet, die die Zugriffsrechte des Nutzers bestimmt. Geschützte Bereiche (Marktplatz, Chat, Adminbereich) sind nur für angemeldete bzw. berechtigte Nutzer erreichbar.
+
+### 5. Automatischer Beschreibungsvorschlag
+
+Bei der Erstellung eines Inserats kann auf Basis der hochgeladenen Bilder automatisch ein Vorschlag für Titel, Beschreibung und Kategorie erzeugt werden (siehe Nachbarsystem in S1). Der Vorschlag wird dem Nutzer zur Bearbeitung angezeigt und muss nicht unverändert übernommen werden. Ist der externe Dienst nicht erreichbar, bleibt die manuelle Eingabe aller Felder weiterhin möglich.
+
+### 6. Mock-Kauf und Guthaben-Verwaltung
+
+Beim Abschluss eines Kaufs wählt der Käufer einen Zahlungsmodus: entweder eine reine Simulation ohne Geldfluss oder die Verrechnung über ein In-App-Guthaben. In beiden Fällen wird der Kauf als Transaktion gespeichert und das Inserat als verkauft markiert. Bei Nutzung des In-App-Guthabens wird der entsprechende Betrag dem Guthaben des Verkäufers gutgeschrieben. Eine echte Zahlungsabwicklung findet nicht statt.
