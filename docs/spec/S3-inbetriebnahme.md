@@ -37,9 +37,9 @@ Bei späteren Änderungen oder Aktualisierungen der Anwendung sollen bereits ges
 - Favoriten,
 - Konversationen,
 - Chat-Nachrichten,
-- Meldungen und deren Bearbeitungsstatus.
-- Transaktionen
-- Bewertungen 
+- Meldungen und deren Bearbeitungsstatus,
+- Transaktionen,
+- Bewertungen. 
 
 Die genaue technische Umsetzung der Datensicherung und der Aktualisierung späterer Versionen ist noch festzulegen.
 
