@@ -14,10 +14,12 @@ Nach aktuellem Stand ist ein gestuftes Vorgehen vorgesehen:
 
 Vor der Inbetriebnahme sollen mindestens folgende Voraussetzungen erfüllt sein:
 
-- Das React-Frontend und das FastAPI-Backend sind lauffähig.
+- Das React-Frontend und das Backend sind lauffähig.
 - Eine PostgreSQL-Datenbank ist eingerichtet und erreichbar.
 - Die Verbindung zwischen Frontend, Backend und Datenbank funktioniert.
 - Der E-Mail-/SMTP-Dienst ist für den Versand von Verifizierungs-E-Mails konfiguriert.
+- Der Bildspeicherdienst ist für den Bild-Upload konfiguriert.
+- Der KI-Beschreibungsdienst ist für den Beschreibungsvorschlag konfiguriert.
 - Socket.io ist für die Chat-Kommunikation eingerichtet.
 - Die wesentlichen Funktionen der Anwendung wurden getestet.
 - Vertrauliche Zugangsdaten sind nicht öffentlich im Repository gespeichert.
@@ -67,6 +69,8 @@ Die konkrete technische Durchführung der einzelnen Schritte kann sich im weiter
 Vor der Freischaltung sollen insbesondere folgende Situationen überprüft werden:
 
 - nicht erreichbarer oder fehlerhaft konfigurierter E-Mail-Dienst,
+- nicht erreichbarer oder fehlerhaft konfigurierter Bildspeicherdienst,
+- nicht erreichbarer oder fehlerhaft konfigurierter KI-Beschreibungsdienst,
 - ungültiger oder abgelaufener Verifizierungslink,
 - nicht erreichbare Datenbank,
 - Verbindungsabbrüche im Chat,
@@ -119,6 +123,8 @@ Nach der Freischaltung ist eine Beobachtungsphase vorgesehen. Dabei sollen insbe
 
 - technische Verfügbarkeit der Anwendung,
 - Erreichbarkeit des E-Mail-Dienstes,
+- Erreichbarkeit des Bildspeicherdienstes,
+- Erreichbarkeit des KI-Beschreibungsdienstes,
 - Fehler bei Registrierung und Login,
 - Stabilität der Chat-Kommunikation,
 - Probleme beim Bild-Upload,
