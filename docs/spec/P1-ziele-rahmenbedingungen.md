@@ -6,7 +6,25 @@ Damit nur Studierende Zugriff haben, kann man sich nur mit einer THM-E-Mail-Adre
 
 Die wichtigsten Funktionen sind: Inserate erstellen (mit Bildern hochladen), den Marktplatz durchsuchen und filtern, Inserate als Favorit speichern, unangemessene Inserate melden und der Chat zur Kommunikation. Das Projekt ist aus unserer Sicht erfolgreich, wenn Registrierung und Verifizierung zuverlässig laufen, Inserate mit Bildern angelegt und wiedergefunden werden können, der Chat in Echtzeit funktioniert und die Oberfläche insgesamt klar und einfach zu bedienen ist.
 
-# 1.2 Nicht-Projektziele
+## 1.2 Stakeholder
+
+### Nutzende Stakeholder
+
+| Stakeholder | Ziel / Interesse | Erwartungen an das System |
+|---|---|---|
+| Gast (unverifiziert) | Einstieg und Registrierung | klare Navigation sowie stabiler Registrierungs- und Verifizierungsprozess |
+| Verifizierter Nutzer als Käufer | Artikel finden und kaufen | schnelle Suche, zuverlässige Filter, Favoriten und einfacher Chat-Kontakt |
+| Verifizierter Nutzer als Verkäufer | Artikel inserieren und verkaufen | einfaches Anlegen von Inseraten, Bild-Upload sowie Chat- und Kaufverwaltung |
+| Administrator | Betrieb und Moderation | sichere Admin-Oberfläche, Bearbeitung von Meldungen, abgestufte Maßnahmen |
+
+### Projekt-Stakeholder
+
+| Stakeholder | Ziel / Interesse | Erwartungen an das System |
+|---|---|---|
+| Entwickler | Wartung und Erweiterung | klar getrennte Module, verständliche APIs, nachvollziehbarer Entwicklungsworkflow |
+| Lehrende / Prüfer | Bewertung | nachvollziehbare Anforderungen, messbare Ziele, verständliche Dokumentation |
+
+# 1.3 Nicht-Projektziele
 
 Ein paar Dinge haben wir bewusst nicht umgesetzt bzw. nur eingeschränkt:
 
