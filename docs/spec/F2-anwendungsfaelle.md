@@ -254,7 +254,7 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 | 08 | Auslösendes Ereignis | Der Admin öffnet den Bereich „Meldungen“. |
 | 09 | Akteure | Administrator. |
 | 10 | Vorbedingung | Der Admin ist eingeloggt und hat Berechtigung zur Bearbeitung von Meldungen. |
-| 11 | Nachbedingung | Die betroffene Meldung ist bearbeitet; das Inserat wurde ggf. entfernt. |
+| 11 | Nachbedingung | Die betroffene Meldung ist bearbeitet; die Maßnahme (Verwarnung, Ausblenden oder Sperre) wurde umgesetzt. |
 | 12 | Ergebnis | Die Meldung wurde verarbeitet und der Zustand der Plattform aktualisiert. |
 | 13 | Hauptszenario | 1. Der Admin öffnet die Meldungsübersicht. 2. Der Admin wählt eine Meldung. 3. Der Admin prüft das gemeldete Inserat. 4. Der Admin trifft eine Entscheidung (Verwarnung / ausblenden / Sperre). 5. Die Entscheidung wird gespeichert. |
 | 14 | Alternativszenarien | Der Admin schließt den Vorgang ohne Entscheidung. |
