@@ -35,7 +35,7 @@ Typische Aktionen:
 - Favorit speichern
 - Chat mit anderen Nutzern führen
 - Inserat melden
-- Insersat kaufen
+- Inserat kaufen
 - Verkäufer bewerten
 - Eigene Inserate verwalten (bearbeiten/löschen)
 
@@ -50,7 +50,7 @@ Typische Aktionen:
 - Meldungen bearbeiten
 - Logs/Aktivitäten einsehen
 
-![Use-Case-Diagramm der THMarket-Anwendung](f1-use-case-diagramm.jpg)
+![Use-Case-Diagramm der THMarket-Anwendung](f1-use-case-diagramm.png)
 
 *Abbildung 3: Use-Case-Diagramm der THMarket-Anwendung*
 
