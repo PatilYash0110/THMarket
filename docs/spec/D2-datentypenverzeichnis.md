@@ -101,8 +101,6 @@
 
 ### Entität: Bewertung
 
-### Entität: Bewertung
-
 | Attribut | Datentyp | Beschreibung |
 |---|---|---|
 | id | INTEGER | Eindeutige ID der Bewertung (Primärschlüssel) |
