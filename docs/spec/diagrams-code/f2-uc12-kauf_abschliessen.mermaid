@@ -1,0 +1,25 @@
+sequenceDiagram
+    autonumber
+    actor Nutzer as Eingeloggter Nutzer (Käufer)
+    participant System as THMarket
+    participant DB as Datenbank
+
+    Nutzer->>System: Klickt bei Inserat auf "Kaufen"
+    System-->>Nutzer: Zeigt Kauf-Dialog an
+    Nutzer->>System: Wählt Zahlungsmodus (Simulation oder Guthaben)
+    Nutzer->>System: Bestätigt Kauf
+
+    alt Kauf erfolgreich
+        System->>DB: Speichert Transaktion, setzt Inserat.status = verkauft
+        DB-->>System: Bestätigung
+        System-->>Nutzer: Erfolgsmeldung, zeigt Bewertungsformular an
+        opt Bewertung abgeben
+            Nutzer->>System: Sendet Bewertung (Sterne, Kommentar)
+            System->>DB: Speichert Bewertung
+        end
+    else Datenbank nicht erreichbar
+        System-->>Nutzer: Zeigt Fehlermeldung an
+        opt Abbruch
+            Nutzer->>System: Bricht Vorgang ab
+        end
+    end
