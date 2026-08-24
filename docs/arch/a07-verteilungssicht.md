@@ -2,8 +2,7 @@
 
 Die Softwarebausteine werden auf verschiedene Infrastruktur-Komponenten verteilt.
 
-> **Abbildung 17 – hier Mermaid-Screenshot einfügen**  
-> *Quelle: `abb17_verteilungssicht.mmd`*
+![Verteilungssicht](diagram_images/a07-verteilungssicht.png)
 
 *Abbildung 17: Verteilungssicht*
 
