@@ -20,7 +20,7 @@ Die Dialoglandkarte zeigt die Struktur und Navigation der THMarket-Anwendung. Si
 Die Dialoglandkarte stellt vereinfacht dar, welche Dialoge es gibt und wie zwischen ihnen navigiert werden kann – etwa vom Login zum Marktplatz oder vom Marktplatz zur Inseratdetailseite und von dort in den Chat. Die genauen Abläufe, Auslöser und Wirkungen werden in Kapitel 4.2 beschrieben.
 **Hinweis:** Ein Logout ist grundsätzlich von jedem Dialog aus möglich. Um die Darstellung nicht zu überladen, wird diese Möglichkeit nicht an jeder Stelle einzeln dargestellt, sondern gilt als durchgängig verfügbar.
 <p align="center">
-  <img src="B1-dialogspezifikation_01-dialoglandkarte.png" alt="Dialoglandkarte der THMarket-Anwendung" width="900">
+  <img src="diagram_images/B1-dialogspezifikation_01-dialoglandkarte.png" alt="Dialoglandkarte der THMarket-Anwendung" width="900">
 </p>
 
 <p align="center"><em>Abbildung 8: Übersicht der Dialoglandkarte der Benutzeroberfläche</em></p>
@@ -83,7 +83,8 @@ Der Registrierungsdialog erlaubt es Studierenden, ein Konto für THMarket anzule
 
 - Nach erfolgreicher Registrierung und Verifizierung → zum Login-Dialog
 - Über „Schon registriert? Jetzt anmelden“ → zurück zum Login-Dialog
-- #### Statik – Formular: Registrierungsformular (Felder)
+
+ #### Statik – Formular: Registrierungsformular (Felder)
 
 | Feldname | Typ | Pflicht | Vorbelegung | Validierung | Bezug zum Datenmodell |
 |---|---|---|---|---|---|
@@ -131,7 +132,8 @@ Der Marktplatz ist die Startseite nach dem Login. Hier werden die aktuellen Inse
 - Über „Inserat erstellen“ → zum Inserat-erstellen-Dialog
 - Über „Profil/Meine Inserate“ → zum Profildialog
 - Über Logout → zurück zum Login-Dialog
-- #### Statik – Formular: Such-/Filterformular (Felder)
+
+#### Statik – Formular: Such-/Filterformular (Felder)
 
 | Feldname | Typ | Pflicht | Vorbelegung | Validierung | Bezug zum Datenmodell |
 |---|---|---|---|---|---|
@@ -179,7 +181,8 @@ Die Detailansicht zeigt alle Informationen zu einem Inserat: Bildergalerie, Tite
 
 - Über „Anbieter kontaktieren“ → zum Chat-Dialog
 - Über „Zurück“ → zum Marktplatz
-- #### Dynamik – Aktionsliste
+
+#### Dynamik – Aktionsliste
 
 | Aktion | Auslöser | Wirkung | Bezug zum Datenmodell | Bezug zum Use Case |
 |---|---|---|---|---|
@@ -364,7 +367,8 @@ Im Profildialog verwaltet der Nutzer seine eigenen Inserate und sieht seine Favo
 - Über ein eigenes Inserat → zum Bearbeiten-Formular
 - Über ein favorisiertes Inserat → zur Inseratdetailseite
 - Über „Zurück“ → zum Marktplatz
-- #### Dynamik – Aktionsliste
+
+#### Dynamik – Aktionsliste
 
 | Aktion | Auslöser | Wirkung | Bezug zum Datenmodell | Bezug zum Use Case |
 |---|---|---|---|---|
