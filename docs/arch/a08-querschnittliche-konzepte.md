@@ -37,7 +37,8 @@ Einheitliches Muster für Datenbankzugriffe (CRUD) und sichere Passwortspeicheru
 - Chats sind privat; Admin-Zugriff nur auf gemeldete Konversationen mit Einwilligung.
 - Hochgeladene Bilder werden von EXIF-Metadaten (u. a. GPS) bereinigt.
 - Impressum, Datenschutzerklärung, Nutzungsbedingungen und Kontolöschung sind vorgesehen.
-- ## 8.3 API
+
+## 8.3 API
 
 Das Backend stellt REST-Endpunkte bereit; der Chat läuft über WebSocket-Events. Antworten erfolgen als JSON; geschützte Endpunkte erfordern ein JWT.
 
@@ -55,7 +56,6 @@ Das Backend stellt REST-Endpunkte bereit; der Chat läuft über WebSocket-Events
 | POST | `/reviews` | Bewertung abgeben | `{transactionId, rating, kommentar}` → `{success}` |
 | POST | `/reports` | Meldung erstellen | `{targetId, grund, conversationId?}` → `{success}` |
 | POST | `/admin/actions` | Admin-Maßnahme | `{reportId, typ}` → `{success}` + Audit-Log |
-| POST | /payments/checkout | Kauf abschließen |
 
 *Tabelle 20: Übersicht der API-Endpunkte*
 
