@@ -50,7 +50,7 @@ Typische Aktionen:
 - Meldungen bearbeiten
 - Logs/Aktivitäten einsehen
 
-![Use-Case-Diagramm der THMarket-Anwendung](f1-use-case-diagramm.png)
+![Use-Case-Diagramm der THMarket-Anwendung](diagram_images/f1-use-case-diagramm.png)
 
 *Abbildung 3: Use-Case-Diagramm der THMarket-Anwendung*
 
@@ -62,7 +62,7 @@ Kommt ein Kauf zustande, schließt der Käufer diesen über den simulierten Kauf
 
 Gemeldete Inserate werden im Adminbereich angezeigt. Ein Administrator prüft die Meldung und kann eine Verwarnung aussprechen, das Inserat ausblenden oder den Nutzer sperren.
 
-![Aktivitätsdiagramm zur Marktplatznutzung nach dem Login](f1-aktivitaetsdiagramm-marktplatznutzung.png)
+![Aktivitätsdiagramm zur Marktplatznutzung nach dem Login](diagram_images/f1-aktivitaetsdiagramm-marktplatznutzung.png)
 
 *Abbildung 4: Aktivitätsdiagramm „Marktplatznutzung nach Login beim App-Start“*
 

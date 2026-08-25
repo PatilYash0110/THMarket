@@ -4,7 +4,7 @@ THMarket ist die Vermittlungsplattform zwischen Studierenden der THM. Um die App
 
 Ist man eingeloggt, kann man Inserate erstellen, durchsuchen und über den Chat mit anderen Nutzern schreiben. Zusätzlich gibt es einen Admin, der Nutzerkonten verwaltet und sich um gemeldete Inserate kümmert.
 
-![Systemkontextdiagramm der THMarket-Anwendung](p2-systemkontextdiagramm.png)
+![Systemkontextdiagramm der THMarket-Anwendung](diagram_images/p2-systemkontextdiagramm.png)
 
 *Abbildung 1: Systemkontextdiagramm der THMarket-Anwendung*
 
@@ -25,6 +25,6 @@ Wir haben die App modular aufgebaut, damit man später leicht weitere Funktionen
 - **Build-Tool:** Vite
 - **Externe Dienste:** Cloudinary (Bildspeicher), Google Gemini API (KI-Beschreibung), Gmail SMTP (E-Mail-Verifizierung)
 
-![Architekturüberblick der THMarket-Anwendung](p2-architekturueberblick.png)
+![Architekturüberblick der THMarket-Anwendung](diagram_images/p2-architekturueberblick.png)
 
 *Abbildung 2: Architekturüberblick der THMarket-Anwendung*

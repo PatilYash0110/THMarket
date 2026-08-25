@@ -48,7 +48,7 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 
 *Tabelle 3: Use Case UC02 – Registrierung*
 
-![Aktivitätsdiagramm zur Registrierung](f2-aktivitaetsdiagramm-registrierung.jpg)
+![Aktivitätsdiagramm zur Registrierung](diagram_images/f2-aktivitaetsdiagramm-registrierung.jpg)
 
 *Abbildung 5: Verfeinerung der Aktivität „Registrierung durchführen“*
 
@@ -167,7 +167,7 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 
 *Tabelle 8: Use Case UC07 – Chat mit Nutzer führen*
 
-![Aktivitätsdiagramm zum Senden einer Chat-Nachricht](f2-aktivitaetsdiagramm-chat.jpg)
+![Aktivitätsdiagramm zum Senden einer Chat-Nachricht](diagram_images/f2-aktivitaetsdiagramm-chat.jpg)
 
 *Abbildung 6: Verfeinerung der Aktivität „Nachricht im Chat senden“*
 

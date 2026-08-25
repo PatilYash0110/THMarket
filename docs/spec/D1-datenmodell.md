@@ -6,6 +6,6 @@ Jedem Inserat ist eine Kategorie zugeordnet, und jedes Inserat kann mehrere Bild
 
 Für den Chat wird pro Inserat und Interessent eine Konversation angelegt, die den Käufer, den Verkäufer und das Inserat referenziert. Zu jeder Konversation gehören mehrere Nachrichten mit Sender, Inhalt und Zeitstempel. Meldungen zu Inseraten werden in einer eigenen Entität gespeichert, die das gemeldete Inserat und den meldenden Nutzer referenziert und Grund, Status sowie Zeitstempel enthält. Nach einem Kauf entsteht eine Transaktion, die das betroffene Inserat sowie Käufer und Verkäufer referenziert und den gewählten Zahlungsmodus sowie den Status festhält. Nach Abschluss eines Verkaufs können sich die beteiligten Nutzer im Rahmen einer Bewertung gegenseitig einschätzen.
 
-![Datenmodell von THMarket](d1-datenmodell.svg)
+![Datenmodell von THMarket](diagram_images/d1-datenmodell.svg)
 
 *Abbildung 7: Datenmodell von THMarket (ER-Diagramm)* 

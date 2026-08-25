@@ -67,7 +67,7 @@ Die Dialoglandkarte stellt vereinfacht dar, welche Dialoge es gibt und wie zwisc
 
 Der Registrierungsdialog erlaubt es Studierenden, ein Konto für THMarket anzulegen. Nach Eingabe von THM-E-Mail-Adresse, Benutzername und Passwort wird ein unverifiziertes Konto angelegt und eine Bestätigungs-E-Mail versendet. Erst nach Klick auf den Verifizierungslink ist das Konto aktiv.
 
-![Mockup Registrierungs-Dialog](b1-registrierungs-dialog.png)
+![Mockup Registrierungs-Dialog](diagram_images/b1-registrierungs-dialog.png)
 
 *Abbildung 10: Mockup „Registrierung“*
 
