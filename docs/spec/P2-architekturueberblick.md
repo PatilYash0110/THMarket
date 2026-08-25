@@ -1,4 +1,4 @@
-# 1.3 Systemkontext
+# 1.4 Systemkontext
 
 THMarket ist die Vermittlungsplattform zwischen Studierenden der THM. Um die App zu nutzen, muss man sich mit seiner THM-Mail registrieren und den Account über einen Bestätigungslink freischalten. Die Bestätigungsmail dafür verschickt das System über einen externen E-Mail-Dienst (SMTP).
 
@@ -8,7 +8,7 @@ Ist man eingeloggt, kann man Inserate erstellen, durchsuchen und über den Chat 
 
 *Abbildung 1: Systemkontextdiagramm der THMarket-Anwendung*
 
-# 1.4 Architekturüberblick
+# 1.5 Architekturüberblick
 
 THMarket läuft nach dem Client-Server-Prinzip und besteht aus drei Teilen: Frontend, Backend und Datenbank. Das Frontend ist mit React gebaut und wird über Vite gebündelt — es ist das, was der Nutzer im Browser sieht, und schickt seine Eingaben ans Backend weiter. Das Backend läuft mit NestJS (TypeScript) und kümmert sich um Login, Registrierung, das Anlegen und Suchen von Inseraten, Favoriten, Meldungen sowie Kauf- und Bewertungsfunktionen. Für den Echtzeit-Chat ist innerhalb des Backends zusätzlich Socket.io eingebunden.
 
