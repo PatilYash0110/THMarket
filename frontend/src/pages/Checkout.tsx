@@ -22,28 +22,10 @@ export function Checkout() {
     return <Navigate to="/login" replace />
   }
 
-  if (!listing || listing.status === 'VERKAUFT' || !listing.sofortkaufMoeglich) {
-    return <Navigate to="/" replace />
-  }
-
-  function handleSubmit(event: FormEvent) {
-    event.preventDefault()
-    if (!listing) return
-
-    if (mode === 'guthaben' && currentUser!.balanceCents < listing.priceCents) {
-      setError('Nicht genügend Guthaben für diesen Kauf.')
-      return
-    }
-
-    setError(null)
-    if (mode === 'guthaben') {
-      adjustBalance(-listing.priceCents)
-    }
-    markAsSold(listing.id)
-    setCompleted(true)
-  }
-
-  if (completed) {
+  // Checked before the "still purchasable" guard below: once markAsSold() flips
+  // the listing to VERKAUFT inside handleSubmit, that guard would otherwise fire
+  // on the resulting re-render and redirect away before the success screen shows.
+  if (completed && listing) {
     return (
       <div className="mx-auto flex max-w-sm flex-col items-center gap-4 py-16 text-center">
         <CheckCircle size={40} className="text-accent" aria-hidden />
@@ -56,6 +38,29 @@ export function Checkout() {
         </Link>
       </div>
     )
+  }
+
+  if (!listing || listing.status === 'VERKAUFT' || !listing.sofortkaufMoeglich) {
+    return <Navigate to="/" replace />
+  }
+
+  const buyer = currentUser
+
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault()
+    if (!listing) return
+
+    if (mode === 'guthaben' && buyer.balanceCents < listing.priceCents) {
+      setError('Nicht genügend Guthaben für diesen Kauf.')
+      return
+    }
+
+    setError(null)
+    if (mode === 'guthaben') {
+      adjustBalance(-listing.priceCents)
+    }
+    markAsSold(listing.id)
+    setCompleted(true)
   }
 
   return (
