@@ -9,6 +9,7 @@ import {
   } from '@phosphor-icons/react'
   import { type FormEvent, useState } from 'react'
   import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+  import logo from '../../media/thm_market_logo.jpg'
   import { useAuth } from '../context/AuthContext'
   import { Button } from './Button'
   
@@ -28,10 +29,12 @@ import {
     return (
       <header className="sticky top-0 z-40 border-b border-border bg-background">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="shrink-0 text-lg font-semibold tracking-tight text-foreground">
-            THM<span className="text-accent">market</span>
+          <Link to="/" className="flex shrink-0 items-center gap-1.5">
+            <span className="text-lg font-semibold tracking-tight text-foreground">THM</span>
+            <img src={logo} alt="market" className="h-5 w-auto" />
           </Link>
   
+          {currentUser && (
           <form onSubmit={handleSearch} className="hidden flex-1 items-center md:flex">
             <div className="flex w-full max-w-md items-center gap-2 border border-border px-3 focus-within:ring-2 focus-within:ring-ring">
               <MagnifyingGlass size={18} className="text-foreground-muted" aria-hidden />
@@ -45,6 +48,7 @@ import {
               />
             </div>
           </form>
+          )}
   
           <nav className="ml-auto flex items-center gap-2">
             {currentUser?.role === 'ADMIN' && (
