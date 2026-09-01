@@ -10,6 +10,7 @@ import { Profile } from './pages/Profile'
 import { RequireAuth } from './components/RequireAuth'
 import { Favorites } from './pages/Favorites'
 import { Messages } from './pages/Messages'
+import { Checkout } from './pages/Checkout'
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="favorites" element={<RequireAuth><Favorites /></RequireAuth>} />
         <Route path="messages" element={<RequireAuth><Messages /></RequireAuth>} />
         <Route path="messages/:conversationId" element={<RequireAuth><Messages /></RequireAuth>} />
+        <Route path="checkout/:listingId" element={<RequireAuth><Checkout /></RequireAuth>} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
