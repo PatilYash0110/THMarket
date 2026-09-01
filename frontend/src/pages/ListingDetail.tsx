@@ -24,6 +24,7 @@ export function ListingDetail() {
   const seller = findUserById(listing.sellerId)
   const sold = listing.status === 'VERKAUFT'
   const isOwner = currentUser?.id === listing.sellerId
+  const isAdmin = currentUser?.role === 'ADMIN'
   const favorite = isFavorite(listing.id)
 
   function handleContactSeller() {
@@ -94,7 +95,11 @@ export function ListingDetail() {
           </div>
         )}
 
-        {isOwner ? (
+        {isAdmin ? (
+          <p className="text-xs uppercase tracking-wide text-foreground-muted">
+            Admin-Ansicht — Kauf, Kontakt und Merken sind für Admin-Konten nicht verfügbar.
+          </p>
+        ) : isOwner ? (
           <div className="flex flex-wrap gap-3">
             <Link to={`/listing/${listing.id}/edit`}>
               <Button variant="secondary">
@@ -132,4 +137,3 @@ export function ListingDetail() {
     </div>
   )
 }
-

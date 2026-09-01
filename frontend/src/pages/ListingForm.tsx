@@ -36,7 +36,7 @@ export function ListingForm() {
   }
 
   if (currentUser.role === 'ADMIN') {
-    return <Navigate to="/" replace />
+    return <Navigate to="/admin" replace />
   }
 
   if (isEditing && (!existing || existing.sellerId !== currentUser.id)) {

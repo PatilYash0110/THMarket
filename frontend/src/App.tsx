@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
-import { RequireAdmin, RequireAuth } from './components/RequireAuth'
+import { RequireAdmin, RequireStudent } from './components/RequireAuth'
 import { Admin } from './pages/Admin'
 import { Checkout } from './pages/Checkout'
 import { Favorites } from './pages/Favorites'
@@ -27,41 +27,41 @@ export default function App() {
         <Route
           path="profile"
           element={
-            <RequireAuth>
+            <RequireStudent>
               <Profile />
-            </RequireAuth>
+            </RequireStudent>
           }
         />
         <Route
           path="favorites"
           element={
-            <RequireAuth>
+            <RequireStudent>
               <Favorites />
-            </RequireAuth>
+            </RequireStudent>
           }
         />
         <Route
           path="messages"
           element={
-            <RequireAuth>
+            <RequireStudent>
               <Messages />
-            </RequireAuth>
+            </RequireStudent>
           }
         />
         <Route
           path="messages/:conversationId"
           element={
-            <RequireAuth>
+            <RequireStudent>
               <Messages />
-            </RequireAuth>
+            </RequireStudent>
           }
         />
         <Route
           path="checkout/:listingId"
           element={
-            <RequireAuth>
+            <RequireStudent>
               <Checkout />
-            </RequireAuth>
+            </RequireStudent>
           }
         />
         <Route

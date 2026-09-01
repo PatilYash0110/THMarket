@@ -13,6 +13,25 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   return <>{children}</>
 }
 
+/**
+ * For marketplace-only areas (buying, selling, chatting, favoriting).
+ * Admin accounts are confined to /admin — they don't browse or transact.
+ */
+export function RequireStudent({ children }: { children: ReactNode }) {
+  const { currentUser } = useAuth()
+  const location = useLocation()
+
+  if (!currentUser) {
+    return <Navigate to="/login" state={{ from: location }} replace />
+  }
+
+  if (currentUser.role !== 'STUDENT') {
+    return <Navigate to="/admin" replace />
+  }
+
+  return <>{children}</>
+}
+
 export function RequireAdmin({ children }: { children: ReactNode }) {
   const { currentUser } = useAuth()
 
