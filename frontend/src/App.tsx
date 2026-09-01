@@ -1,12 +1,14 @@
+import { Route, Routes } from 'react-router-dom'
+import { Layout } from './components/Layout'
+import { NotFound } from './pages/NotFound'
+
 export default function App() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-        THM<span className="text-accent">market</span>
-      </h1>
-      <p className="mt-2 text-sm text-foreground-muted">
-        Tailwind and the design tokens are wired up.
-      </p>
-    </div>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route index element={<div>Willkommen bei THMarket</div>} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
   )
 }
