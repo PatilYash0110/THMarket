@@ -1,10 +1,12 @@
 import clsx from 'clsx'
 import { useMemo } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Navigate, useSearchParams } from 'react-router-dom'
 import { EmptyState } from '../components/EmptyState'
 import { ListingCard } from '../components/ListingCard'
+import { useAuth } from '../context/AuthContext'
 import { useListings } from '../context/ListingsContext'
 import type { ListingCategory } from '../types'
+import { LandingPage } from './LandingPage'
 
 const CATEGORIES: ListingCategory[] = [
   'Elektronik',
@@ -18,6 +20,7 @@ const CATEGORIES: ListingCategory[] = [
 type SortOption = 'neueste' | 'preis-auf' | 'preis-ab'
 
 export function Home() {
+  const { currentUser } = useAuth()
   const { listings } = useListings()
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -59,22 +62,16 @@ export function Home() {
     setSearchParams(params)
   }
 
-  const showHero = !query && !category
+  if (!currentUser) {
+    return <LandingPage />
+  }
+
+  if (currentUser.role === 'ADMIN') {
+    return <Navigate to="/admin" replace />
+  }
 
   return (
     <div className="flex flex-col gap-10">
-      {showHero && (
-        <section className="border-b border-border pb-10">
-          <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-            Kaufen und verkaufen, exklusiv für THM-Studierende.
-          </h1>
-          <p className="mt-4 max-w-xl text-base text-foreground-muted">
-            Verifiziert mit deiner @thm.de-Adresse. Elektronik, Bücher, Möbel und mehr — direkt
-            von Kommiliton:innen.
-          </p>
-        </section>
-      )}
-
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap gap-2">
           <button
@@ -135,4 +132,3 @@ export function Home() {
     </div>
   )
 }
-
