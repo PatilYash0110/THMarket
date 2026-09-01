@@ -2,6 +2,13 @@ import { ChatCircle, GraduationCap, ShieldCheck } from '@phosphor-icons/react'
 import { Link } from 'react-router-dom'
 import startpageImage from '../../media/startpage_image_non_register.png'
 import { Button } from '../components/Button'
+import { TypingHeadline } from '../components/TypingHeadline'
+
+const HEADLINES = [
+  'Dein Campus Marktplatz.',
+  'Kaufen, verkaufen, vernetzen.',
+  'Von Studierenden, für Studierende.',
+]
 
 const FEATURES = [
   {
@@ -28,13 +35,11 @@ export function LandingPage() {
         <div className="flex flex-col justify-center gap-14">
           <div className="flex flex-col gap-7">
             <h1 className="text-6xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-7xl">
-              Nur für THM.
-              <br />
-              Nur echte Studierende.
+              <TypingHeadline sentences={HEADLINES} />
             </h1>
             <p className="max-w-md text-lg text-foreground-muted">
-              Jede Anzeige kommt von einer verifizierten @thm.de-Adresse. Kein Fremdmarkt, kein
-              Spam — nur dein Campus.
+              THMarket ist der Marktplatz exklusiv für Studierende der THM. Verkaufe, was du
+              nicht mehr brauchst, finde günstige Angebote in deiner Nähe.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link to="/register">
