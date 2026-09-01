@@ -8,6 +8,7 @@ import { Register } from './pages/Register'
 import { ListingForm } from './pages/ListingForm'
 import { Profile } from './pages/Profile'
 import { RequireAuth } from './components/RequireAuth'
+import { Favorites } from './pages/Favorites'
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="listing/:id/edit" element={<ListingForm />} />
         <Route path="listing/:id" element={<ListingDetail />} />
         <Route path="profile" element={<RequireAuth><Profile /></RequireAuth>} />
+        <Route path="favorites" element={<RequireAuth><Favorites /></RequireAuth>} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
