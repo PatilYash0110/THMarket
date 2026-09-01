@@ -48,7 +48,7 @@ export function Impressum() {
             Hinweis zum Projektstatus
           </h2>
           <p>
-            THMmarket ist ein studentisches Projekt im Rahmen des Kurses „Projekt 1 –
+            THMarket ist ein studentisches Projekt im Rahmen des Kurses „Projekt 1 –
             Softwaretechnik“ an der Technischen Hochschule Mittelhessen (THM) und dient
             ausschließlich Demonstrations- und Lehrzwecken. Es besteht kein kommerzieller Betrieb.
           </p>
@@ -76,4 +76,3 @@ export function Impressum() {
       </div>
     )
   }
-  

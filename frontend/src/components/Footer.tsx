@@ -8,7 +8,7 @@ export function Footer() {
           THM<span className="text-accent">market</span>
         </p>
         <div className="flex items-center gap-4 text-xs text-on-slate/70">
-          <span>© {new Date().getFullYear()} THMmarket</span>
+          <span>© {new Date().getFullYear()} THMarket</span>
           <Link to="/impressum" className="hover:text-on-slate hover:underline">
             Impressum
           </Link>
