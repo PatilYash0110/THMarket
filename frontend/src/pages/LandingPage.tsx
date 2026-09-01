@@ -1,5 +1,6 @@
 import { ChatCircle, GraduationCap, ShieldCheck } from '@phosphor-icons/react'
 import { Link } from 'react-router-dom'
+import startpageImage from '../../media/startpage_image_non_register.png'
 import { Button } from '../components/Button'
 
 const FEATURES = [
@@ -22,8 +23,8 @@ const FEATURES = [
 
 export function LandingPage() {
   return (
-    <div className="flex flex-col gap-24 py-8">
-      <section className="grid grid-cols-1 items-center gap-12 md:grid-cols-2">
+    <div className="grid grid-cols-1 items-stretch gap-12 py-8 md:grid-cols-2">
+      <div className="flex flex-col gap-10">
         <div className="flex flex-col gap-6">
           <h1 className="text-5xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-6xl">
             Nur für THM.
@@ -46,20 +47,27 @@ export function LandingPage() {
           </div>
         </div>
 
-      </section>
+        <div className="flex flex-col gap-8 border-t border-border pt-10">
+          {FEATURES.map((feature) => (
+            <div key={feature.title} className="flex flex-col gap-3">
+              <feature.icon size={24} className="text-accent" aria-hidden />
+              <p className="text-sm font-semibold uppercase tracking-wide text-foreground">
+                {feature.title}
+              </p>
+              <p className="text-sm text-foreground-muted">{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
 
-      <section className="grid grid-cols-1 gap-10 border-t border-border pt-16 sm:grid-cols-3">
-        {FEATURES.map((feature) => (
-          <div key={feature.title} className="flex flex-col gap-3">
-            <feature.icon size={24} className="text-accent" aria-hidden />
-            <p className="text-sm font-semibold uppercase tracking-wide text-foreground">
-              {feature.title}
-            </p>
-            <p className="text-sm text-foreground-muted">{feature.description}</p>
-          </div>
-        ))}
-      </section>
+      <div className="hidden md:block">
+        <img
+          src={startpageImage}
+          alt=""
+          aria-hidden
+          className="h-full w-full object-cover"
+        />
+      </div>
     </div>
   )
 }
-
