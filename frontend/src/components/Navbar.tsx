@@ -29,10 +29,9 @@ import {
     return (
       <header className="sticky top-0 z-40 border-b border-border bg-background">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="flex shrink-0 items-center gap-1.5">
-            <span className="text-lg font-semibold tracking-tight text-foreground">THM</span>
-            <img src={logo} alt="market" className="h-5 w-auto" />
-          </Link>
+            <Link to="/" className="flex shrink-0 items-center">
+                <img src={logo} alt="THMmarket" className="h-15 w-auto" />
+            </Link>
   
           {currentUser && (
           <form onSubmit={handleSearch} className="hidden flex-1 items-center md:flex">
