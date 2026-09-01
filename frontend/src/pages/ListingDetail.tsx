@@ -48,7 +48,7 @@ export function ListingDetail() {
           <div className="flex gap-2">
             {listing.images.map((image, index) => (
               <button
-                key={image}
+                key={`${listing.id}-image-${index}`}
                 type="button"
                 onClick={() => setActiveImage(index)}
                 aria-label={`Bild ${index + 1} anzeigen`}
@@ -132,3 +132,4 @@ export function ListingDetail() {
     </div>
   )
 }
+
