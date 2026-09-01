@@ -4,6 +4,7 @@ import { Button } from '../components/Button'
 import { useAuth } from '../context/AuthContext'
 import { useListings } from '../context/ListingsContext'
 import type { Listing, ListingCategory } from '../types'
+import { placeholderImage } from '../lib/placeholder'
 
 const CATEGORIES: ListingCategory[] = [
   'Elektronik',
@@ -13,8 +14,6 @@ const CATEGORIES: ListingCategory[] = [
   'Kleidung',
   'Sonstiges',
 ]
-
-const FALLBACK_IMAGE = 'https://picsum.photos/seed/neues-inserat/640/640'
 
 export function ListingForm() {
   const { id } = useParams<{ id: string }>()
@@ -49,7 +48,7 @@ export function ListingForm() {
   function handleSubmit(event: FormEvent) {
     event.preventDefault()
     const priceCents = Math.round(Number.parseFloat(price.replace(',', '.')) * 100)
-    const images = [imageUrl.trim() || FALLBACK_IMAGE]
+    const images = [imageUrl.trim() || placeholderImage(title)]
 
     if (isEditing && existing) {
       updateListing(existing.id, {

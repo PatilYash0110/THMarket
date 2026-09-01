@@ -1,8 +1,9 @@
+import { placeholderImage } from '../lib/placeholder'
 import type { Listing } from '../types'
 import { MOCK_STUDENT } from './users'
 
-function img(seed: string) {
-  return `https://picsum.photos/seed/${seed}/640/640`
+function img(label: string) {
+  return placeholderImage(label)
 }
 
 export const INITIAL_LISTINGS: Listing[] = [
@@ -13,7 +14,7 @@ export const INITIAL_LISTINGS: Listing[] = [
       'Verkaufe mein MacBook Air M1 in sehr gutem Zustand. Wenig genutzt, keine Kratzer, inkl. Original-Ladegerät. Ideal für Studium und Programmieren.',
     priceCents: 65000,
     category: 'Elektronik',
-    images: [img('macbook-1'), img('macbook-2')],
+    images: [img('MacBook Air'), img('MacBook Air')],
     sofortkaufMoeglich: true,
     status: 'AKTIV',
     sellerId: MOCK_STUDENT.id,
@@ -26,7 +27,7 @@ export const INITIAL_LISTINGS: Listing[] = [
       'Aktuelle Auflage, kaum Gebrauchsspuren, keine Markierungen. Perfekt für Projekt 1.',
     priceCents: 1800,
     category: 'Bücher & Skripte',
-    images: [img('book-1')],
+    images: [img('Lehrbuch Softwaretechnik')],
     sofortkaufMoeglich: true,
     status: 'AKTIV',
     sellerId: MOCK_STUDENT.id,
@@ -39,7 +40,7 @@ export const INITIAL_LISTINGS: Listing[] = [
       'Elektrisch höhenverstellbarer Schreibtisch, 140x70cm. Selbstabholung in Gießen.',
     priceCents: 12000,
     category: 'Möbel',
-    images: [img('desk-1')],
+    images: [img('Schreibtisch')],
     sofortkaufMoeglich: false,
     status: 'AKTIV',
     sellerId: MOCK_STUDENT.id,
@@ -52,7 +53,7 @@ export const INITIAL_LISTINGS: Listing[] = [
       'Zuverlässiges Trekkingrad, 21-Gang-Schaltung, neue Bremsbeläge. Ideal für den Weg zur Hochschule.',
     priceCents: 22000,
     category: 'Fahrräder',
-    images: [img('bike-1'), img('bike-2')],
+    images: [img('Trekkingrad'), img('Trekkingrad')],
     sofortkaufMoeglich: true,
     status: 'AKTIV',
     sellerId: MOCK_STUDENT.id,
@@ -64,7 +65,7 @@ export const INITIAL_LISTINGS: Listing[] = [
     description: 'Warme Winterjacke, kaum getragen, Herrengröße M.',
     priceCents: 3500,
     category: 'Kleidung',
-    images: [img('jacket-1')],
+    images: [img('Winterjacke')],
     sofortkaufMoeglich: true,
     status: 'VERKAUFT',
     sellerId: MOCK_STUDENT.id,
@@ -76,7 +77,7 @@ export const INITIAL_LISTINGS: Listing[] = [
     description: 'Voll funktionsfähig, mit Anleitung und Tasche.',
     priceCents: 4500,
     category: 'Elektronik',
-    images: [img('calculator-1')],
+    images: [img('Grafikrechner')],
     sofortkaufMoeglich: false,
     status: 'AKTIV',
     sellerId: MOCK_STUDENT.id,
@@ -88,7 +89,7 @@ export const INITIAL_LISTINGS: Listing[] = [
     description: 'Ergonomischer Bürostuhl mit Lendenwirbelstütze, verstellbare Armlehnen.',
     priceCents: 8000,
     category: 'Möbel',
-    images: [img('chair-1')],
+    images: [img('Bürostuhl')],
     sofortkaufMoeglich: true,
     status: 'AKTIV',
     sellerId: MOCK_STUDENT.id,
@@ -100,7 +101,7 @@ export const INITIAL_LISTINGS: Listing[] = [
     description: 'Verschiedene USB-C-Kabel, Adapter und ein altes Ladegerät, alles zusammen.',
     priceCents: 800,
     category: 'Sonstiges',
-    images: [img('cables-1')],
+    images: [img('Kabel Adapter')],
     sofortkaufMoeglich: false,
     status: 'AKTIV',
     sellerId: MOCK_STUDENT.id,
