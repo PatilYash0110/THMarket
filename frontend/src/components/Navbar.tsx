@@ -25,12 +25,17 @@ import {
       if (query.trim()) params.set('q', query.trim())
       navigate(`/?${params.toString()}`)
     }
+
+    function handleLogout() {
+        logout()
+        navigate('/')
+      }
   
     return (
       <header className="sticky top-0 z-40 border-b border-border bg-background">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
             <Link to="/" className="flex shrink-0 items-center">
-                <img src={logo} alt="THMmarket" className="h-16 w-auto" />
+                <img src={logo} alt="THMarket" className="h-16 w-auto" />
             </Link>
   
           {currentUser && (
@@ -102,13 +107,13 @@ import {
                   <span className="hidden lg:inline">{currentUser.name}</span>
                 </Link>
                 <span className="hidden sm:inline-block">
-                  <Button size="sm" variant="ghost" onClick={logout}>
+                  <Button size="sm" variant="ghost" onClick={handleLogout}>
                     Abmelden
                   </Button>
                 </span>
                 <button
                   type="button"
-                  onClick={logout}
+                  onClick={handleLogout}
                   aria-label="Abmelden"
                   className="flex h-10 w-10 cursor-pointer items-center justify-center text-foreground hover:text-accent sm:hidden"
                 >
