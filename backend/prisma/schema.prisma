@@ -13,15 +13,58 @@ enum Role {
 }
 
 model User {
-  id                        String    @id @default(cuid())
-  email                     String    @unique
-  name                      String
-  passwordHash              String
-  role                      Role      @default(STUDENT)
-  verified                  Boolean   @default(false)
-  emailVerificationToken    String?   @unique
-  emailVerificationExpires  DateTime?
-  balanceCents              Int       @default(0)
-  createdAt                 DateTime  @default(now())
-  updatedAt                 DateTime  @updatedAt
+  id                       String    @id @default(cuid())
+  email                    String    @unique
+  name                     String
+  passwordHash             String
+  role                     Role      @default(STUDENT)
+  verified                 Boolean   @default(false)
+  emailVerificationToken   String?   @unique
+  emailVerificationExpires DateTime?
+  balanceCents             Int       @default(0)
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+  listings                 Listing[]
+  favorites                Favorite[]
+}
+
+enum ListingStatus {
+  AKTIV
+  VERKAUFT
+}
+
+// Kategorie ist ein validierter String, kein echtes Enum — die echten Werte
+// ("Bücher & Skripte" usw.) sind keine gültigen Prisma-Enum-Bezeichner und
+// bräuchten ein @map auf DB-taugliche Schlüssel, was der Client dann statt
+// des Anzeigetexts zurückgeben würde. Stattdessen Validierung über @IsIn(...)
+// in den DTOs; manuell synchron zu halten mit
+// frontend/src/types/listing.ts's ListingCategory-Union.
+model Listing {
+  id                 String        @id @default(cuid())
+  title              String
+  description        String
+  priceCents         Int
+  category           String
+  images             String[]
+  sofortkaufMoeglich Boolean       @default(true)
+  status             ListingStatus @default(AKTIV)
+  sellerId           String
+  seller             User          @relation(fields: [sellerId], references: [id])
+  favorites          Favorite[]
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@index([sellerId])
+  @@index([status])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, listingId])
 }
