@@ -6,7 +6,6 @@ import { Button } from '../components/Button'
 import { useAuth } from '../context/AuthContext'
 import { useListings } from '../context/ListingsContext'
 import { formatDate, formatPrice } from '../lib/format'
-import { findUserById } from '../mocks/users'
 
 export function ListingDetail() {
   const { id } = useParams<{ id: string }>()
@@ -21,7 +20,7 @@ export function ListingDetail() {
     return <Navigate to="/" replace />
   }
 
-  const seller = findUserById(listing.sellerId)
+  const seller = listing.seller
   const sold = listing.status === 'VERKAUFT'
   const isOwner = currentUser?.id === listing.sellerId
   const isAdmin = currentUser?.role === 'ADMIN'
@@ -81,19 +80,17 @@ export function ListingDetail() {
           {listing.description}
         </p>
 
-        {seller && (
-          <div className="flex items-center justify-between border border-border px-4 py-3">
-            <div>
-              <p className="text-sm font-medium text-foreground">{seller.name}</p>
-              {seller.verified && (
-                <p className="mt-0.5 flex items-center gap-1 text-xs text-accent">
-                  <ShieldCheck size={14} weight="fill" aria-hidden />
-                  Verifizierte THM-Adresse
-                </p>
-              )}
-            </div>
+        <div className="flex items-center justify-between border border-border px-4 py-3">
+          <div>
+            <p className="text-sm font-medium text-foreground">{seller.name}</p>
+            {seller.verified && (
+              <p className="mt-0.5 flex items-center gap-1 text-xs text-accent">
+                <ShieldCheck size={14} weight="fill" aria-hidden />
+                Verifizierte THM-Adresse
+              </p>
+            )}
           </div>
-        )}
+        </div>
 
         {isAdmin ? (
           <p className="text-xs uppercase tracking-wide text-foreground-muted">
