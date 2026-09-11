@@ -9,13 +9,13 @@ export class ApiError extends Error {
   }
 }
 
-async function parseErrorMessage(response: Response): Promise<string> {
+export async function parseErrorMessage(response: Response): Promise<string> {
   try {
     const body = await response.json()
     if (typeof body.message === 'string') return body.message
     if (Array.isArray(body.message)) return body.message.join(' ')
   } catch {
-    // response wasn't JSON — fall through to the generic message
+    // Antwort war kein JSON — Standardmeldung verwenden
   }
   return 'Etwas ist schiefgelaufen. Bitte versuche es erneut.'
 }
