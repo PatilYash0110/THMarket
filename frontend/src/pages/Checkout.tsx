@@ -1,6 +1,7 @@
 import { CheckCircle } from '@phosphor-icons/react'
 import { type FormEvent, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
+import { ApiError } from '../api/auth'
 import { Button } from '../components/Button'
 import { useAuth } from '../context/AuthContext'
 import { useListings } from '../context/ListingsContext'
@@ -15,6 +16,7 @@ export function Checkout() {
   const [mode, setMode] = useState<PaymentMode>('simulation')
   const [error, setError] = useState<string | null>(null)
   const [completed, setCompleted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
   const listing = listingId ? getListing(listingId) : undefined
 
@@ -22,9 +24,9 @@ export function Checkout() {
     return <Navigate to="/login" replace />
   }
 
-  // Checked before the "still purchasable" guard below: once markAsSold() flips
-  // the listing to VERKAUFT inside handleSubmit, that guard would otherwise fire
-  // on the resulting re-render and redirect away before the success screen shows.
+  // Wird vor der "noch käuflich"-Prüfung unten geprüft: Sobald markAsSold()
+  // in handleSubmit das Inserat auf VERKAUFT setzt, würde diese Prüfung sonst
+  // beim resultierenden Re-Render greifen und vor der Erfolgsseite wegleiten.
   if (completed && listing) {
     return (
       <div className="mx-auto flex max-w-sm flex-col items-center gap-4 py-16 text-center">
@@ -46,9 +48,9 @@ export function Checkout() {
 
   const buyer = currentUser
 
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault()
-    if (!listing) return
+    if (!listing || submitting) return
 
     if (mode === 'guthaben' && buyer.balanceCents < listing.priceCents) {
       setError('Nicht genügend Guthaben für diesen Kauf.')
@@ -56,11 +58,18 @@ export function Checkout() {
     }
 
     setError(null)
-    if (mode === 'guthaben') {
-      adjustBalance(-listing.priceCents)
+    setSubmitting(true)
+    try {
+      await markAsSold(listing.id)
+      if (mode === 'guthaben') {
+        adjustBalance(-listing.priceCents)
+      }
+      setCompleted(true)
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Kauf fehlgeschlagen. Bitte versuche es erneut.')
+    } finally {
+      setSubmitting(false)
     }
-    markAsSold(listing.id)
-    setCompleted(true)
   }
 
   return (
@@ -141,8 +150,8 @@ export function Checkout() {
           </p>
         )}
 
-        <Button type="submit" size="lg">
-          Jetzt kaufen — {formatPrice(listing.priceCents)}
+        <Button type="submit" size="lg" disabled={submitting}>
+          {submitting ? 'Wird verarbeitet…' : `Jetzt kaufen — ${formatPrice(listing.priceCents)}`}
         </Button>
       </form>
     </div>
