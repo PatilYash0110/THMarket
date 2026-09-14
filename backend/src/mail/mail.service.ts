@@ -11,13 +11,16 @@ export class MailService {
     const user = this.config.get<string>('GMAIL_USER');
     const pass = this.config.get<string>('GMAIL_APP_PASSWORD');
 
-    this.transporter =
-      user && pass
-        ? nodemailer.createTransport({
-            service: 'gmail',
-            auth: { user, pass },
-          })
-        : null;
+    if (user && pass) {
+      const transportOptions = {
+        service: 'gmail',
+        auth: { user, pass },
+        family: 4,
+      };
+      this.transporter = nodemailer.createTransport(transportOptions);
+    } else {
+      this.transporter = null;
+    }
   }
 
   async sendVerificationEmail(to: string, name: string, verifyUrl: string): Promise<void> {
