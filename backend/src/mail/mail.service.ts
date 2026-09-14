@@ -13,7 +13,10 @@ export class MailService {
 
     if (user && pass) {
       const transportOptions = {
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        requireTLS: true,
         auth: { user, pass },
         family: 4,
       };
