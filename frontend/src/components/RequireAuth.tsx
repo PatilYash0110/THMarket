@@ -2,24 +2,15 @@ import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-export function RequireAuth({ children }: { children: ReactNode }) {
-  const { currentUser } = useAuth()
-  const location = useLocation()
-
-  if (!currentUser) {
-    return <Navigate to="/login" state={{ from: location }} replace />
-  }
-
-  return <>{children}</>
-}
-
 /**
  * For marketplace-only areas (buying, selling, chatting, favoriting).
  * Admin accounts are confined to /admin — they don't browse or transact.
  */
 export function RequireStudent({ children }: { children: ReactNode }) {
-  const { currentUser } = useAuth()
+  const { currentUser, loading } = useAuth()
   const location = useLocation()
+
+  if (loading) return null
 
   if (!currentUser) {
     return <Navigate to="/login" state={{ from: location }} replace />
@@ -33,7 +24,9 @@ export function RequireStudent({ children }: { children: ReactNode }) {
 }
 
 export function RequireAdmin({ children }: { children: ReactNode }) {
-  const { currentUser } = useAuth()
+  const { currentUser, loading } = useAuth()
+
+  if (loading) return null
 
   if (!currentUser) {
     return <Navigate to="/login" replace />

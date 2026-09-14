@@ -1,12 +1,13 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { fetchCurrentUser, loginUser } from '../api/auth'
 import type { User } from '../types'
-import { findUserById } from '../mocks/users'
 
-const STORAGE_KEY = 'thmarket.currentUserId'
+const TOKEN_STORAGE_KEY = 'thmarket.token'
 
 interface AuthContextValue {
   currentUser: User | null
-  loginAs: (userId: string) => void
+  loading: boolean
+  login: (email: string, password: string) => Promise<void>
   logout: () => void
   adjustBalance: (deltaCents: number) => void
 }
@@ -14,25 +15,33 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    const storedId = localStorage.getItem(STORAGE_KEY)
-    return storedId ? (findUserById(storedId) ?? null) : null
-  })
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem(STORAGE_KEY, currentUser.id)
-    } else {
-      localStorage.removeItem(STORAGE_KEY)
+    const token = localStorage.getItem(TOKEN_STORAGE_KEY)
+    if (!token) {
+      setLoading(false)
+      return
     }
-  }, [currentUser])
 
-  function loginAs(userId: string) {
-    const user = findUserById(userId)
-    setCurrentUser(user ?? null)
+    fetchCurrentUser(token)
+      .then(setCurrentUser)
+      .catch(() => {
+        localStorage.removeItem(TOKEN_STORAGE_KEY)
+        setCurrentUser(null)
+      })
+      .finally(() => setLoading(false))
+  }, [])
+
+  async function login(email: string, password: string) {
+    const { accessToken, user } = await loginUser({ email, password })
+    localStorage.setItem(TOKEN_STORAGE_KEY, accessToken)
+    setCurrentUser(user)
   }
 
   function logout() {
+    localStorage.removeItem(TOKEN_STORAGE_KEY)
     setCurrentUser(null)
   }
 
@@ -41,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ currentUser, loginAs, logout, adjustBalance }}>
+    <AuthContext.Provider value={{ currentUser, loading, login, logout, adjustBalance }}>
       {children}
     </AuthContext.Provider>
   )

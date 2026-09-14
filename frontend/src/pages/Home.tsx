@@ -20,7 +20,7 @@ const CATEGORIES: ListingCategory[] = [
 type SortOption = 'neueste' | 'preis-auf' | 'preis-ab'
 
 export function Home() {
-  const { currentUser } = useAuth()
+  const { currentUser, loading } = useAuth()
   const { listings } = useListings()
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -62,6 +62,8 @@ export function Home() {
     setSearchParams(params)
   }
 
+  if (loading) return null
+
   if (!currentUser) {
     return <LandingPage />
   }
@@ -102,7 +104,6 @@ export function Home() {
             </button>
           ))}
         </div>
-
         <label className="flex items-center gap-2 text-xs text-foreground-muted">
           Sortieren
           <select
@@ -116,7 +117,6 @@ export function Home() {
           </select>
         </label>
       </div>
-
       {filtered.length === 0 ? (
         <EmptyState
           title="Keine Inserate gefunden"

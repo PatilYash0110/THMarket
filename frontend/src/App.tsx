@@ -12,6 +12,7 @@ import { Messages } from './pages/Messages'
 import { NotFound } from './pages/NotFound'
 import { Profile } from './pages/Profile'
 import { Register } from './pages/Register'
+import { VerifyEmail } from './pages/VerifyEmail'
 import { Impressum } from './pages/Impressum'
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="listing/:id/edit" element={<ListingForm />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="verify-email" element={<VerifyEmail />} />
         <Route path="impressum" element={<Impressum />} />
 
         <Route

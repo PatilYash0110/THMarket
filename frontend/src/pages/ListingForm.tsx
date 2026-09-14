@@ -1,11 +1,12 @@
 import { Plus, X } from '@phosphor-icons/react'
 import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { uploadListingImages } from '../api/listings'
 import { Button } from '../components/Button'
 import { useAuth } from '../context/AuthContext'
 import { useListings } from '../context/ListingsContext'
 import { placeholderImage } from '../lib/placeholder'
-import type { Listing, ListingCategory } from '../types'
+import type { ListingCategory } from '../types'
 
 const CATEGORIES: ListingCategory[] = [
   'Elektronik',
@@ -17,6 +18,12 @@ const CATEGORIES: ListingCategory[] = [
 ]
 
 const MAX_IMAGES = 6
+
+// Vorhandene Fotos haben schon eine echte (Cloudinary-)URL; frisch gewählte
+// sind rohe Files, die erst beim Absenden hochgeladen werden — bis dahin
+// werden sie über eine lokale Object-URL als Vorschau angezeigt. Beide
+// laufen durch dasselbe Vorschau-Raster.
+type ImageItem = { kind: 'existing'; url: string } | { kind: 'new'; file: File; previewUrl: string }
 
 export function ListingForm() {
   const { id } = useParams<{ id: string }>()
@@ -32,7 +39,10 @@ export function ListingForm() {
   const [price, setPrice] = useState(existing ? String(existing.priceCents / 100) : '')
   const [description, setDescription] = useState(existing?.description ?? '')
   const [sofortkauf, setSofortkauf] = useState(existing?.sofortkaufMoeglich ?? true)
-  const [images, setImages] = useState<string[]>(existing?.images ?? [])
+  const [images, setImages] = useState<ImageItem[]>(
+    (existing?.images ?? []).map((url) => ({ kind: 'existing', url })),
+  )
+  const [submitting, setSubmitting] = useState(false)
   const objectUrlsRef = useRef(new Set<string>())
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -46,20 +56,22 @@ export function ListingForm() {
   function handleFilesSelected(fileList: FileList | null) {
     if (!fileList) return
     const files = Array.from(fileList).slice(0, MAX_IMAGES - images.length)
-    const newUrls = files.map((file) => {
-      const url = URL.createObjectURL(file)
-      objectUrlsRef.current.add(url)
-      return url
+    const newItems: ImageItem[] = files.map((file) => {
+      const previewUrl = URL.createObjectURL(file)
+      objectUrlsRef.current.add(previewUrl)
+      return { kind: 'new', file, previewUrl }
     })
-    setImages((prev) => [...prev, ...newUrls])
+    setImages((prev) => [...prev, ...newItems])
   }
 
-  function removeImage(url: string) {
-    if (objectUrlsRef.current.has(url)) {
-      URL.revokeObjectURL(url)
-      objectUrlsRef.current.delete(url)
+  function removeImage(item: ImageItem) {
+    if (item.kind === 'new') {
+      URL.revokeObjectURL(item.previewUrl)
+      objectUrlsRef.current.delete(item.previewUrl)
     }
-    setImages((prev) => prev.filter((image) => image !== url))
+    setImages((prev) =>
+      prev.filter((image) => (item.kind === 'existing' ? !(image.kind === 'existing' && image.url === item.url) : !(image.kind === 'new' && image.file === item.file))),
+    )
   }
 
   if (!currentUser) {
@@ -74,15 +86,35 @@ export function ListingForm() {
     return <Navigate to="/" replace />
   }
 
-  const seller = currentUser
-
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault()
-    const priceCents = Math.round(Number.parseFloat(price.replace(',', '.')) * 100)
-    const finalImages = images.length > 0 ? images : [placeholderImage(title)]
+    if (submitting) return
+    setSubmitting(true)
+    try {
+      const priceCents = Math.round(Number.parseFloat(price.replace(',', '.')) * 100)
 
-    if (isEditing && existing) {
-      updateListing(existing.id, {
+      const newFiles = images.filter((item): item is Extract<ImageItem, { kind: 'new' }> => item.kind === 'new')
+      const uploadedUrls = newFiles.length > 0 ? await uploadListingImages(newFiles.map((item) => item.file)) : []
+      let uploadIndex = 0
+      const resolvedImages = images.map((item) =>
+        item.kind === 'existing' ? item.url : uploadedUrls[uploadIndex++],
+      )
+      const finalImages = resolvedImages.length > 0 ? resolvedImages : [placeholderImage(title)]
+
+      if (isEditing && existing) {
+        await updateListing(existing.id, {
+          title,
+          category,
+          priceCents,
+          description,
+          sofortkaufMoeglich: sofortkauf,
+          images: finalImages,
+        })
+        navigate(`/listing/${existing.id}`)
+        return
+      }
+
+      const newListing = await addListing({
         title,
         category,
         priceCents,
@@ -90,24 +122,21 @@ export function ListingForm() {
         sofortkaufMoeglich: sofortkauf,
         images: finalImages,
       })
-      navigate(`/listing/${existing.id}`)
-      return
+      navigate(`/listing/${newListing.id}`)
+    } finally {
+      setSubmitting(false)
     }
+  }
 
-    const newListing: Listing = {
-      id: `listing-${Date.now()}`,
-      title,
-      category,
-      priceCents,
-      description,
-      sofortkaufMoeglich: sofortkauf,
-      images: finalImages,
-      status: 'AKTIV',
-      sellerId: seller.id,
-      createdAt: new Date().toISOString(),
+  async function handleMarkAsSold() {
+    if (!existing || submitting) return
+    setSubmitting(true)
+    try {
+      await markAsSold(existing.id)
+      navigate(`/listing/${existing.id}`)
+    } finally {
+      setSubmitting(false)
     }
-    addListing(newListing)
-    navigate(`/listing/${newListing.id}`)
   }
 
   return (
@@ -176,19 +205,22 @@ export function ListingForm() {
         <div className="flex flex-col gap-1.5 text-sm">
           <span className="font-medium text-foreground">Fotos (optional)</span>
           <div className="flex flex-wrap gap-3">
-            {images.map((image) => (
-              <div key={image} className="group relative h-24 w-24 shrink-0 overflow-hidden border border-border">
-                <img src={image} alt="" className="h-full w-full object-cover" aria-hidden />
-                <button
-                  type="button"
-                  onClick={() => removeImage(image)}
-                  aria-label="Bild entfernen"
-                  className="absolute right-1 top-1 flex h-6 w-6 cursor-pointer items-center justify-center bg-background/90 text-foreground hover:text-destructive"
-                >
-                  <X size={14} aria-hidden />
-                </button>
-              </div>
-            ))}
+            {images.map((image) => {
+              const src = image.kind === 'existing' ? image.url : image.previewUrl
+              return (
+                <div key={src} className="group relative h-24 w-24 shrink-0 overflow-hidden border border-border">
+                  <img src={src} alt="" className="h-full w-full object-cover" aria-hidden />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(image)}
+                    aria-label="Bild entfernen"
+                    className="absolute right-1 top-1 flex h-6 w-6 cursor-pointer items-center justify-center bg-background/90 text-foreground hover:text-destructive"
+                  >
+                    <X size={14} aria-hidden />
+                  </button>
+                </div>
+              )
+            })}
             {images.length < MAX_IMAGES && (
               <button
                 type="button"
@@ -213,7 +245,7 @@ export function ListingForm() {
           />
           <span className="text-xs text-foreground-muted">
             Wähle Fotos von deinem Gerät — bis zu {MAX_IMAGES}. Ohne Angabe wird ein Platzhalter
-            verwendet. Dauerhafte Speicherung (Cloudinary) folgt in Phase 3.
+            verwendet.
           </span>
         </div>
 
@@ -224,22 +256,20 @@ export function ListingForm() {
             onChange={(event) => setSofortkauf(event.target.checked)}
             className="h-4 w-4 accent-accent"
           />
-          Sofortkauf ermöglichen (sonst nur „Anbieter kontaktieren“)
+          Sofortkauf ermöglichen (sonst nur „Anbieter kontaktieren")
         </label>
 
         <div className="mt-2 flex flex-wrap gap-3">
-          <Button type="submit" size="lg">
-            {isEditing ? 'Änderungen speichern' : 'Inserat veröffentlichen'}
+          <Button type="submit" size="lg" disabled={submitting}>
+            {submitting ? 'Wird gespeichert…' : isEditing ? 'Änderungen speichern' : 'Inserat veröffentlichen'}
           </Button>
           {isEditing && existing && existing.status === 'AKTIV' && (
             <Button
               type="button"
               variant="secondary"
               size="lg"
-              onClick={() => {
-                markAsSold(existing.id)
-                navigate(`/listing/${existing.id}`)
-              }}
+              disabled={submitting}
+              onClick={handleMarkAsSold}
             >
               Als verkauft markieren
             </Button>
