@@ -42,6 +42,11 @@ export function Profile() {
               {formatPrice(currentUser.balanceCents)}
             </p>
           </div>
+          <Link to="/topup">
+            <Button size="sm" variant="secondary">
+              Aufladen
+            </Button>
+          </Link>
         </div>
       </div>
 

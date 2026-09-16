@@ -5,6 +5,7 @@ import { Admin } from './pages/Admin'
 import { Checkout } from './pages/Checkout'
 import { Favorites } from './pages/Favorites'
 import { Home } from './pages/Home'
+import { Impressum } from './pages/Impressum'
 import { ListingDetail } from './pages/ListingDetail'
 import { ListingForm } from './pages/ListingForm'
 import { Login } from './pages/Login'
@@ -12,8 +13,8 @@ import { Messages } from './pages/Messages'
 import { NotFound } from './pages/NotFound'
 import { Profile } from './pages/Profile'
 import { Register } from './pages/Register'
+import { TopUp } from './pages/TopUp'
 import { VerifyEmail } from './pages/VerifyEmail'
-import { Impressum } from './pages/Impressum'
 
 export default function App() {
   return (
@@ -65,6 +66,14 @@ export default function App() {
           element={
             <RequireStudent>
               <Checkout />
+            </RequireStudent>
+          }
+        />
+        <Route
+          path="topup"
+          element={
+            <RequireStudent>
+              <TopUp />
             </RequireStudent>
           }
         />
