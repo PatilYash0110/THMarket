@@ -20,3 +20,16 @@ export async function topUpBalance(input: {
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
   return response.json()
 }
+
+export async function withdrawBalance(input: {
+  amountCents: number
+  card: { number: string; expiry: string; cvc: string }
+}): Promise<{ balanceCents: number }> {
+  const response = await fetch(`${API_URL}/wallet/withdraw`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(input),
+  })
+  if (!response.ok) throw new ApiError(await parseErrorMessage(response))
+  return response.json()
+}

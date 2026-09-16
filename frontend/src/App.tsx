@@ -15,6 +15,7 @@ import { Profile } from './pages/Profile'
 import { Register } from './pages/Register'
 import { TopUp } from './pages/TopUp'
 import { VerifyEmail } from './pages/VerifyEmail'
+import { Withdraw } from './pages/Withdraw'
 
 export default function App() {
   return (
@@ -74,6 +75,14 @@ export default function App() {
           element={
             <RequireStudent>
               <TopUp />
+            </RequireStudent>
+          }
+        />
+        <Route
+          path="withdraw"
+          element={
+            <RequireStudent>
+              <Withdraw />
             </RequireStudent>
           }
         />

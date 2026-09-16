@@ -47,6 +47,11 @@ export function Profile() {
               Aufladen
             </Button>
           </Link>
+          <Link to="/withdraw">
+            <Button size="sm" variant="ghost">
+              Auszahlen
+            </Button>
+          </Link>
         </div>
       </div>
 
