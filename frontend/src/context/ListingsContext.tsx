@@ -5,6 +5,7 @@ import {
   fetchFavoriteListingIds,
   fetchListings,
   markListingSold,
+  purchaseListing as purchaseListingRequest,
   removeFavorite,
   updateListing as updateListingRequest,
 } from '../api/listings'
@@ -20,6 +21,11 @@ interface CreateListingInput {
   sofortkaufMoeglich: boolean
 }
 
+interface PurchaseInput {
+  paymentMethod: 'simulation' | 'guthaben'
+  card?: { number: string; expiry: string; cvc: string }
+}
+
 interface ListingsContextValue {
   listings: Listing[]
   favoriteIds: string[]
@@ -28,6 +34,7 @@ interface ListingsContextValue {
   addListing: (input: CreateListingInput) => Promise<Listing>
   updateListing: (id: string, updates: Partial<Listing>) => Promise<Listing>
   markAsSold: (id: string) => Promise<Listing>
+  purchaseListing: (id: string, input: PurchaseInput) => Promise<Listing & { buyerBalanceCents?: number }>
   toggleFavorite: (id: string) => Promise<void>
   isFavorite: (id: string) => boolean
 }
@@ -76,6 +83,12 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
     return listing
   }
 
+  async function purchaseListing(id: string, input: PurchaseInput) {
+    const result = await purchaseListingRequest(id, input)
+    setListings((prev) => prev.map((existing) => (existing.id === id ? result : existing)))
+    return result
+  }
+
   async function toggleFavorite(id: string) {
     if (favoriteIds.includes(id)) {
       await removeFavorite(id)
@@ -100,6 +113,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
         addListing,
         updateListing,
         markAsSold,
+        purchaseListing,
         toggleFavorite,
         isFavorite,
       }}

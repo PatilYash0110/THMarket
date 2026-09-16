@@ -58,6 +58,22 @@ export async function markListingSold(id: string): Promise<Listing> {
   return response.json()
 }
 
+export async function purchaseListing(
+  id: string,
+  input: {
+    paymentMethod: 'simulation' | 'guthaben'
+    card?: { number: string; expiry: string; cvc: string }
+  },
+): Promise<Listing & { buyerBalanceCents?: number }> {
+  const response = await fetch(`${API_URL}/listings/${id}/purchase`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(input),
+  })
+  if (!response.ok) throw new ApiError(await parseErrorMessage(response))
+  return response.json()
+}
+
 export async function addFavorite(id: string): Promise<void> {
   const response = await fetch(`${API_URL}/listings/${id}/favorite`, {
     method: 'POST',
