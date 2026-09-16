@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsInt, Max, Min, ValidateNested } from 'class-validator';
+import { IsDefined, IsInt, Max, Min, ValidateNested } from 'class-validator';
 import { MockCardDto } from '../../payments/mock-card';
 
 const MIN_TOPUP_CENTS = 500;
@@ -11,6 +11,11 @@ export class TopUpDto {
   @Max(MAX_TOPUP_CENTS, { message: 'Höchstbetrag ist 500,00 €.' })
   amountCents: number;
 
+  // @ValidateNested() alone does not reject a missing/undefined value (see
+  // purchase-listing.dto.ts) — @IsDefined() is what actually makes this
+  // required, without it a missing `card` would crash the service instead
+  // of cleanly 400-ing.
+  @IsDefined({ message: 'Kartendaten sind erforderlich.' })
   @ValidateNested()
   @Type(() => MockCardDto)
   card: MockCardDto;
