@@ -1,11 +1,14 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { validateMockCard } from '../payments/mock-card';
 import { CreateListingDto } from './dto/create-listing.dto';
+import { PurchaseListingDto } from './dto/purchase-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 
 const SELLER_SELECT = { name: true, verified: true } as const;
@@ -59,28 +62,87 @@ export class ListingsService {
     });
   }
 
-  // Bewusst keine Besitzprüfung: Ein Inserat wird entweder vom eigenen
-  // Verkäufer selbst (über die Bearbeiten-Seite) oder von einem anderen
-  // Studenten, der den Mock-Checkout abschließt, als verkauft markiert. Bis
-  // Phase 5 (Transaktions-Verwaltung) gibt es keine gespeicherte
-  // Transaktion, das Backend kann also noch nicht unterscheiden zwischen
-  // "ein Käufer, der wirklich den Checkout durchlaufen hat" und "irgendein
-  // eingeloggter Student, der diese Route direkt aufruft". Die AKTIV-Prüfung
-  // begrenzt den Schaden auf einen einmaligen, einseitigen Übergang — das
-  // ist eine bewusste, befristete Phasen-Grenze, kein Versehen.
+  // Deliberately no ownership check: the seller can self-mark their own
+  // listing sold from the edit page, with no payment involved. (Buyer-paid
+  // purchases go through `purchase()` below, which does check ownership.)
+  // After that split, this route is still callable directly by anyone
+  // authenticated for €0 — a documented, pre-existing, still-accepted gap,
+  // not something this change closes.
+  //
+  // Uses a conditional `updateMany` rather than a plain findUnique+update:
+  // two concurrent calls could otherwise both read `AKTIV` before either
+  // writes, and both then succeed, since a plain `.update()` has no way to
+  // reject based on the row's state at write time. `UPDATE ... WHERE status
+  // = 'AKTIV'` re-evaluates that predicate against the latest *committed*
+  // row when a concurrent writer has to wait on the lock, so the loser
+  // genuinely gets `count: 0` under Postgres's default READ COMMITTED.
   async markSold(id: string) {
+    const result = await this.prisma.listing.updateMany({
+      where: { id, status: 'AKTIV' },
+      data: { status: 'VERKAUFT' },
+    });
+    if (result.count === 0) {
+      const exists = await this.prisma.listing.findUnique({ where: { id }, select: { id: true } });
+      if (!exists) {
+        throw new NotFoundException('Inserat nicht gefunden.');
+      }
+      throw new ConflictException('Dieses Inserat ist bereits verkauft.');
+    }
+
+    return this.prisma.listing.findUniqueOrThrow({
+      where: { id },
+      include: { seller: { select: SELLER_SELECT } },
+    });
+  }
+
+  // Buyer-paid purchase: 'simulation' validates a mock credit card and never
+  // touches balance ("no money moves"); 'guthaben' atomically debits the
+  // buyer, credits the seller, and flips the listing to VERKAUFT — or rolls
+  // back entirely if any of those three checks fails. Both the listing
+  // status gate and the buyer-balance gate use the same conditional
+  // `updateMany` pattern as `markSold`: wrapping plain reads-then-writes in
+  // `$transaction` alone would NOT prevent two concurrent purchases from
+  // both passing their checks before either writes, which would double-sell
+  // the listing and double-charge/credit both sides.
+  async purchase(id: string, buyerId: string, dto: PurchaseListingDto) {
+    if (dto.paymentMethod === 'simulation') {
+      validateMockCard(dto.card!);
+      return this.markSold(id);
+    }
+
     const listing = await this.prisma.listing.findUnique({ where: { id } });
     if (!listing) {
       throw new NotFoundException('Inserat nicht gefunden.');
     }
-    if (listing.status !== 'AKTIV') {
-      throw new ConflictException('Dieses Inserat ist bereits verkauft.');
+    if (listing.sellerId === buyerId) {
+      throw new ForbiddenException('Du kannst dein eigenes Inserat nicht kaufen.');
     }
 
-    return this.prisma.listing.update({
-      where: { id },
-      data: { status: 'VERKAUFT' },
-      include: { seller: { select: SELLER_SELECT } },
+    return this.prisma.$transaction(async (tx) => {
+      const sold = await tx.listing.updateMany({ where: { id, status: 'AKTIV' }, data: { status: 'VERKAUFT' } });
+      if (sold.count === 0) {
+        throw new ConflictException('Dieses Inserat ist bereits verkauft.');
+      }
+
+      const debited = await tx.user.updateMany({
+        where: { id: buyerId, balanceCents: { gte: listing.priceCents } },
+        data: { balanceCents: { decrement: listing.priceCents } },
+      });
+      if (debited.count === 0) {
+        throw new BadRequestException('Nicht genügend Guthaben für diesen Kauf.');
+      }
+
+      await tx.user.update({
+        where: { id: listing.sellerId },
+        data: { balanceCents: { increment: listing.priceCents } },
+      });
+
+      const buyer = await tx.user.findUniqueOrThrow({ where: { id: buyerId }, select: { balanceCents: true } });
+      const updated = await tx.listing.findUniqueOrThrow({
+        where: { id },
+        include: { seller: { select: SELLER_SELECT } },
+      });
+      return { ...updated, buyerBalanceCents: buyer.balanceCents };
     });
   }
 
