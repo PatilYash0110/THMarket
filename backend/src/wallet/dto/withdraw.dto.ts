@@ -2,12 +2,16 @@ import { Type } from 'class-transformer';
 import { IsDefined, IsInt, Max, Min, ValidateNested } from 'class-validator';
 import { MockCardDto } from '../../payments/mock-card';
 
-const MIN_WITHDRAW_CENTS = 500;
 const MAX_WITHDRAW_CENTS = 50000;
 
 export class WithdrawDto {
+  // Unlike TopUpDto, no business-meaningful minimum here — the real floor is
+  // "don't withdraw more than you have" (checked in the service against the
+  // live balance), not an arbitrary amount. A 5€ minimum copied verbatim
+  // from top-up would make a full-balance withdrawal below that threshold
+  // permanently impossible, which defeats the point of a "cash out" action.
   @IsInt()
-  @Min(MIN_WITHDRAW_CENTS, { message: 'Mindestbetrag ist 5,00 €.' })
+  @Min(1, { message: 'Betrag muss größer als 0 sein.' })
   @Max(MAX_WITHDRAW_CENTS, { message: 'Höchstbetrag ist 500,00 €.' })
   amountCents: number;
 

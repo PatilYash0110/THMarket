@@ -91,7 +91,7 @@ export function Withdraw() {
           <input
             required
             type="number"
-            min="5"
+            min="0.01"
             max={currentUser.balanceCents / 100}
             step="0.01"
             value={amount}
