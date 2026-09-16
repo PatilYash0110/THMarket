@@ -9,7 +9,7 @@ interface AuthContextValue {
   loading: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => void
-  adjustBalance: (deltaCents: number) => void
+  setBalance: (balanceCents: number) => void
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
@@ -45,12 +45,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCurrentUser(null)
   }
 
-  function adjustBalance(deltaCents: number) {
-    setCurrentUser((prev) => (prev ? { ...prev, balanceCents: prev.balanceCents + deltaCents } : prev))
+  function setBalance(balanceCents: number) {
+    setCurrentUser((prev) => (prev ? { ...prev, balanceCents } : prev))
   }
 
   return (
-    <AuthContext.Provider value={{ currentUser, loading, login, logout, adjustBalance }}>
+    <AuthContext.Provider value={{ currentUser, loading, login, logout, setBalance }}>
       {children}
     </AuthContext.Provider>
   )
