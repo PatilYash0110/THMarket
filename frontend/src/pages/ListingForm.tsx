@@ -29,6 +29,7 @@ export function ListingForm() {
   const isEditing = Boolean(id)
   const { currentUser, loading: authLoading } = useAuth()
   const { getListing, loading: listingsLoading } = useListings()
+  const [deleted, setDeleted] = useState(false)
 
   // Unlike routes wrapped in <RequireStudent> (which already gate on this),
   // /listing/new and /listing/:id/edit are bare routes that do their own
@@ -63,6 +64,17 @@ export function ListingForm() {
 
   const existing = id ? getListing(id) : undefined
 
+  // Deleting the listing (below) removes it from the shared listings array,
+  // which would otherwise make this exact "not found" check fire on the
+  // very next render — racing the child's own post-delete navigation and
+  // sometimes winning, landing on "/" instead of "/profile". `deleted` is
+  // set by the child right before that race could happen, so this
+  // wrapper-owned redirect always takes precedence once we know the vanished
+  // listing is our own doing, not a genuine not-found/not-owner case.
+  if (deleted) {
+    return <Navigate to="/profile" replace />
+  }
+
   if (isEditing && (!existing || existing.sellerId !== currentUser.id)) {
     return <Navigate to="/" replace />
   }
@@ -70,10 +82,25 @@ export function ListingForm() {
   // Mounted with a key so React creates a fresh instance — re-seeding every
   // useState from `existing` — whenever the edited listing's identity
   // changes, instead of reusing a stale instance across listings.
-  return <ListingFormFields key={existing?.id ?? 'new'} existing={existing} isEditing={isEditing} />
+  return (
+    <ListingFormFields
+      key={existing?.id ?? 'new'}
+      existing={existing}
+      isEditing={isEditing}
+      onDeleted={() => setDeleted(true)}
+    />
+  )
 }
 
-function ListingFormFields({ existing, isEditing }: { existing: Listing | undefined; isEditing: boolean }) {
+function ListingFormFields({
+  existing,
+  isEditing,
+  onDeleted,
+}: {
+  existing: Listing | undefined
+  isEditing: boolean
+  onDeleted: () => void
+}) {
   const { addListing, updateListing, markAsSold, removeListing } = useListings()
   const navigate = useNavigate()
 
@@ -193,7 +220,13 @@ function ListingFormFields({ existing, isEditing }: { existing: Listing | undefi
     setSubmitting(true)
     try {
       await removeListing(existing.id)
-      navigate('/profile')
+      // Not navigate('/profile') directly: removing the listing from the
+      // shared ListingsContext array makes the parent wrapper's "not found"
+      // check see `existing` vanish on its next render, which can otherwise
+      // race this navigation and win, landing on "/" instead of "/profile".
+      // onDeleted() tells the wrapper this is an expected deletion so it
+      // redirects to /profile itself, with no ambiguity to race.
+      onDeleted()
     } finally {
       setSubmitting(false)
     }
