@@ -1,23 +1,46 @@
-import { Heart, PencilSimple, ShieldCheck } from '@phosphor-icons/react'
+import { Flag, Heart, PencilSimple, ShieldCheck, SmileySad } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
+import { ReportForm } from '../components/ReportForm'
 import { useAuth } from '../context/AuthContext'
 import { useListings } from '../context/ListingsContext'
 import { formatDate, formatPrice } from '../lib/format'
 
+type ReportTarget = 'LISTING' | 'USER' | null
+
 export function ListingDetail() {
   const { id } = useParams<{ id: string }>()
-  const { getListing, isFavorite, toggleFavorite } = useListings()
+  const { getListing, isFavorite, toggleFavorite, loading } = useListings()
   const { currentUser } = useAuth()
   const navigate = useNavigate()
   const [activeImage, setActiveImage] = useState(0)
+  const [reporting, setReporting] = useState<ReportTarget>(null)
 
   const listing = id ? getListing(id) : undefined
 
+  // Wait for the listings list to finish its initial fetch before deciding
+  // "not found" — on a fresh page load (e.g. a hard reload of this URL),
+  // `listings` is still empty for a moment and `getListing` would otherwise
+  // return undefined for a listing that does in fact exist.
+  if (loading) {
+    return null
+  }
+
   if (!listing) {
-    return <Navigate to="/" replace />
+    return (
+      <div className="mx-auto flex max-w-sm flex-col items-center gap-4 py-16 text-center">
+        <SmileySad size={40} className="text-foreground-muted" aria-hidden />
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">Inserat nicht gefunden</h1>
+        <p className="text-sm text-foreground-muted">
+          Dieses Inserat existiert nicht mehr oder wurde entfernt.
+        </p>
+        <Link to="/" className="text-sm font-medium text-accent underline">
+          Zurück zur Startseite
+        </Link>
+      </div>
+    )
   }
 
   const seller = listing.seller
@@ -82,15 +105,29 @@ export function ListingDetail() {
 
         <div className="flex items-center justify-between border border-border px-4 py-3">
           <div>
-            <p className="text-sm font-medium text-foreground">{seller.name}</p>
-            {seller.verified && (
+            <p className="text-sm font-medium text-foreground">{seller?.name ?? 'Gelöschter Nutzer'}</p>
+            {seller?.verified && (
               <p className="mt-0.5 flex items-center gap-1 text-xs text-accent">
                 <ShieldCheck size={14} weight="fill" aria-hidden />
                 Verifizierte THM-Adresse
               </p>
             )}
           </div>
+          {!isAdmin && !isOwner && seller && (
+            <button
+              type="button"
+              onClick={() => setReporting(reporting === 'USER' ? null : 'USER')}
+              className="flex cursor-pointer items-center gap-1 text-xs text-foreground-muted hover:text-destructive"
+            >
+              <Flag size={14} aria-hidden />
+              Nutzer melden
+            </button>
+          )}
         </div>
+
+        {reporting === 'USER' && listing.sellerId && (
+          <ReportForm targetType="USER" targetId={listing.sellerId} onCancel={() => setReporting(null)} />
+        )}
 
         {isAdmin ? (
           <p className="text-xs uppercase tracking-wide text-foreground-muted">
@@ -128,7 +165,20 @@ export function ListingDetail() {
               <Heart size={18} weight={favorite ? 'fill' : 'regular'} className={favorite ? 'text-accent' : undefined} aria-hidden />
               {favorite ? 'Gemerkt' : 'Merken'}
             </Button>
+            <button
+              type="button"
+              onClick={() => setReporting(reporting === 'LISTING' ? null : 'LISTING')}
+              aria-label="Inserat melden"
+              className="flex cursor-pointer items-center gap-1.5 px-2 text-sm text-foreground-muted hover:text-destructive"
+            >
+              <Flag size={16} aria-hidden />
+              Inserat melden
+            </button>
           </div>
+        )}
+
+        {reporting === 'LISTING' && (
+          <ReportForm targetType="LISTING" targetId={listing.id} onCancel={() => setReporting(null)} />
         )}
       </div>
     </div>

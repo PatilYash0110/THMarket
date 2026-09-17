@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { ApiError, registerUser } from '../api/auth'
 import { Button } from '../components/Button'
 import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter'
+import { ResendVerificationButton } from '../components/ResendVerificationButton'
 
 const THM_EMAIL_PATTERN = /^[^\s@]+@([a-z0-9-]+\.)*thm\.de$/i
 // At least one lowercase letter, one uppercase letter, and one digit — mirrors backend/src/auth/dto/register.dto.ts
@@ -22,7 +23,6 @@ export function Register() {
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
-
     if (!THM_EMAIL_PATTERN.test(email)) {
       setError('Bitte verwende eine gültige @thm.de-Adresse (auch Subdomains wie @mnd.thm.de).')
       return
@@ -57,6 +57,7 @@ export function Register() {
           Wir haben eine Bestätigungs-E-Mail an <span className="font-medium text-foreground">{email}</span> gesendet.
           Bitte bestätige deine Adresse, bevor du dich zum ersten Mal anmeldest.
         </p>
+        <ResendVerificationButton email={email} />
         <Link to="/login" className="text-sm font-medium text-accent underline">
           Zur Anmeldung
         </Link>
@@ -72,6 +73,7 @@ export function Register() {
           Nur mit einer verifizierten <span className="font-medium text-foreground">@thm.de</span>-Adresse möglich.
         </p>
       </div>
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1.5 text-sm">
           <span className="font-medium text-foreground">Name</span>
@@ -127,6 +129,7 @@ export function Register() {
           {submitting ? 'Registrieren…' : 'Registrieren'}
         </Button>
       </form>
+
       <p className="text-center text-sm text-foreground-muted">
         Bereits registriert?{' '}
         <Link to="/login" className="font-medium text-accent underline">

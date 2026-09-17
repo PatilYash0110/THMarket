@@ -23,7 +23,11 @@ export class CloudinaryService {
         { folder: 'thmarket/listings' },
         (error, result) => {
           if (error || !result) {
-            reject(error ?? new Error('Cloudinary-Upload fehlgeschlagen.'));
+            reject(
+              new Error(error?.message ?? 'Cloudinary-Upload fehlgeschlagen.', {
+                cause: error,
+              }),
+            );
             return;
           }
           resolve(result.secure_url);

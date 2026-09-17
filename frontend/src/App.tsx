@@ -1,10 +1,13 @@
 import { Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { RequireAdmin, RequireStudent } from './components/RequireAuth'
+import { AccountSettings } from './pages/AccountSettings'
 import { Admin } from './pages/Admin'
 import { Checkout } from './pages/Checkout'
 import { Favorites } from './pages/Favorites'
+import { ForgotPassword } from './pages/ForgotPassword'
 import { Home } from './pages/Home'
+import { Impressum } from './pages/Impressum'
 import { ListingDetail } from './pages/ListingDetail'
 import { ListingForm } from './pages/ListingForm'
 import { Login } from './pages/Login'
@@ -12,8 +15,10 @@ import { Messages } from './pages/Messages'
 import { NotFound } from './pages/NotFound'
 import { Profile } from './pages/Profile'
 import { Register } from './pages/Register'
+import { ResetPassword } from './pages/ResetPassword'
+import { TopUp } from './pages/TopUp'
 import { VerifyEmail } from './pages/VerifyEmail'
-import { Impressum } from './pages/Impressum'
+import { Withdraw } from './pages/Withdraw'
 
 export default function App() {
   return (
@@ -26,6 +31,8 @@ export default function App() {
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="verify-email" element={<VerifyEmail />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="reset-password" element={<ResetPassword />} />
         <Route path="impressum" element={<Impressum />} />
 
         <Route
@@ -65,6 +72,30 @@ export default function App() {
           element={
             <RequireStudent>
               <Checkout />
+            </RequireStudent>
+          }
+        />
+        <Route
+          path="topup"
+          element={
+            <RequireStudent>
+              <TopUp />
+            </RequireStudent>
+          }
+        />
+        <Route
+          path="withdraw"
+          element={
+            <RequireStudent>
+              <Withdraw />
+            </RequireStudent>
+          }
+        />
+        <Route
+          path="settings"
+          element={
+            <RequireStudent>
+              <AccountSettings />
             </RequireStudent>
           }
         />

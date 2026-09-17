@@ -13,19 +13,32 @@ enum Role {
 }
 
 model User {
-  id                       String    @id @default(cuid())
-  email                    String    @unique
+  id                       String          @id @default(cuid())
+  email                    String          @unique
   name                     String
   passwordHash             String
-  role                     Role      @default(STUDENT)
-  verified                 Boolean   @default(false)
-  emailVerificationToken   String?   @unique
+  role                     Role            @default(STUDENT)
+  verified                 Boolean         @default(false)
+  emailVerificationToken   String?         @unique
   emailVerificationExpires DateTime?
-  balanceCents             Int       @default(0)
-  createdAt                DateTime  @default(now())
-  updatedAt                DateTime  @updatedAt
-  listings                 Listing[]
+  emailVerificationSentAt  DateTime?
+  passwordResetToken       String?         @unique
+  passwordResetExpires     DateTime?
+  passwordChangedAt        DateTime?
+  balanceCents             Int             @default(0)
+  // Set by an admin resolving a report with the USER_WARNED action; the value
+  // itself IS the warning text shown to the user. There's no notifications
+  // system, so a banner on the user's own Profile page (cleared via
+  // POST /auth/dismiss-warning) is the only way this ever reaches them.
+  warningMessage           String?
+  createdAt                DateTime        @default(now())
+  updatedAt                DateTime        @updatedAt
+  listings                 Listing[]       @relation("ListingSeller")
+  purchases                Listing[]       @relation("ListingBuyer")
   favorites                Favorite[]
+  reportsFiled             Report[]        @relation("ReportsFiled")
+  reportsReceived          Report[]        @relation("ReportsReceived")
+  auditLogEntries          AuditLogEntry[]
 }
 
 enum ListingStatus {
@@ -33,12 +46,11 @@ enum ListingStatus {
   VERKAUFT
 }
 
-// Kategorie ist ein validierter String, kein echtes Enum — die echten Werte
-// ("Bücher & Skripte" usw.) sind keine gültigen Prisma-Enum-Bezeichner und
-// bräuchten ein @map auf DB-taugliche Schlüssel, was der Client dann statt
-// des Anzeigetexts zurückgeben würde. Stattdessen Validierung über @IsIn(...)
-// in den DTOs; manuell synchron zu halten mit
-// frontend/src/types/listing.ts's ListingCategory-Union.
+// Category is a validated string, not a native enum — the real values
+// ("Bücher & Skripte", etc.) aren't valid Prisma enum identifiers and would
+// need @map-ing to DB-safe keys, which the client would then expose instead
+// of the display string. Validated via @IsIn(...) on the DTOs instead; kept
+// manually in sync with frontend/src/types/listing.ts's ListingCategory union.
 model Listing {
   id                 String        @id @default(cuid())
   title              String
@@ -48,13 +60,28 @@ model Listing {
   images             String[]
   sofortkaufMoeglich Boolean       @default(true)
   status             ListingStatus @default(AKTIV)
-  sellerId           String
-  seller             User          @relation(fields: [sellerId], references: [id])
+  // Nullable (not required) so that deleting a seller's account never has to
+  // choose between destroying sale history and cascading into other
+  // students' data — see Listing.seller's onDelete comment below.
+  sellerId           String?
+  // No cascade here on purpose: Favorite.listingId already cascades, so a
+  // required, cascading seller relation would mean deleting one bad-actor
+  // account silently wipes every OTHER student's favorites on that seller's
+  // listings, and would destroy the only record a completed sale ever
+  // happened (there's no separate Order/Transaction model — this row IS the
+  // transaction record). AdminService.deleteUser() instead blocks deleting a
+  // user who still has AKTIV listings and only lets VERKAUFT ones survive
+  // with sellerId set to null here.
+  seller             User?         @relation("ListingSeller", fields: [sellerId], references: [id])
+  buyerId            String?
+  buyer              User?         @relation("ListingBuyer", fields: [buyerId], references: [id])
   favorites          Favorite[]
+  reports            Report[]
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 
   @@index([sellerId])
+  @@index([buyerId])
   @@index([status])
 }
 
@@ -67,4 +94,59 @@ model Favorite {
   createdAt DateTime @default(now())
 
   @@unique([userId, listingId])
+}
+
+enum ReportTargetType {
+  LISTING
+  USER
+}
+
+// Deliberately just two states, not a richer workflow — with a single seeded
+// admin account, an "in progress" state would add ceremony without a second
+// reviewer to hand off to. GESCHLOSSEN doesn't say what happened; that's
+// recorded as its own AuditLogEntry instead, so a report's own status stays
+// a simple "does this still need attention" flag.
+enum ReportStatus {
+  OFFEN
+  GESCHLOSSEN
+}
+
+// targetType excludes CONVERSATION for now — CLAUDE.md's admin phase
+// mentions reporting a chat conversation, but no Conversation/Message model
+// exists yet (chat is still frontend-mocked). Postgres enums support
+// ALTER TYPE ... ADD VALUE later, so this isn't a blocker.
+model Report {
+  id             String           @id @default(cuid())
+  targetType     ReportTargetType
+  reason         String
+  message        String?
+  status         ReportStatus     @default(OFFEN)
+  // Raw snapshot only (listing title, or "Name (email)") captured at report
+  // creation time — no "Inserat:"/"Nutzer:" prefix baked in here; the
+  // frontend renders that based on targetType. Falls back into view once the
+  // live listing/reportedUser relation below has gone null (target deleted),
+  // so a report stays legible even after its target no longer exists.
+  targetLabel    String
+  reporterId     String?
+  reporter       User?            @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: SetNull)
+  listingId      String?
+  listing        Listing?         @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  reportedUserId String?
+  reportedUser   User?            @relation("ReportsReceived", fields: [reportedUserId], references: [id], onDelete: SetNull)
+  createdAt      DateTime         @default(now())
+  resolvedAt     DateTime?
+
+  @@index([status])
+}
+
+model AuditLogEntry {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action     String
+  // Plain strings, not relations — same "target may be long gone" reasoning
+  // as Report.targetLabel, kept queryable/filterable without a live FK.
+  targetType String?
+  targetId   String?
+  createdAt  DateTime @default(now())
 }

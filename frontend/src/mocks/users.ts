@@ -7,6 +7,7 @@ export const MOCK_STUDENT: User = {
   role: 'STUDENT',
   verified: true,
   balanceCents: 4250,
+  warningMessage: null,
 }
 
 export const MOCK_ADMIN: User = {
@@ -16,6 +17,7 @@ export const MOCK_ADMIN: User = {
   role: 'ADMIN',
   verified: true,
   balanceCents: 0,
+  warningMessage: null,
 }
 
 export const MOCK_USERS: User[] = [MOCK_STUDENT, MOCK_ADMIN]
@@ -23,4 +25,3 @@ export const MOCK_USERS: User[] = [MOCK_STUDENT, MOCK_ADMIN]
 export function findUserById(id: string): User | undefined {
   return MOCK_USERS.find((user) => user.id === id)
 }
-

@@ -18,6 +18,7 @@ import { CurrentUser } from '../auth/current-user.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { JwtPayload } from '../auth/jwt.strategy';
 import { CreateListingDto } from './dto/create-listing.dto';
+import { PurchaseListingDto } from './dto/purchase-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 import { ListingsService } from './listings.service';
 
@@ -36,8 +37,8 @@ export class ListingsController {
     return this.listingsService.findAll();
   }
 
-  // Vor ':id' registriert, damit eine Anfrage an /listings/favorites nicht
-  // von der dynamischen :id-Route geschluckt wird.
+  // Registered before ':id' so a request to /listings/favorites doesn't get
+  // swallowed by the dynamic :id route.
   @UseGuards(JwtAuthGuard)
   @Get('favorites')
   listFavoriteIds(@CurrentUser() user: JwtPayload) {
@@ -63,7 +64,10 @@ export class ListingsController {
       limits: { fileSize: MAX_FILE_SIZE_BYTES },
       fileFilter: (_req, file, callback) => {
         if (!file.mimetype.startsWith('image/')) {
-          callback(new BadRequestException('Nur Bilddateien sind erlaubt.'), false);
+          callback(
+            new BadRequestException('Nur Bilddateien sind erlaubt.'),
+            false,
+          );
           return;
         }
         callback(null, true);
@@ -77,7 +81,11 @@ export class ListingsController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @CurrentUser() user: JwtPayload, @Body() dto: UpdateListingDto) {
+  update(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: UpdateListingDto,
+  ) {
     return this.listingsService.update(id, user.sub, dto);
   }
 
@@ -85,6 +93,23 @@ export class ListingsController {
   @Patch(':id/sold')
   markSold(@Param('id') id: string) {
     return this.listingsService.markSold(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    await this.listingsService.remove(id, user.sub);
+    return { deleted: true };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/purchase')
+  purchase(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: PurchaseListingDto,
+  ) {
+    return this.listingsService.purchase(id, user.sub, dto);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -96,7 +121,10 @@ export class ListingsController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id/favorite')
-  async removeFavorite(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+  async removeFavorite(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
     await this.listingsService.removeFavorite(user.sub, id);
     return { favorited: false };
   }

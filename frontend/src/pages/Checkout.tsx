@@ -11,9 +11,12 @@ type PaymentMode = 'simulation' | 'guthaben'
 
 export function Checkout() {
   const { listingId } = useParams<{ listingId: string }>()
-  const { currentUser, adjustBalance } = useAuth()
-  const { getListing, markAsSold } = useListings()
+  const { currentUser, setBalance } = useAuth()
+  const { getListing, purchaseListing, loading } = useListings()
   const [mode, setMode] = useState<PaymentMode>('simulation')
+  const [cardNumber, setCardNumber] = useState('')
+  const [cardExpiry, setCardExpiry] = useState('')
+  const [cardCvc, setCardCvc] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [completed, setCompleted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -24,9 +27,13 @@ export function Checkout() {
     return <Navigate to="/login" replace />
   }
 
-  // Wird vor der "noch käuflich"-Prüfung unten geprüft: Sobald markAsSold()
-  // in handleSubmit das Inserat auf VERKAUFT setzt, würde diese Prüfung sonst
-  // beim resultierenden Re-Render greifen und vor der Erfolgsseite wegleiten.
+  if (loading) {
+    return null
+  }
+
+  // Checked before the "still purchasable" guard below: once purchaseListing()
+  // flips the listing to VERKAUFT inside handleSubmit, that guard would otherwise
+  // fire on the resulting re-render and redirect away before the success screen shows.
   if (completed && listing) {
     return (
       <div className="mx-auto flex max-w-sm flex-col items-center gap-4 py-16 text-center">
@@ -60,9 +67,14 @@ export function Checkout() {
     setError(null)
     setSubmitting(true)
     try {
-      await markAsSold(listing.id)
-      if (mode === 'guthaben') {
-        adjustBalance(-listing.priceCents)
+      const result = await purchaseListing(
+        listing.id,
+        mode === 'simulation'
+          ? { paymentMethod: 'simulation', card: { number: cardNumber, expiry: cardExpiry, cvc: cardCvc } }
+          : { paymentMethod: 'guthaben' },
+      )
+      if (result.buyerBalanceCents !== undefined) {
+        setBalance(result.buyerBalanceCents)
       }
       setCompleted(true)
     } catch (err) {
@@ -111,35 +123,42 @@ export function Checkout() {
 
         {mode === 'simulation' && (
           <fieldset className="flex flex-col gap-3">
-            <legend className="mb-1 text-sm font-medium text-foreground">Testkarte</legend>
+            <legend className="mb-1 text-sm font-medium text-foreground">Kreditkarte</legend>
             <label className="flex flex-col gap-1.5 text-sm">
               <span className="text-foreground-muted">Kartennummer</span>
               <input
-                readOnly
-                value="4242 4242 4242 4242"
-                className="h-11 border border-border bg-surface-muted px-3 text-sm text-foreground"
+                required
+                value={cardNumber}
+                onChange={(event) => setCardNumber(event.target.value)}
+                placeholder="4242 4242 4242 4242"
+                className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </label>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex flex-col gap-1.5 text-sm">
                 <span className="text-foreground-muted">Ablaufdatum</span>
                 <input
-                  readOnly
-                  value="12/29"
-                  className="h-11 border border-border bg-surface-muted px-3 text-sm text-foreground"
+                  required
+                  value={cardExpiry}
+                  onChange={(event) => setCardExpiry(event.target.value)}
+                  placeholder="12/29"
+                  className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />
               </label>
               <label className="flex flex-col gap-1.5 text-sm">
                 <span className="text-foreground-muted">CVC</span>
                 <input
-                  readOnly
-                  value="123"
-                  className="h-11 border border-border bg-surface-muted px-3 text-sm text-foreground"
+                  required
+                  value={cardCvc}
+                  onChange={(event) => setCardCvc(event.target.value)}
+                  placeholder="123"
+                  className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />
               </label>
             </div>
             <p className="text-xs text-foreground-muted">
-              Feste Testkartendaten — Phase 1/5 Mock, es findet keine echte Zahlung statt.
+              Nur die Testkarte 4242 4242 4242 4242 (12/29, CVC 123) wird akzeptiert — es findet
+              keine echte Zahlung statt.
             </p>
           </fieldset>
         )}
