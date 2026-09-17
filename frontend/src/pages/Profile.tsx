@@ -1,6 +1,8 @@
-import { Gear, ShieldCheck, Wallet } from '@phosphor-icons/react'
+import { Gear, ShieldCheck, Warning, Wallet, X } from '@phosphor-icons/react'
 import type { ReactNode } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ApiError, dismissWarning } from '../api/auth'
 import { EmptyState } from '../components/EmptyState'
 import { ListingCard } from '../components/ListingCard'
 import { Button } from '../components/Button'
@@ -43,10 +45,25 @@ function ListingSection({
 }
 
 export function Profile() {
-  const { currentUser } = useAuth()
+  const { currentUser, updateUser } = useAuth()
   const { listings } = useListings()
+  const [dismissing, setDismissing] = useState(false)
 
   if (!currentUser) return null
+
+  async function handleDismissWarning() {
+    setDismissing(true)
+    try {
+      const updated = await dismissWarning()
+      updateUser(updated)
+    } catch (err) {
+      // Non-critical UI affordance — if clearing fails, the banner just
+      // stays until a retry; no need for an error message here.
+      console.error(err instanceof ApiError ? err.message : err)
+    } finally {
+      setDismissing(false)
+    }
+  }
 
   const activeListings = listings.filter(
     (listing) => listing.sellerId === currentUser.id && listing.status === 'AKTIV',
@@ -58,6 +75,27 @@ export function Profile() {
 
   return (
     <div className="flex flex-col gap-10">
+      {currentUser.warningMessage && (
+        <div className="flex items-start justify-between gap-4 border border-destructive bg-destructive/5 p-4">
+          <div className="flex items-start gap-2.5">
+            <Warning size={18} weight="fill" className="mt-0.5 shrink-0 text-destructive" aria-hidden />
+            <div>
+              <p className="text-sm font-medium text-foreground">Verwarnung von der THM-Administration</p>
+              <p className="mt-1 text-sm text-foreground-muted">{currentUser.warningMessage}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleDismissWarning}
+            disabled={dismissing}
+            aria-label="Verwarnung ausblenden"
+            className="cursor-pointer text-foreground-muted hover:text-foreground disabled:cursor-not-allowed"
+          >
+            <X size={16} aria-hidden />
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-col gap-6 border border-border p-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center bg-surface-muted text-lg font-semibold text-foreground">
