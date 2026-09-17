@@ -1,6 +1,6 @@
-import { Heart, PencilSimple, ShieldCheck } from '@phosphor-icons/react'
+import { Heart, PencilSimple, ShieldCheck, SmileySad } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
 import { useAuth } from '../context/AuthContext'
@@ -9,15 +9,30 @@ import { formatDate, formatPrice } from '../lib/format'
 
 export function ListingDetail() {
   const { id } = useParams<{ id: string }>()
-  const { getListing, isFavorite, toggleFavorite } = useListings()
+  const { getListing, isFavorite, toggleFavorite, loading } = useListings()
   const { currentUser } = useAuth()
   const navigate = useNavigate()
   const [activeImage, setActiveImage] = useState(0)
 
   const listing = id ? getListing(id) : undefined
 
+  if (loading) {
+    return null
+  }
+
   if (!listing) {
-    return <Navigate to="/" replace />
+    return (
+      <div className="mx-auto flex max-w-sm flex-col items-center gap-4 py-16 text-center">
+        <SmileySad size={40} className="text-foreground-muted" aria-hidden />
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">Inserat nicht gefunden</h1>
+        <p className="text-sm text-foreground-muted">
+          Dieses Inserat existiert nicht mehr oder wurde entfernt.
+        </p>
+        <Link to="/" className="text-sm font-medium text-accent underline">
+          Zurück zur Startseite
+        </Link>
+      </div>
+    )
   }
 
   const seller = listing.seller

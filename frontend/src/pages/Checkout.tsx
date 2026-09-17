@@ -12,7 +12,7 @@ type PaymentMode = 'simulation' | 'guthaben'
 export function Checkout() {
   const { listingId } = useParams<{ listingId: string }>()
   const { currentUser, setBalance } = useAuth()
-  const { getListing, purchaseListing } = useListings()
+  const { getListing, purchaseListing, loading } = useListings()
   const [mode, setMode] = useState<PaymentMode>('simulation')
   const [cardNumber, setCardNumber] = useState('')
   const [cardExpiry, setCardExpiry] = useState('')
@@ -25,6 +25,10 @@ export function Checkout() {
 
   if (!currentUser) {
     return <Navigate to="/login" replace />
+  }
+
+  if (loading) {
+    return null
   }
 
   // Checked before the "still purchasable" guard below: once purchaseListing()
