@@ -139,6 +139,15 @@ export class ListingsService {
         throw new BadRequestException('Nicht genügend Guthaben für diesen Kauf.');
       }
 
+      // sellerId is nullable at the schema level (a seller's account can be
+      // deleted after their listing sells — see AdminService), but an AKTIV
+      // listing can never reach that state: admin deletion is blocked while
+      // a user still has any AKTIV listings, precisely to prevent this from
+      // happening mid-purchase.
+      if (!listing.sellerId) {
+        throw new ConflictException('Der Verkäufer dieses Inserats existiert nicht mehr.');
+      }
+
       await tx.user.update({
         where: { id: listing.sellerId },
         data: { balanceCents: { increment: listing.priceCents } },
