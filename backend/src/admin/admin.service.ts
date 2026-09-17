@@ -212,16 +212,21 @@ export class AdminService {
     if (!listing) {
       throw new NotFoundException('Inserat nicht gefunden.');
     }
-    const deleted = await tx.listing.deleteMany({ where: { id: listingId } });
-    if (deleted.count === 0) {
-      throw new ConflictException('Inserat wurde bereits gelöscht.');
-    }
-    // Close any other still-open reports about the same listing, so a second
-    // report doesn't sit OFFEN forever once the first is acted on.
+    // Close sibling reports BEFORE deleting the listing, not after: the
+    // listing→Report relation is `onDelete: SetNull`, so the instant the
+    // listing row is deleted, Postgres itself nulls out `listingId` on every
+    // report that referenced it — including this query's own WHERE filter,
+    // which would then match nothing. Two students can report the same bad
+    // listing from different angles; without closing siblings first, the
+    // second report would sit OFFEN forever once the first is acted on.
     await tx.report.updateMany({
       where: { listingId, status: 'OFFEN' },
       data: { status: 'GESCHLOSSEN', resolvedAt: new Date() },
     });
+    const deleted = await tx.listing.deleteMany({ where: { id: listingId } });
+    if (deleted.count === 0) {
+      throw new ConflictException('Inserat wurde bereits gelöscht.');
+    }
     await tx.auditLogEntry.create({
       data: {
         actorId: adminId,
@@ -267,16 +272,18 @@ export class AdminService {
       throw new ConflictException('Dieser Nutzer hat noch aktive Inserate. Bitte lösche diese zuerst.');
     }
 
-    const deleted = await tx.user.deleteMany({ where: { id: userId, role: 'STUDENT', NOT: { id: adminId } } });
-    if (deleted.count === 0) {
-      throw new ConflictException('Nutzer wurde bereits gelöscht.');
-    }
-    // Close any other still-open reports about the same user, so a second
-    // report doesn't sit OFFEN forever once the first is acted on.
+    // Close sibling reports BEFORE deleting the user, not after — same
+    // reasoning as performListingDeletion: User→Report is `onDelete:
+    // SetNull`, so deleting the user row would otherwise null out
+    // `reportedUserId` on sibling reports before this filter ever runs.
     await tx.report.updateMany({
       where: { reportedUserId: userId, status: 'OFFEN' },
       data: { status: 'GESCHLOSSEN', resolvedAt: new Date() },
     });
+    const deleted = await tx.user.deleteMany({ where: { id: userId, role: 'STUDENT', NOT: { id: adminId } } });
+    if (deleted.count === 0) {
+      throw new ConflictException('Nutzer wurde bereits gelöscht.');
+    }
     await tx.auditLogEntry.create({
       data: {
         actorId: adminId,
