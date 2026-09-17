@@ -17,6 +17,7 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 const VERIFICATION_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 const RESEND_VERIFICATION_COOLDOWN_MS = 60 * 1000;
@@ -227,5 +228,30 @@ export class AuthService {
       throw new NotFoundException('Nutzer nicht gefunden.');
     }
     return this.toPublicUser(user);
+  }
+
+  async updateProfile(userId: string, dto: UpdateProfileDto): Promise<PublicUser> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('Nutzer nicht gefunden.');
+    }
+
+    const data: { name?: string; passwordHash?: string; passwordChangedAt?: Date } = {};
+
+    if (dto.name !== undefined) {
+      data.name = dto.name;
+    }
+
+    if (dto.newPassword !== undefined) {
+      const currentMatches = await bcrypt.compare(dto.currentPassword!, user.passwordHash);
+      if (!currentMatches) {
+        throw new ForbiddenException('Aktuelles Passwort ist falsch.');
+      }
+      data.passwordHash = await bcrypt.hash(dto.newPassword, BCRYPT_ROUNDS);
+      data.passwordChangedAt = new Date();
+    }
+
+    const updated = await this.prisma.user.update({ where: { id: userId }, data });
+    return this.toPublicUser(updated);
   }
 }
