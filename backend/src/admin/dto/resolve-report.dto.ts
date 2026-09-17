@@ -1,6 +1,13 @@
-import { IsDefined, IsIn, IsString, MaxLength, ValidateIf } from 'class-validator';
+import {
+  IsDefined,
+  IsIn,
+  IsString,
+  MaxLength,
+  ValidateIf,
+} from 'class-validator';
 
-export type ResolveReportAction = 'NO_ACTION' | 'USER_WARNED' | 'USER_DELETED' | 'LISTING_DELETED';
+export type ResolveReportAction =
+  'NO_ACTION' | 'USER_WARNED' | 'USER_DELETED' | 'LISTING_DELETED';
 
 export class ResolveReportDto {
   @IsIn(['NO_ACTION', 'USER_WARNED', 'USER_DELETED', 'LISTING_DELETED'])

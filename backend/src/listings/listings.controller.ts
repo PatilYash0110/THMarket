@@ -64,7 +64,10 @@ export class ListingsController {
       limits: { fileSize: MAX_FILE_SIZE_BYTES },
       fileFilter: (_req, file, callback) => {
         if (!file.mimetype.startsWith('image/')) {
-          callback(new BadRequestException('Nur Bilddateien sind erlaubt.'), false);
+          callback(
+            new BadRequestException('Nur Bilddateien sind erlaubt.'),
+            false,
+          );
           return;
         }
         callback(null, true);
@@ -78,7 +81,11 @@ export class ListingsController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @CurrentUser() user: JwtPayload, @Body() dto: UpdateListingDto) {
+  update(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: UpdateListingDto,
+  ) {
     return this.listingsService.update(id, user.sub, dto);
   }
 
@@ -97,7 +104,11 @@ export class ListingsController {
 
   @UseGuards(JwtAuthGuard)
   @Post(':id/purchase')
-  purchase(@Param('id') id: string, @CurrentUser() user: JwtPayload, @Body() dto: PurchaseListingDto) {
+  purchase(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: PurchaseListingDto,
+  ) {
     return this.listingsService.purchase(id, user.sub, dto);
   }
 
@@ -110,7 +121,10 @@ export class ListingsController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id/favorite')
-  async removeFavorite(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+  async removeFavorite(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
     await this.listingsService.removeFavorite(user.sub, id);
     return { favorited: false };
   }

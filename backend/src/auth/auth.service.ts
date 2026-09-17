@@ -29,7 +29,8 @@ const PASSWORD_RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
 const BCRYPT_ROUNDS = 12;
 // Generic response for both resend-verification and forgot-password so
 // neither endpoint leaks whether a given @thm.de address has an account.
-const GENERIC_RESET_MESSAGE = 'Falls ein Konto mit dieser E-Mail existiert, wurde eine E-Mail gesendet.';
+const GENERIC_RESET_MESSAGE =
+  'Falls ein Konto mit dieser E-Mail existiert, wurde eine E-Mail gesendet.';
 
 export interface PublicUser {
   id: string;
@@ -78,9 +79,13 @@ export class AuthService {
   }
 
   async register(dto: RegisterDto): Promise<{ email: string }> {
-    const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    const existing = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
     if (existing) {
-      throw new ConflictException('Diese E-Mail-Adresse ist bereits registriert.');
+      throw new ConflictException(
+        'Diese E-Mail-Adresse ist bereits registriert.',
+      );
     }
 
     const passwordHash = await bcrypt.hash(dto.password, BCRYPT_ROUNDS);
@@ -105,10 +110,18 @@ export class AuthService {
   }
 
   async verifyEmail(token: string): Promise<{ email: string }> {
-    const user = await this.prisma.user.findUnique({ where: { emailVerificationToken: token } });
+    const user = await this.prisma.user.findUnique({
+      where: { emailVerificationToken: token },
+    });
 
-    if (!user || !user.emailVerificationExpires || user.emailVerificationExpires < new Date()) {
-      throw new NotFoundException('Der Bestätigungslink ist ungültig oder abgelaufen.');
+    if (
+      !user ||
+      !user.emailVerificationExpires ||
+      user.emailVerificationExpires < new Date()
+    ) {
+      throw new NotFoundException(
+        'Der Bestätigungslink ist ungültig oder abgelaufen.',
+      );
     }
 
     await this.prisma.user.update({
@@ -126,21 +139,28 @@ export class AuthService {
   // Always resolves to the same shape, whether or not the email exists or is
   // already verified — this endpoint is public and unauthenticated, so it
   // must not become a way to check which @thm.de addresses are registered.
-  async resendVerification(dto: ResendVerificationDto): Promise<{ message: string }> {
-    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
+  async resendVerification(
+    dto: ResendVerificationDto,
+  ): Promise<{ message: string }> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
 
     if (user && !user.verified) {
       if (
         user.emailVerificationSentAt &&
-        Date.now() - user.emailVerificationSentAt.getTime() < RESEND_VERIFICATION_COOLDOWN_MS
+        Date.now() - user.emailVerificationSentAt.getTime() <
+          RESEND_VERIFICATION_COOLDOWN_MS
       ) {
         throw new BadRequestException(
           'Bitte warte eine Minute, bevor du einen neuen Bestätigungslink anforderst.',
         );
       }
 
-      const { token: emailVerificationToken, expires: emailVerificationExpires } =
-        this.generateVerificationToken();
+      const {
+        token: emailVerificationToken,
+        expires: emailVerificationExpires,
+      } = this.generateVerificationToken();
 
       await this.prisma.user.update({
         where: { id: user.id },
@@ -158,22 +178,38 @@ export class AuthService {
     return { message: GENERIC_RESET_MESSAGE };
   }
 
-  async login(dto: LoginDto): Promise<{ accessToken: string; user: PublicUser }> {
-    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
+  async login(
+    dto: LoginDto,
+  ): Promise<{ accessToken: string; user: PublicUser }> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
     if (!user) {
-      throw new UnauthorizedException('Ungültige E-Mail-Adresse oder Passwort.');
+      throw new UnauthorizedException(
+        'Ungültige E-Mail-Adresse oder Passwort.',
+      );
     }
 
-    const passwordMatches = await bcrypt.compare(dto.password, user.passwordHash);
+    const passwordMatches = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
     if (!passwordMatches) {
-      throw new UnauthorizedException('Ungültige E-Mail-Adresse oder Passwort.');
+      throw new UnauthorizedException(
+        'Ungültige E-Mail-Adresse oder Passwort.',
+      );
     }
 
     if (!user.verified) {
-      throw new ForbiddenException('Bitte bestätige zuerst deine E-Mail-Adresse.');
+      throw new ForbiddenException(
+        'Bitte bestätige zuerst deine E-Mail-Adresse.',
+      );
     }
 
-    const accessToken = await this.jwt.signAsync({ sub: user.id, role: user.role });
+    const accessToken = await this.jwt.signAsync({
+      sub: user.id,
+      role: user.role,
+    });
 
     return { accessToken, user: this.toPublicUser(user) };
   }
@@ -191,11 +227,15 @@ export class AuthService {
   // of endpoint: claiming an identity, not just requesting an email) since a
   // THM-only, real-name platform shouldn't leak account existence here.
   async forgotPassword(dto: ForgotPasswordDto): Promise<{ message: string }> {
-    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
 
     if (user) {
       const passwordResetToken = randomBytes(32).toString('hex');
-      const passwordResetExpires = new Date(Date.now() + PASSWORD_RESET_TOKEN_TTL_MS);
+      const passwordResetExpires = new Date(
+        Date.now() + PASSWORD_RESET_TOKEN_TTL_MS,
+      );
 
       await this.prisma.user.update({
         where: { id: user.id },
@@ -217,7 +257,10 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(dto.newPassword, BCRYPT_ROUNDS);
 
     const result = await this.prisma.user.updateMany({
-      where: { passwordResetToken: dto.token, passwordResetExpires: { gt: new Date() } },
+      where: {
+        passwordResetToken: dto.token,
+        passwordResetExpires: { gt: new Date() },
+      },
       data: {
         passwordHash,
         passwordResetToken: null,
@@ -227,26 +270,38 @@ export class AuthService {
     });
 
     if (result.count === 0) {
-      throw new BadRequestException('Der Link zum Zurücksetzen ist ungültig oder abgelaufen.');
+      throw new BadRequestException(
+        'Der Link zum Zurücksetzen ist ungültig oder abgelaufen.',
+      );
     }
 
     return { message: 'Passwort erfolgreich zurückgesetzt.' };
   }
 
-  async updateProfile(userId: string, dto: UpdateProfileDto): Promise<PublicUser> {
+  async updateProfile(
+    userId: string,
+    dto: UpdateProfileDto,
+  ): Promise<PublicUser> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('Nutzer nicht gefunden.');
     }
 
-    const data: { name?: string; passwordHash?: string; passwordChangedAt?: Date } = {};
+    const data: {
+      name?: string;
+      passwordHash?: string;
+      passwordChangedAt?: Date;
+    } = {};
 
     if (dto.name !== undefined) {
       data.name = dto.name;
     }
 
     if (dto.newPassword !== undefined) {
-      const currentMatches = await bcrypt.compare(dto.currentPassword!, user.passwordHash);
+      const currentMatches = await bcrypt.compare(
+        dto.currentPassword!,
+        user.passwordHash,
+      );
       if (!currentMatches) {
         throw new ForbiddenException('Aktuelles Passwort ist falsch.');
       }
@@ -254,7 +309,10 @@ export class AuthService {
       data.passwordChangedAt = new Date();
     }
 
-    const updated = await this.prisma.user.update({ where: { id: userId }, data });
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data,
+    });
     return this.toPublicUser(updated);
   }
 

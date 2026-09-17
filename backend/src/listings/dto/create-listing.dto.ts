@@ -1,4 +1,12 @@
-import { ArrayMaxSize, IsBoolean, IsIn, IsInt, IsString, Min, MinLength } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsString,
+  Min,
+  MinLength,
+} from 'class-validator';
 
 // Manuell synchron gehalten mit frontend/src/types/listing.ts's ListingCategory-
 // Union — kein gemeinsames Paket in diesem Monorepo, um das zu deduplizieren.

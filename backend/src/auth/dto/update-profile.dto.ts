@@ -1,5 +1,16 @@
-import { IsDefined, IsOptional, IsString, Matches, MaxLength, MinLength, ValidateIf } from 'class-validator';
-import { STRONG_PASSWORD_MESSAGE, STRONG_PASSWORD_PATTERN } from '../password-strength';
+import {
+  IsDefined,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+  ValidateIf,
+} from 'class-validator';
+import {
+  STRONG_PASSWORD_MESSAGE,
+  STRONG_PASSWORD_PATTERN,
+} from '../password-strength';
 
 export class UpdateProfileDto {
   @IsOptional()
@@ -19,7 +30,9 @@ export class UpdateProfileDto {
   @ValidateIf((dto: UpdateProfileDto) => dto.currentPassword !== undefined)
   @IsDefined({ message: 'Neues Passwort ist erforderlich.' })
   @IsString()
-  @MinLength(8, { message: 'Das Passwort muss mindestens 8 Zeichen lang sein.' })
+  @MinLength(8, {
+    message: 'Das Passwort muss mindestens 8 Zeichen lang sein.',
+  })
   @MaxLength(72)
   @Matches(STRONG_PASSWORD_PATTERN, { message: STRONG_PASSWORD_MESSAGE })
   newPassword?: string;

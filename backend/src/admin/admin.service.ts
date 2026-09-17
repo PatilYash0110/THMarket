@@ -5,7 +5,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma, type ReportStatus, type ReportTargetType } from '@prisma/client';
+import {
+  Prisma,
+  type ReportStatus,
+  type ReportTargetType,
+} from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReportDto } from './dto/create-report.dto';
 import type { ResolveReportAction } from './dto/resolve-report.dto';
@@ -29,7 +33,9 @@ export class AdminService {
         throw new NotFoundException('Inserat nicht gefunden.');
       }
       if (listing.sellerId === reporterId) {
-        throw new ForbiddenException('Du kannst dein eigenes Inserat nicht melden.');
+        throw new ForbiddenException(
+          'Du kannst dein eigenes Inserat nicht melden.',
+        );
       }
       return this.prisma.report.create({
         data: {
@@ -81,15 +87,27 @@ export class AdminService {
     // OFFEN first, newest-first within each group — Array.prototype.sort is
     // stable, so the createdAt-desc order from the query is preserved within
     // each status group.
-    return [...reports].sort((a, b) => (a.status === b.status ? 0 : a.status === 'OFFEN' ? -1 : 1));
+    return [...reports].sort((a, b) =>
+      a.status === b.status ? 0 : a.status === 'OFFEN' ? -1 : 1,
+    );
   }
 
-  private assertActionMatchesTarget(action: ResolveReportAction, targetType: ReportTargetType): void {
+  private assertActionMatchesTarget(
+    action: ResolveReportAction,
+    targetType: ReportTargetType,
+  ): void {
     if (action === 'LISTING_DELETED' && targetType !== 'LISTING') {
-      throw new BadRequestException('Diese Aktion ist nur für gemeldete Inserate möglich.');
+      throw new BadRequestException(
+        'Diese Aktion ist nur für gemeldete Inserate möglich.',
+      );
     }
-    if ((action === 'USER_WARNED' || action === 'USER_DELETED') && targetType !== 'USER') {
-      throw new BadRequestException('Diese Aktion ist nur für gemeldete Nutzer möglich.');
+    if (
+      (action === 'USER_WARNED' || action === 'USER_DELETED') &&
+      targetType !== 'USER'
+    ) {
+      throw new BadRequestException(
+        'Diese Aktion ist nur für gemeldete Nutzer möglich.',
+      );
     }
   }
 
@@ -118,15 +136,26 @@ export class AdminService {
 
       if (dto.action === 'LISTING_DELETED') {
         if (existing.listingId) {
-          await this.performListingDeletion(tx, existing.listingId, adminId, dto.note);
+          await this.performListingDeletion(
+            tx,
+            existing.listingId,
+            adminId,
+            dto.note,
+          );
         } else {
           await tx.auditLogEntry.create({
-            data: { actorId: adminId, action: `Meldung geprüft — Inserat war bereits entfernt: ${dto.note}` },
+            data: {
+              actorId: adminId,
+              action: `Meldung geprüft — Inserat war bereits entfernt: ${dto.note}`,
+            },
           });
         }
       } else if (dto.action === 'USER_WARNED') {
         if (existing.reportedUserId) {
-          await tx.user.update({ where: { id: existing.reportedUserId }, data: { warningMessage: dto.note } });
+          await tx.user.update({
+            where: { id: existing.reportedUserId },
+            data: { warningMessage: dto.note },
+          });
           const user = await tx.user.findUniqueOrThrow({
             where: { id: existing.reportedUserId },
             select: { name: true, email: true },
@@ -141,15 +170,26 @@ export class AdminService {
           });
         } else {
           await tx.auditLogEntry.create({
-            data: { actorId: adminId, action: `Meldung geprüft — Nutzer existiert nicht mehr: ${dto.note}` },
+            data: {
+              actorId: adminId,
+              action: `Meldung geprüft — Nutzer existiert nicht mehr: ${dto.note}`,
+            },
           });
         }
       } else if (dto.action === 'USER_DELETED') {
         if (existing.reportedUserId) {
-          await this.performUserDeletion(tx, existing.reportedUserId, adminId, dto.note!);
+          await this.performUserDeletion(
+            tx,
+            existing.reportedUserId,
+            adminId,
+            dto.note!,
+          );
         } else {
           await tx.auditLogEntry.create({
-            data: { actorId: adminId, action: `Meldung geprüft — Nutzer existiert nicht mehr: ${dto.note}` },
+            data: {
+              actorId: adminId,
+              action: `Meldung geprüft — Nutzer existiert nicht mehr: ${dto.note}`,
+            },
           });
         }
       } else {
@@ -158,7 +198,8 @@ export class AdminService {
             actorId: adminId,
             action: `Meldung "${existing.targetLabel}" ohne Maßnahme geschlossen${dto.note ? `: ${dto.note}` : ''}`,
             targetType: existing.targetType,
-            targetId: existing.listingId ?? existing.reportedUserId ?? undefined,
+            targetId:
+              existing.listingId ?? existing.reportedUserId ?? undefined,
           },
         });
       }
@@ -181,15 +222,26 @@ export class AdminService {
       },
       orderBy: { createdAt: 'asc' },
     });
-    return users.map(({ _count, ...user }) => ({ ...user, reportsReceivedCount: _count.reportsReceived }));
+    return users.map(({ _count, ...user }) => ({
+      ...user,
+      reportsReceivedCount: _count.reportsReceived,
+    }));
   }
 
   async deleteUser(id: string, adminId: string, note: string): Promise<void> {
-    await this.prisma.$transaction((tx) => this.performUserDeletion(tx, id, adminId, note));
+    await this.prisma.$transaction((tx) =>
+      this.performUserDeletion(tx, id, adminId, note),
+    );
   }
 
-  async deleteListing(id: string, adminId: string, note?: string): Promise<void> {
-    await this.prisma.$transaction((tx) => this.performListingDeletion(tx, id, adminId, note));
+  async deleteListing(
+    id: string,
+    adminId: string,
+    note?: string,
+  ): Promise<void> {
+    await this.prisma.$transaction((tx) =>
+      this.performListingDeletion(tx, id, adminId, note),
+    );
   }
 
   async listAuditLog() {
@@ -208,7 +260,10 @@ export class AdminService {
     adminId: string,
     note?: string,
   ): Promise<void> {
-    const listing = await tx.listing.findUnique({ where: { id: listingId }, select: { title: true } });
+    const listing = await tx.listing.findUnique({
+      where: { id: listingId },
+      select: { title: true },
+    });
     if (!listing) {
       throw new NotFoundException('Inserat nicht gefunden.');
     }
@@ -255,7 +310,9 @@ export class AdminService {
     note: string,
   ): Promise<void> {
     if (userId === adminId) {
-      throw new ForbiddenException('Du kannst dein eigenes Konto nicht über den Admin-Bereich löschen.');
+      throw new ForbiddenException(
+        'Du kannst dein eigenes Konto nicht über den Admin-Bereich löschen.',
+      );
     }
     const target = await tx.user.findUnique({
       where: { id: userId },
@@ -265,11 +322,17 @@ export class AdminService {
       throw new NotFoundException('Nutzer nicht gefunden.');
     }
     if (target.role === 'ADMIN') {
-      throw new ForbiddenException('Admin-Konten können nicht gelöscht werden.');
+      throw new ForbiddenException(
+        'Admin-Konten können nicht gelöscht werden.',
+      );
     }
-    const activeListingCount = await tx.listing.count({ where: { sellerId: userId, status: 'AKTIV' } });
+    const activeListingCount = await tx.listing.count({
+      where: { sellerId: userId, status: 'AKTIV' },
+    });
     if (activeListingCount > 0) {
-      throw new ConflictException('Dieser Nutzer hat noch aktive Inserate. Bitte lösche diese zuerst.');
+      throw new ConflictException(
+        'Dieser Nutzer hat noch aktive Inserate. Bitte lösche diese zuerst.',
+      );
     }
 
     // Close sibling reports BEFORE deleting the user, not after — same
@@ -280,7 +343,9 @@ export class AdminService {
       where: { reportedUserId: userId, status: 'OFFEN' },
       data: { status: 'GESCHLOSSEN', resolvedAt: new Date() },
     });
-    const deleted = await tx.user.deleteMany({ where: { id: userId, role: 'STUDENT', NOT: { id: adminId } } });
+    const deleted = await tx.user.deleteMany({
+      where: { id: userId, role: 'STUDENT', NOT: { id: adminId } },
+    });
     if (deleted.count === 0) {
       throw new ConflictException('Nutzer wurde bereits gelöscht.');
     }

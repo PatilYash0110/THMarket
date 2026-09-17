@@ -36,8 +36,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       select: { passwordChangedAt: true },
     });
 
-    if (user?.passwordChangedAt && payload.iat && payload.iat * 1000 < user.passwordChangedAt.getTime()) {
-      throw new UnauthorizedException('Sitzung abgelaufen. Bitte melde dich erneut an.');
+    if (
+      user?.passwordChangedAt &&
+      payload.iat &&
+      payload.iat * 1000 < user.passwordChangedAt.getTime()
+    ) {
+      throw new UnauthorizedException(
+        'Sitzung abgelaufen. Bitte melde dich erneut an.',
+      );
     }
 
     return payload;

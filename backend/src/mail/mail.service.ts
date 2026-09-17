@@ -26,7 +26,11 @@ export class MailService {
     }
   }
 
-  async sendVerificationEmail(to: string, name: string, verifyUrl: string): Promise<void> {
+  async sendVerificationEmail(
+    to: string,
+    name: string,
+    verifyUrl: string,
+  ): Promise<void> {
     if (!this.transporter) {
       this.logger.warn(
         `GMAIL_USER/GMAIL_APP_PASSWORD not set — logging verification link instead of sending email.`,
@@ -57,7 +61,11 @@ export class MailService {
     this.logger.log(`Verification email sent to ${to}`);
   }
 
-  async sendPasswordResetEmail(to: string, name: string, resetUrl: string): Promise<void> {
+  async sendPasswordResetEmail(
+    to: string,
+    name: string,
+    resetUrl: string,
+  ): Promise<void> {
     if (!this.transporter) {
       this.logger.warn(
         `GMAIL_USER/GMAIL_APP_PASSWORD not set — logging password reset link instead of sending email.`,

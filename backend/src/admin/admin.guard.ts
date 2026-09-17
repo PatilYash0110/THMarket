@@ -1,4 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import type { Request } from 'express';
 import type { JwtPayload } from '../auth/jwt.strategy';
 
 // Every route in AdminController except report creation is privilege-
@@ -9,8 +10,9 @@ import type { JwtPayload } from '../auth/jwt.strategy';
 @Injectable()
 export class AdminGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
-    const user: JwtPayload | undefined = request.user;
-    return user?.role === 'ADMIN';
+    const request = context
+      .switchToHttp()
+      .getRequest<Request & { user?: JwtPayload }>();
+    return request.user?.role === 'ADMIN';
   }
 }

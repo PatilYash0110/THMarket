@@ -32,7 +32,9 @@ export class AdminController {
   @Post('reports')
   createReport(@CurrentUser() user: JwtPayload, @Body() dto: CreateReportDto) {
     if (user.role !== 'STUDENT') {
-      throw new ForbiddenException('Nur Studierende können Meldungen einreichen.');
+      throw new ForbiddenException(
+        'Nur Studierende können Meldungen einreichen.',
+      );
     }
     return this.adminService.createReport(user.sub, dto);
   }
@@ -45,7 +47,11 @@ export class AdminController {
 
   @UseGuards(AdminGuard)
   @Patch('reports/:id/resolve')
-  resolveReport(@Param('id') id: string, @CurrentUser() user: JwtPayload, @Body() dto: ResolveReportDto) {
+  resolveReport(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: ResolveReportDto,
+  ) {
     return this.adminService.resolveReport(id, user.sub, dto);
   }
 
@@ -57,14 +63,22 @@ export class AdminController {
 
   @UseGuards(AdminGuard)
   @Delete('users/:id')
-  async deleteUser(@Param('id') id: string, @CurrentUser() user: JwtPayload, @Body() dto: DeleteUserDto) {
+  async deleteUser(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: DeleteUserDto,
+  ) {
     await this.adminService.deleteUser(id, user.sub, dto.note);
     return { deleted: true };
   }
 
   @UseGuards(AdminGuard)
   @Delete('listings/:id')
-  async deleteListing(@Param('id') id: string, @CurrentUser() user: JwtPayload, @Body() dto: DeleteListingDto) {
+  async deleteListing(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: DeleteListingDto,
+  ) {
     await this.adminService.deleteListing(id, user.sub, dto.note);
     return { deleted: true };
   }

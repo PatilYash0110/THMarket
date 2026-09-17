@@ -27,7 +27,11 @@ export function validateMockCard(card: MockCardDto): void {
   const expiry = card.expiry.trim();
   const cvc = card.cvc.trim();
 
-  if (number !== MOCK_CARD.number || expiry !== MOCK_CARD.expiry || cvc !== MOCK_CARD.cvc) {
+  if (
+    number !== MOCK_CARD.number ||
+    expiry !== MOCK_CARD.expiry ||
+    cvc !== MOCK_CARD.cvc
+  ) {
     throw new BadRequestException(
       'Ungültige Kartendaten. Bitte verwende die Testkarte 4242 4242 4242 4242, 12/29, CVC 123.',
     );

@@ -12,7 +12,10 @@ export class WalletService {
   // topping up their own balance isn't a contested resource — two
   // concurrent top-ups both succeeding is correct, not a bug, so a plain
   // `update` is fine.
-  async topUp(userId: string, dto: TopUpDto): Promise<{ balanceCents: number }> {
+  async topUp(
+    userId: string,
+    dto: TopUpDto,
+  ): Promise<{ balanceCents: number }> {
     validateMockCard(dto.card);
 
     const user = await this.prisma.user.update({
@@ -28,7 +31,10 @@ export class WalletService {
   // both read a sufficient balance before either writes and both succeed,
   // overdrawing the account — the same class of race already found and
   // fixed in listings.service.ts's markSold/purchase.
-  async withdraw(userId: string, dto: WithdrawDto): Promise<{ balanceCents: number }> {
+  async withdraw(
+    userId: string,
+    dto: WithdrawDto,
+  ): Promise<{ balanceCents: number }> {
     validateMockCard(dto.card);
 
     const result = await this.prisma.user.updateMany({
@@ -36,7 +42,9 @@ export class WalletService {
       data: { balanceCents: { decrement: dto.amountCents } },
     });
     if (result.count === 0) {
-      throw new BadRequestException('Nicht genügend Guthaben für diese Auszahlung.');
+      throw new BadRequestException(
+        'Nicht genügend Guthaben für diese Auszahlung.',
+      );
     }
 
     const user = await this.prisma.user.findUniqueOrThrow({

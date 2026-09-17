@@ -37,7 +37,9 @@ export class ListingsService {
 
   async create(sellerId: string, role: string, dto: CreateListingDto) {
     if (role !== 'STUDENT') {
-      throw new ForbiddenException('Admin-Konten können keine Inserate erstellen.');
+      throw new ForbiddenException(
+        'Admin-Konten können keine Inserate erstellen.',
+      );
     }
 
     return this.prisma.listing.create({
@@ -86,7 +88,10 @@ export class ListingsService {
       data: { status: 'VERKAUFT', ...(buyerId ? { buyerId } : {}) },
     });
     if (result.count === 0) {
-      const exists = await this.prisma.listing.findUnique({ where: { id }, select: { id: true } });
+      const exists = await this.prisma.listing.findUnique({
+        where: { id },
+        select: { id: true },
+      });
       if (!exists) {
         throw new NotFoundException('Inserat nicht gefunden.');
       }
@@ -119,7 +124,9 @@ export class ListingsService {
       throw new NotFoundException('Inserat nicht gefunden.');
     }
     if (listing.sellerId === buyerId) {
-      throw new ForbiddenException('Du kannst dein eigenes Inserat nicht kaufen.');
+      throw new ForbiddenException(
+        'Du kannst dein eigenes Inserat nicht kaufen.',
+      );
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -136,7 +143,9 @@ export class ListingsService {
         data: { balanceCents: { decrement: listing.priceCents } },
       });
       if (debited.count === 0) {
-        throw new BadRequestException('Nicht genügend Guthaben für diesen Kauf.');
+        throw new BadRequestException(
+          'Nicht genügend Guthaben für diesen Kauf.',
+        );
       }
 
       // sellerId is nullable at the schema level (a seller's account can be
@@ -145,7 +154,9 @@ export class ListingsService {
       // a user still has any AKTIV listings, precisely to prevent this from
       // happening mid-purchase.
       if (!listing.sellerId) {
-        throw new ConflictException('Der Verkäufer dieses Inserats existiert nicht mehr.');
+        throw new ConflictException(
+          'Der Verkäufer dieses Inserats existiert nicht mehr.',
+        );
       }
 
       await tx.user.update({
@@ -153,7 +164,10 @@ export class ListingsService {
         data: { balanceCents: { increment: listing.priceCents } },
       });
 
-      const buyer = await tx.user.findUniqueOrThrow({ where: { id: buyerId }, select: { balanceCents: true } });
+      const buyer = await tx.user.findUniqueOrThrow({
+        where: { id: buyerId },
+        select: { balanceCents: true },
+      });
       const updated = await tx.listing.findUniqueOrThrow({
         where: { id },
         include: { seller: { select: SELLER_SELECT } },
@@ -175,14 +189,19 @@ export class ListingsService {
     });
 
     if (result.count === 0) {
-      const listing = await this.prisma.listing.findUnique({ where: { id }, select: { sellerId: true, status: true } });
+      const listing = await this.prisma.listing.findUnique({
+        where: { id },
+        select: { sellerId: true, status: true },
+      });
       if (!listing) {
         throw new NotFoundException('Inserat nicht gefunden.');
       }
       if (listing.sellerId !== userId) {
         throw new ForbiddenException('Du kannst nur eigene Inserate löschen.');
       }
-      throw new ConflictException('Verkaufte Inserate können nicht gelöscht werden.');
+      throw new ConflictException(
+        'Verkaufte Inserate können nicht gelöscht werden.',
+      );
     }
   }
 

@@ -1,4 +1,10 @@
-import { IsIn, IsOptional, IsString, MaxLength, ValidateIf } from 'class-validator';
+import {
+  IsIn,
+  IsOptional,
+  IsString,
+  MaxLength,
+  ValidateIf,
+} from 'class-validator';
 import { REPORT_REASONS } from '../report-reasons';
 
 export class CreateReportDto {
