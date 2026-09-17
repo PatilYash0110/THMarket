@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { RequireAdmin, RequireStudent } from './components/RequireAuth'
+import { AccountSettings } from './pages/AccountSettings'
 import { Admin } from './pages/Admin'
 import { Checkout } from './pages/Checkout'
 import { Favorites } from './pages/Favorites'
@@ -87,6 +88,14 @@ export default function App() {
           element={
             <RequireStudent>
               <Withdraw />
+            </RequireStudent>
+          }
+        />
+        <Route
+          path="settings"
+          element={
+            <RequireStudent>
+              <AccountSettings />
             </RequireStudent>
           }
         />

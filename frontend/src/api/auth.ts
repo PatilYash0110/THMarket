@@ -61,6 +61,11 @@ export async function fetchCurrentUser(token: string): Promise<User> {
   return response.json()
 }
 
+function authHeaders(): HeadersInit {
+  const token = localStorage.getItem('thmarket.token')
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
 export async function resendVerificationEmail(email: string): Promise<{ message: string }> {
   const response = await fetch(`${API_URL}/auth/resend-verification`, {
     method: 'POST',
@@ -86,6 +91,20 @@ export async function resetPassword(token: string, newPassword: string): Promise
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ token, newPassword }),
+  })
+  if (!response.ok) throw new ApiError(await parseErrorMessage(response))
+  return response.json()
+}
+
+export async function updateProfile(input: {
+  name?: string
+  currentPassword?: string
+  newPassword?: string
+}): Promise<User> {
+  const response = await fetch(`${API_URL}/auth/me`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(input),
   })
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
   return response.json()
