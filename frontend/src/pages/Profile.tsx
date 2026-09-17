@@ -1,4 +1,5 @@
-import { ShieldCheck, Wallet } from '@phosphor-icons/react'
+import { Gear, ShieldCheck, Wallet } from '@phosphor-icons/react'
+import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { EmptyState } from '../components/EmptyState'
 import { ListingCard } from '../components/ListingCard'
@@ -6,6 +7,40 @@ import { Button } from '../components/Button'
 import { useAuth } from '../context/AuthContext'
 import { useListings } from '../context/ListingsContext'
 import { formatPrice } from '../lib/format'
+import type { Listing } from '../types'
+
+function ListingSection({
+  title,
+  listings,
+  emptyTitle,
+  emptyDescription,
+  action,
+}: {
+  title: string
+  listings: Listing[]
+  emptyTitle: string
+  emptyDescription: string
+  action?: ReactNode
+}) {
+  return (
+    <section className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
+        {action}
+      </div>
+
+      {listings.length === 0 ? (
+        <EmptyState title={emptyTitle} description={emptyDescription} />
+      ) : (
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+          {listings.map((listing) => (
+            <ListingCard key={listing.id} listing={listing} />
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
 
 export function Profile() {
   const { currentUser } = useAuth()
@@ -13,7 +48,13 @@ export function Profile() {
 
   if (!currentUser) return null
 
-  const ownListings = listings.filter((listing) => listing.sellerId === currentUser.id)
+  const activeListings = listings.filter(
+    (listing) => listing.sellerId === currentUser.id && listing.status === 'AKTIV',
+  )
+  const soldListings = listings.filter(
+    (listing) => listing.sellerId === currentUser.id && listing.status === 'VERKAUFT',
+  )
+  const purchasedListings = listings.filter((listing) => listing.buyerId === currentUser.id)
 
   return (
     <div className="flex flex-col gap-10">
@@ -32,6 +73,13 @@ export function Profile() {
               </p>
             )}
           </div>
+          <Link
+            to="/settings"
+            aria-label="Kontoeinstellungen"
+            className="flex h-9 w-9 items-center justify-center text-foreground-muted hover:text-foreground"
+          >
+            <Gear size={20} aria-hidden />
+          </Link>
         </div>
 
         <div className="flex items-center gap-3 border border-border px-4 py-3">
@@ -55,29 +103,33 @@ export function Profile() {
         </div>
       </div>
 
-      <section className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight text-foreground">Meine Inserate</h2>
+      <ListingSection
+        title="Aktive Inserate"
+        listings={activeListings}
+        emptyTitle="Noch keine aktiven Inserate"
+        emptyDescription="Erstelle dein erstes Inserat, um es hier zu sehen."
+        action={
           <Link to="/listing/new">
             <Button size="sm" variant="secondary">
               Neues Inserat
             </Button>
           </Link>
-        </div>
+        }
+      />
 
-        {ownListings.length === 0 ? (
-          <EmptyState
-            title="Noch keine Inserate"
-            description="Erstelle dein erstes Inserat, um es hier zu sehen."
-          />
-        ) : (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
-            {ownListings.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} />
-            ))}
-          </div>
-        )}
-      </section>
+      <ListingSection
+        title="Verkaufte Inserate"
+        listings={soldListings}
+        emptyTitle="Noch keine verkauften Inserate"
+        emptyDescription="Sobald du ein Inserat verkaufst, erscheint es hier."
+      />
+
+      <ListingSection
+        title="Meine Käufe"
+        listings={purchasedListings}
+        emptyTitle="Noch keine Käufe"
+        emptyDescription="Sobald du etwas kaufst, erscheint es hier."
+      />
     </div>
   )
 }
