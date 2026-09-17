@@ -60,8 +60,19 @@ model Listing {
   images             String[]
   sofortkaufMoeglich Boolean       @default(true)
   status             ListingStatus @default(AKTIV)
-  sellerId           String
-  seller             User          @relation("ListingSeller", fields: [sellerId], references: [id])
+  // Nullable (not required) so that deleting a seller's account never has to
+  // choose between destroying sale history and cascading into other
+  // students' data — see Listing.seller's onDelete comment below.
+  sellerId           String?
+  // No cascade here on purpose: Favorite.listingId already cascades, so a
+  // required, cascading seller relation would mean deleting one bad-actor
+  // account silently wipes every OTHER student's favorites on that seller's
+  // listings, and would destroy the only record a completed sale ever
+  // happened (there's no separate Order/Transaction model — this row IS the
+  // transaction record). AdminService.deleteUser() instead blocks deleting a
+  // user who still has AKTIV listings and only lets VERKAUFT ones survive
+  // with sellerId set to null here.
+  seller             User?         @relation("ListingSeller", fields: [sellerId], references: [id])
   buyerId            String?
   buyer              User?         @relation("ListingBuyer", fields: [buyerId], references: [id])
   favorites          Favorite[]
