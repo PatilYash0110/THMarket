@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import {
   addFavorite,
   createListing,
+  deleteListing as deleteListingRequest,
   fetchFavoriteListingIds,
   fetchListings,
   markListingSold,
@@ -35,6 +36,7 @@ interface ListingsContextValue {
   updateListing: (id: string, updates: Partial<Listing>) => Promise<Listing>
   markAsSold: (id: string) => Promise<Listing>
   purchaseListing: (id: string, input: PurchaseInput) => Promise<Listing & { buyerBalanceCents?: number }>
+  removeListing: (id: string) => Promise<void>
   toggleFavorite: (id: string) => Promise<void>
   isFavorite: (id: string) => boolean
 }
@@ -89,6 +91,11 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
     return result
   }
 
+  async function removeListing(id: string) {
+    await deleteListingRequest(id)
+    setListings((prev) => prev.filter((listing) => listing.id !== id))
+  }
+
   async function toggleFavorite(id: string) {
     if (favoriteIds.includes(id)) {
       await removeFavorite(id)
@@ -114,6 +121,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
         updateListing,
         markAsSold,
         purchaseListing,
+        removeListing,
         toggleFavorite,
         isFavorite,
       }}

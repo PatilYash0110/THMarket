@@ -74,6 +74,14 @@ export async function purchaseListing(
   return response.json()
 }
 
+export async function deleteListing(id: string): Promise<void> {
+  const response = await fetch(`${API_URL}/listings/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  })
+  if (!response.ok) throw new ApiError(await parseErrorMessage(response))
+}
+
 export async function addFavorite(id: string): Promise<void> {
   const response = await fetch(`${API_URL}/listings/${id}/favorite`, {
     method: 'POST',
