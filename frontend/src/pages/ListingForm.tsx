@@ -1,7 +1,8 @@
-import { Plus, X } from '@phosphor-icons/react'
+import { Plus, Sparkle, X } from '@phosphor-icons/react'
 import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
-import { uploadListingImages } from '../api/listings'
+import { ApiError } from '../api/auth'
+import { generateListingDescription, uploadListingImages } from '../api/listings'
 import { Button } from '../components/Button'
 import { useAuth } from '../context/AuthContext'
 import { useListings } from '../context/ListingsContext'
@@ -108,6 +109,9 @@ function ListingFormFields({
   const [category, setCategory] = useState<ListingCategory>(existing?.category ?? CATEGORIES[0])
   const [price, setPrice] = useState(existing ? String(existing.priceCents / 100) : '')
   const [description, setDescription] = useState(existing?.description ?? '')
+  const [aiHint, setAiHint] = useState('')
+  const [generating, setGenerating] = useState(false)
+  const [aiError, setAiError] = useState<string | null>(null)
   const [sofortkauf, setSofortkauf] = useState(existing?.sofortkaufMoeglich ?? true)
   const [images, setImages] = useState<ImageItem[]>(
     (existing?.images ?? []).map((url) => ({ kind: 'existing', url })),
@@ -154,6 +158,40 @@ function ListingFormFields({
     setImages((prev) =>
       prev.filter((image) => (item.kind === 'existing' ? !(image.kind === 'existing' && image.url === item.url) : !(image.kind === 'new' && image.file === item.file))),
     )
+  }
+
+  // Only newly-picked, not-yet-uploaded photos are sent to Gemini — an
+  // existing edit's already-Cloudinary-hosted images aren't re-fetched and
+  // re-sent for this. Regenerating on an edit with only old photos and no
+  // hint needs at least a hint typed in first.
+  async function handleGenerateDescription() {
+    const newImages = images.filter((item): item is Extract<ImageItem, { kind: 'new' }> => item.kind === 'new')
+    if (newImages.length === 0 && !aiHint.trim()) {
+      setAiError('Wähle mindestens ein Foto oder gib einen Hinweis ein.')
+      return
+    }
+    if (description.trim() && !window.confirm('Die vorhandene Beschreibung durch einen KI-Vorschlag ersetzen?')) {
+      return
+    }
+    setAiError(null)
+    setGenerating(true)
+    try {
+      const result = await generateListingDescription(
+        newImages.map((item) => item.file),
+        aiHint.trim() || undefined,
+        title || undefined,
+        category,
+      )
+      setDescription(result)
+    } catch (err) {
+      setAiError(
+        err instanceof ApiError
+          ? err.message
+          : 'Beschreibung konnte nicht generiert werden. Bitte manuell eingeben.',
+      )
+    } finally {
+      setGenerating(false)
+    }
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -280,8 +318,26 @@ function ListingFormFields({
           </label>
         </div>
 
-        <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-foreground">Beschreibung</span>
+        <div className="flex flex-col gap-1.5 text-sm">
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-medium text-foreground">Beschreibung</span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={generating}
+              onClick={handleGenerateDescription}
+            >
+              <Sparkle size={14} aria-hidden />
+              {generating ? 'Wird generiert…' : 'Mit KI generieren'}
+            </Button>
+          </div>
+          <input
+            value={aiHint}
+            onChange={(event) => setAiHint(event.target.value)}
+            placeholder="Hinweis für die KI (optional), z. B. kleiner Kratzer am Rahmen"
+            className="h-10 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
           <textarea
             required
             rows={5}
@@ -290,10 +346,17 @@ function ListingFormFields({
             placeholder="Zustand, Details, Abholung…"
             className="border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
-          <span className="text-xs text-foreground-muted">
-            Manuelle Eingabe — automatische Beschreibung per KI folgt in einer späteren Phase.
-          </span>
-        </label>
+          {aiError ? (
+            <p role="alert" className="text-xs text-destructive">
+              {aiError}
+            </p>
+          ) : (
+            <span className="text-xs text-foreground-muted">
+              Manuelle Eingabe, oder Foto(s)/Hinweis oben angeben und auf „Mit KI generieren" klicken —
+              der Vorschlag bleibt danach frei bearbeitbar.
+            </span>
+          )}
+        </div>
 
         <div className="flex flex-col gap-1.5 text-sm">
           <span className="font-medium text-foreground">Fotos (optional)</span>
