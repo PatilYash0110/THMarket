@@ -76,10 +76,14 @@ export class ListingsService {
   // = 'AKTIV'` re-evaluates that predicate against the latest *committed*
   // row when a concurrent writer has to wait on the lock, so the loser
   // genuinely gets `count: 0` under Postgres's default READ COMMITTED.
-  async markSold(id: string) {
+  //
+  // `buyerId` is optional and only ever passed by purchase()'s simulation
+  // branch below — the self-service PATCH :id/sold route (no real buyer)
+  // calls this with no second argument, leaving buyerId untouched.
+  async markSold(id: string, buyerId?: string) {
     const result = await this.prisma.listing.updateMany({
       where: { id, status: 'AKTIV' },
-      data: { status: 'VERKAUFT' },
+      data: { status: 'VERKAUFT', ...(buyerId ? { buyerId } : {}) },
     });
     if (result.count === 0) {
       const exists = await this.prisma.listing.findUnique({ where: { id }, select: { id: true } });
@@ -107,7 +111,7 @@ export class ListingsService {
   async purchase(id: string, buyerId: string, dto: PurchaseListingDto) {
     if (dto.paymentMethod === 'simulation') {
       validateMockCard(dto.card!);
-      return this.markSold(id);
+      return this.markSold(id, buyerId);
     }
 
     const listing = await this.prisma.listing.findUnique({ where: { id } });
@@ -119,7 +123,10 @@ export class ListingsService {
     }
 
     return this.prisma.$transaction(async (tx) => {
-      const sold = await tx.listing.updateMany({ where: { id, status: 'AKTIV' }, data: { status: 'VERKAUFT' } });
+      const sold = await tx.listing.updateMany({
+        where: { id, status: 'AKTIV' },
+        data: { status: 'VERKAUFT', buyerId },
+      });
       if (sold.count === 0) {
         throw new ConflictException('Dieses Inserat ist bereits verkauft.');
       }

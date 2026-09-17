@@ -21,5 +21,6 @@ export interface Listing {
   status: ListingStatus
   sellerId: string
   seller: { name: string; verified: boolean }
+  buyerId: string | null
   createdAt: string
 }
