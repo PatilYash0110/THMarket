@@ -27,8 +27,21 @@ type ImageItem = { kind: 'existing'; url: string } | { kind: 'new'; file: File; 
 export function ListingForm() {
   const { id } = useParams<{ id: string }>()
   const isEditing = Boolean(id)
-  const { currentUser } = useAuth()
+  const { currentUser, loading: authLoading } = useAuth()
   const { getListing, loading: listingsLoading } = useListings()
+
+  // Unlike routes wrapped in <RequireStudent> (which already gate on this),
+  // /listing/new and /listing/:id/edit are bare routes that do their own
+  // auth check inline — so on a fresh direct load of either URL, AuthContext
+  // briefly has currentUser === null while it resolves the stored token.
+  // Deciding "not logged in" during that window redirected to /login, and
+  // since that redirect carried no `state.from`, Login then bounced on to
+  // "/" once the real (logged-in) user resolved a moment later — a logged-in
+  // user landing on either URL never actually saw the form. Same class of
+  // bug as the listings-loading race below, just on the auth side.
+  if (authLoading) {
+    return null
+  }
 
   if (!currentUser) {
     return <Navigate to="/login" replace />
