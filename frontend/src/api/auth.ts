@@ -109,3 +109,12 @@ export async function updateProfile(input: {
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
   return response.json()
 }
+
+export async function dismissWarning(): Promise<User> {
+  const response = await fetch(`${API_URL}/auth/dismiss-warning`, {
+    method: 'POST',
+    headers: authHeaders(),
+  })
+  if (!response.ok) throw new ApiError(await parseErrorMessage(response))
+  return response.json()
+}
