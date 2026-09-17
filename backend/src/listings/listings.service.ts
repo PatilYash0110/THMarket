@@ -153,6 +153,30 @@ export class ListingsService {
     });
   }
 
+  // Owner-only, AKTIV-only. A single atomic conditional delete, not
+  // check-then-delete: a plain delete performed after separate ownership
+  // and status checks could race a concurrent purchase completing on the
+  // same listing (`purchase()` above flips status to VERKAUFT and sets
+  // buyerId inside its own transaction) — exactly the scenario the
+  // VERKAUFT-block exists to prevent (a buyer's future purchase record
+  // getting destroyed), just reached via a race instead of a direct call.
+  async remove(id: string, userId: string): Promise<void> {
+    const result = await this.prisma.listing.deleteMany({
+      where: { id, sellerId: userId, status: 'AKTIV' },
+    });
+
+    if (result.count === 0) {
+      const listing = await this.prisma.listing.findUnique({ where: { id }, select: { sellerId: true, status: true } });
+      if (!listing) {
+        throw new NotFoundException('Inserat nicht gefunden.');
+      }
+      if (listing.sellerId !== userId) {
+        throw new ForbiddenException('Du kannst nur eigene Inserate löschen.');
+      }
+      throw new ConflictException('Verkaufte Inserate können nicht gelöscht werden.');
+    }
+  }
+
   async addFavorite(userId: string, listingId: string) {
     await this.findOne(listingId);
     await this.prisma.favorite.upsert({

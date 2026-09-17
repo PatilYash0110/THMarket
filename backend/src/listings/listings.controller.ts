@@ -89,6 +89,13 @@ export class ListingsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    await this.listingsService.remove(id, user.sub);
+    return { deleted: true };
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post(':id/purchase')
   purchase(@Param('id') id: string, @CurrentUser() user: JwtPayload, @Body() dto: PurchaseListingDto) {
     return this.listingsService.purchase(id, user.sub, dto);
