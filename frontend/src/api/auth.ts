@@ -15,7 +15,7 @@ export async function parseErrorMessage(response: Response): Promise<string> {
     if (typeof body.message === 'string') return body.message
     if (Array.isArray(body.message)) return body.message.join(' ')
   } catch {
-    // Antwort war kein JSON — Standardmeldung verwenden
+    // response wasn't JSON — fall through to the generic message
   }
   return 'Etwas ist schiefgelaufen. Bitte versuche es erneut.'
 }
@@ -56,6 +56,16 @@ export async function loginUser(input: {
 export async function fetchCurrentUser(token: string): Promise<User> {
   const response = await fetch(`${API_URL}/auth/me`, {
     headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok) throw new ApiError(await parseErrorMessage(response))
+  return response.json()
+}
+
+export async function resendVerificationEmail(email: string): Promise<{ message: string }> {
+  const response = await fetch(`${API_URL}/auth/resend-verification`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
   })
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
   return response.json()

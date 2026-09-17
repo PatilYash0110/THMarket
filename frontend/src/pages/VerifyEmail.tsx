@@ -2,6 +2,7 @@ import { CheckCircle, XCircle } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { ApiError, verifyEmail } from '../api/auth'
+import { ResendVerificationButton } from '../components/ResendVerificationButton'
 
 type Status = 'verifying' | 'success' | 'error'
 
@@ -10,7 +11,7 @@ export function VerifyEmail() {
   const token = searchParams.get('token')
   const [status, setStatus] = useState<Status>('verifying')
   const [message, setMessage] = useState<string | null>(null)
-
+  const [resendEmail, setResendEmail] = useState('')
   // The backend clears the token after a successful verify, so calling this
   // twice for the same token would make the second call fail. StrictMode
   // deliberately double-invokes effects in development, so without this
@@ -41,6 +42,7 @@ export function VerifyEmail() {
       {status === 'verifying' && (
         <p className="text-sm text-foreground-muted">E-Mail-Adresse wird bestätigt…</p>
       )}
+
       {status === 'success' && (
         <>
           <CheckCircle size={40} className="text-accent" aria-hidden />
@@ -55,6 +57,7 @@ export function VerifyEmail() {
           </Link>
         </>
       )}
+
       {status === 'error' && (
         <>
           <XCircle size={40} className="text-destructive" aria-hidden />
@@ -62,6 +65,19 @@ export function VerifyEmail() {
             Bestätigung fehlgeschlagen
           </h1>
           <p className="text-sm text-foreground-muted">{message}</p>
+
+          <div className="flex w-full flex-col items-center gap-3 border-t border-border pt-4">
+            <p className="text-xs text-foreground-muted">Neuen Bestätigungslink anfordern:</p>
+            <input
+              type="email"
+              value={resendEmail}
+              onChange={(event) => setResendEmail(event.target.value)}
+              placeholder="max.mustermann@thm.de"
+              className="h-10 w-full border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+            {resendEmail.trim() && <ResendVerificationButton email={resendEmail.trim()} />}
+          </div>
+
           <Link to="/register" className="text-sm font-medium text-accent underline">
             Erneut registrieren
           </Link>
