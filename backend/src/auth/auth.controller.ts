@@ -62,4 +62,10 @@ export class AuthController {
   updateProfile(@CurrentUser() user: JwtPayload, @Body() dto: UpdateProfileDto) {
     return this.authService.updateProfile(user.sub, dto);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('dismiss-warning')
+  dismissWarning(@CurrentUser() user: JwtPayload) {
+    return this.authService.dismissWarning(user.sub);
+  }
 }

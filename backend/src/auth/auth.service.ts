@@ -38,6 +38,7 @@ export interface PublicUser {
   role: 'STUDENT' | 'ADMIN';
   verified: boolean;
   balanceCents: number;
+  warningMessage: string | null;
 }
 
 @Injectable()
@@ -56,6 +57,7 @@ export class AuthService {
     role: string;
     verified: boolean;
     balanceCents: number;
+    warningMessage: string | null;
   }): PublicUser {
     return {
       id: user.id,
@@ -64,6 +66,7 @@ export class AuthService {
       role: user.role as 'STUDENT' | 'ADMIN',
       verified: user.verified,
       balanceCents: user.balanceCents,
+      warningMessage: user.warningMessage,
     };
   }
 
@@ -155,6 +158,34 @@ export class AuthService {
     return { message: GENERIC_RESET_MESSAGE };
   }
 
+  async login(dto: LoginDto): Promise<{ accessToken: string; user: PublicUser }> {
+    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    if (!user) {
+      throw new UnauthorizedException('Ungültige E-Mail-Adresse oder Passwort.');
+    }
+
+    const passwordMatches = await bcrypt.compare(dto.password, user.passwordHash);
+    if (!passwordMatches) {
+      throw new UnauthorizedException('Ungültige E-Mail-Adresse oder Passwort.');
+    }
+
+    if (!user.verified) {
+      throw new ForbiddenException('Bitte bestätige zuerst deine E-Mail-Adresse.');
+    }
+
+    const accessToken = await this.jwt.signAsync({ sub: user.id, role: user.role });
+
+    return { accessToken, user: this.toPublicUser(user) };
+  }
+
+  async me(userId: string): Promise<PublicUser> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('Nutzer nicht gefunden.');
+    }
+    return this.toPublicUser(user);
+  }
+
   // Deliberately always returns the same generic message, whether or not the
   // email exists — stricter than register()'s 409 (which is a different kind
   // of endpoint: claiming an identity, not just requesting an email) since a
@@ -202,34 +233,6 @@ export class AuthService {
     return { message: 'Passwort erfolgreich zurückgesetzt.' };
   }
 
-  async login(dto: LoginDto): Promise<{ accessToken: string; user: PublicUser }> {
-    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
-    if (!user) {
-      throw new UnauthorizedException('Ungültige E-Mail-Adresse oder Passwort.');
-    }
-
-    const passwordMatches = await bcrypt.compare(dto.password, user.passwordHash);
-    if (!passwordMatches) {
-      throw new UnauthorizedException('Ungültige E-Mail-Adresse oder Passwort.');
-    }
-
-    if (!user.verified) {
-      throw new ForbiddenException('Bitte bestätige zuerst deine E-Mail-Adresse.');
-    }
-
-    const accessToken = await this.jwt.signAsync({ sub: user.id, role: user.role });
-
-    return { accessToken, user: this.toPublicUser(user) };
-  }
-
-  async me(userId: string): Promise<PublicUser> {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      throw new NotFoundException('Nutzer nicht gefunden.');
-    }
-    return this.toPublicUser(user);
-  }
-
   async updateProfile(userId: string, dto: UpdateProfileDto): Promise<PublicUser> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
@@ -252,6 +255,18 @@ export class AuthService {
     }
 
     const updated = await this.prisma.user.update({ where: { id: userId }, data });
+    return this.toPublicUser(updated);
+  }
+
+  // Self-service: the only way a warningMessage (set by an admin resolving a
+  // report with USER_WARNED) ever reaches the user is a banner on their own
+  // Profile page, since there's no notifications system — this clears it
+  // once they've seen it.
+  async dismissWarning(userId: string): Promise<PublicUser> {
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: { warningMessage: null },
+    });
     return this.toPublicUser(updated);
   }
 }
