@@ -12,15 +12,22 @@ import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { MailService } from '../mail/mail.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 const VERIFICATION_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 const RESEND_VERIFICATION_COOLDOWN_MS = 60 * 1000;
+// Shorter than the verification TTL on purpose: a live password-reset link
+// sitting in an inbox is a real account-takeover window if that inbox is
+// ever compromised or shared, unlike a verification link (worst case there
+// is someone else marking your email verified — no password exposure).
+const PASSWORD_RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
 const BCRYPT_ROUNDS = 12;
-// Generic response for resend-verification so the endpoint doesn't leak
-// which @thm.de addresses are registered or already verified.
+// Generic response for both resend-verification and forgot-password so
+// neither endpoint leaks whether a given @thm.de address has an account.
 const GENERIC_RESET_MESSAGE = 'Falls ein Konto mit dieser E-Mail existiert, wurde eine E-Mail gesendet.';
 
 export interface PublicUser {
@@ -145,6 +152,53 @@ export class AuthService {
     }
 
     return { message: GENERIC_RESET_MESSAGE };
+  }
+
+  // Deliberately always returns the same generic message, whether or not the
+  // email exists — stricter than register()'s 409 (which is a different kind
+  // of endpoint: claiming an identity, not just requesting an email) since a
+  // THM-only, real-name platform shouldn't leak account existence here.
+  async forgotPassword(dto: ForgotPasswordDto): Promise<{ message: string }> {
+    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
+
+    if (user) {
+      const passwordResetToken = randomBytes(32).toString('hex');
+      const passwordResetExpires = new Date(Date.now() + PASSWORD_RESET_TOKEN_TTL_MS);
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { passwordResetToken, passwordResetExpires },
+      });
+
+      const resetUrl = `${this.config.getOrThrow<string>('FRONTEND_URL')}/reset-password?token=${passwordResetToken}`;
+      await this.mail.sendPasswordResetEmail(user.email, user.name, resetUrl);
+    }
+
+    return { message: GENERIC_RESET_MESSAGE };
+  }
+
+  // Atomic conditional write, not read-then-write: two near-simultaneous
+  // submits of the same reset token could otherwise both pass a separate
+  // expiry check before either writes, and both appear to succeed. Same
+  // idiom as listings.service.ts's markSold/purchase.
+  async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {
+    const passwordHash = await bcrypt.hash(dto.newPassword, BCRYPT_ROUNDS);
+
+    const result = await this.prisma.user.updateMany({
+      where: { passwordResetToken: dto.token, passwordResetExpires: { gt: new Date() } },
+      data: {
+        passwordHash,
+        passwordResetToken: null,
+        passwordResetExpires: null,
+        passwordChangedAt: new Date(),
+      },
+    });
+
+    if (result.count === 0) {
+      throw new BadRequestException('Der Link zum Zurücksetzen ist ungültig oder abgelaufen.');
+    }
+
+    return { message: 'Passwort erfolgreich zurückgesetzt.' };
   }
 
   async login(dto: LoginDto): Promise<{ accessToken: string; user: PublicUser }> {

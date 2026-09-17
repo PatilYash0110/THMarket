@@ -56,4 +56,34 @@ export class MailService {
 
     this.logger.log(`Verification email sent to ${to}`);
   }
+
+  async sendPasswordResetEmail(to: string, name: string, resetUrl: string): Promise<void> {
+    if (!this.transporter) {
+      this.logger.warn(
+        `GMAIL_USER/GMAIL_APP_PASSWORD not set — logging password reset link instead of sending email.`,
+      );
+      this.logger.log(`Password reset link for ${to}: ${resetUrl}`);
+      return;
+    }
+
+    await this.transporter.sendMail({
+      from: `"THMarket" <${this.config.get<string>('GMAIL_USER')}>`,
+      to,
+      subject: 'Passwort zurücksetzen — THMarket',
+      text: `Hallo ${name},\n\ndu hast angefordert, dein THMarket-Passwort zurückzusetzen:\n${resetUrl}\n\nDieser Link ist 1 Stunde gültig. Falls du das nicht warst, kannst du diese E-Mail ignorieren.`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+          <p>Hallo ${name},</p>
+          <p>du hast angefordert, dein THMarket-Passwort zurückzusetzen:</p>
+          <p>
+            <a href="${resetUrl}" style="display:inline-block;background:#1b1e21;color:#fff;padding:12px 24px;text-decoration:none;">
+              Passwort zurücksetzen
+            </a>
+          </p>
+          <p style="color:#6b6d72;font-size:13px;">Dieser Link ist 1 Stunde gültig. Falls du das nicht warst, kannst du diese E-Mail ignorieren.</p>
+        </div>
+      `,
+    });
+    this.logger.log(`Password reset email sent to ${to}`);
+  }
 }
