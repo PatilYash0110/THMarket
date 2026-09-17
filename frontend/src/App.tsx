@@ -4,6 +4,7 @@ import { RequireAdmin, RequireStudent } from './components/RequireAuth'
 import { Admin } from './pages/Admin'
 import { Checkout } from './pages/Checkout'
 import { Favorites } from './pages/Favorites'
+import { ForgotPassword } from './pages/ForgotPassword'
 import { Home } from './pages/Home'
 import { Impressum } from './pages/Impressum'
 import { ListingDetail } from './pages/ListingDetail'
@@ -13,6 +14,7 @@ import { Messages } from './pages/Messages'
 import { NotFound } from './pages/NotFound'
 import { Profile } from './pages/Profile'
 import { Register } from './pages/Register'
+import { ResetPassword } from './pages/ResetPassword'
 import { TopUp } from './pages/TopUp'
 import { VerifyEmail } from './pages/VerifyEmail'
 import { Withdraw } from './pages/Withdraw'
@@ -28,6 +30,8 @@ export default function App() {
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="verify-email" element={<VerifyEmail />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="reset-password" element={<ResetPassword />} />
         <Route path="impressum" element={<Impressum />} />
 
         <Route

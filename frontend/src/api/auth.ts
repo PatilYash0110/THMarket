@@ -70,3 +70,23 @@ export async function resendVerificationEmail(email: string): Promise<{ message:
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
   return response.json()
 }
+
+export async function forgotPassword(email: string): Promise<{ message: string }> {
+  const response = await fetch(`${API_URL}/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  })
+  if (!response.ok) throw new ApiError(await parseErrorMessage(response))
+  return response.json()
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+  const response = await fetch(`${API_URL}/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, newPassword }),
+  })
+  if (!response.ok) throw new ApiError(await parseErrorMessage(response))
+  return response.json()
+}

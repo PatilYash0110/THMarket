@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api/auth'
 import { Button } from '../components/Button'
 import { useAuth } from '../context/AuthContext'
@@ -64,6 +64,9 @@ export function Login() {
             aria-describedby={error ? 'login-error' : undefined}
             className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
+          <Link to="/forgot-password" className="self-end text-xs font-medium text-accent underline">
+            Passwort vergessen?
+          </Link>
         </label>
         {error && (
           <p id="login-error" role="alert" className="text-sm text-destructive">
