@@ -7,6 +7,21 @@ import { useAuth } from '../context/AuthContext'
 import { useMessages } from '../context/MessagesContext'
 import { formatDate } from '../lib/format'
 
+// A small colored "squircle" standing in for a profile photo, since listings
+// carry photos but student accounts don't.
+function Avatar({ name, className }: { name: string; className?: string }) {
+  return (
+    <div
+      className={clsx(
+        'flex shrink-0 items-center justify-center rounded-2xl bg-accent-soft text-sm font-semibold text-accent-strong',
+        className,
+      )}
+    >
+      {name.charAt(0).toUpperCase()}
+    </div>
+  )
+}
+
 export function Messages() {
   const { currentUser } = useAuth()
   const { conversationId } = useParams<{ conversationId?: string }>()
@@ -44,85 +59,105 @@ export function Messages() {
     )
   }
 
+  const activeOther = activeConversation
+    ? activeConversation.buyer?.id === currentUser.id
+      ? activeConversation.seller
+      : activeConversation.buyer
+    : undefined
+
   return (
-    <div className="grid grid-cols-1 border border-border md:grid-cols-[280px_1fr]">
-      <aside className="border-b border-border md:border-b-0 md:border-r">
+    <div className="grid h-[calc(100dvh-8rem)] grid-cols-1 overflow-hidden rounded-3xl border border-border bg-surface shadow-sm md:grid-cols-[300px_1fr]">
+      <aside className="flex min-h-0 flex-col gap-1 overflow-y-auto border-b border-border p-2 md:border-b-0 md:border-r">
         {conversations.map((conversation) => {
           const isBuyer = conversation.buyer?.id === currentUser.id
           const other = isBuyer ? conversation.seller : conversation.buyer
           const lastMessage = conversation.messages[0]
+          const isActive = conversation.id === activeConversation?.id
 
           return (
             <Link
               key={conversation.id}
               to={`/messages/${conversation.id}`}
               className={clsx(
-                'block border-b border-border px-4 py-3 hover:bg-surface-muted',
-                conversation.id === activeConversation?.id && 'bg-surface-muted',
+                'flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors',
+                isActive ? 'bg-accent-soft' : 'hover:bg-surface-muted',
               )}
             >
-              <p className="text-sm font-medium text-foreground">{conversation.listing?.title ?? 'Inserat'}</p>
-              <p className="text-xs text-foreground-muted">mit {other?.name ?? 'Gelöschter Nutzer'}</p>
-              {lastMessage && (
-                <p className="mt-1 truncate text-xs text-foreground-muted">{lastMessage.text}</p>
-              )}
+              <Avatar name={other?.name ?? '?'} className="h-11 w-11" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-foreground">
+                  {conversation.listing?.title ?? 'Inserat'}
+                </p>
+                <p className="truncate text-xs text-foreground-muted">
+                  {lastMessage ? lastMessage.text : `mit ${other?.name ?? 'Gelöschter Nutzer'}`}
+                </p>
+              </div>
             </Link>
           )
         })}
       </aside>
 
-      <section className="flex min-h-[24rem] flex-col">
+      <section className="flex min-h-0 flex-col">
         {!activeConversation ? (
           <div className="flex flex-1 items-center justify-center p-8 text-sm text-foreground-muted">
             Wähle eine Unterhaltung aus.
           </div>
         ) : (
           <>
-            <header className="border-b border-border px-4 py-3">
-              <p className="text-sm font-medium text-foreground">
-                {activeConversation.listing?.title ?? 'Inserat'}
-              </p>
+            <header className="flex shrink-0 items-center gap-3 border-b border-border px-5 py-4">
+              <Avatar name={activeOther?.name ?? '?'} className="h-10 w-10" />
+              <div>
+                <p className="font-display text-base font-semibold text-foreground">
+                  {activeConversation.listing?.title ?? 'Inserat'}
+                </p>
+                <p className="text-xs text-foreground-muted">mit {activeOther?.name ?? 'Gelöschter Nutzer'}</p>
+              </div>
             </header>
 
-            <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
+            <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-5">
               {getMessages(activeConversation.id).map((message) => {
                 const isMine = message.senderId === currentUser.id
                 return (
                   <div
                     key={message.id}
-                    className={clsx('flex flex-col', isMine ? 'items-end' : 'items-start')}
+                    className={clsx('flex items-end gap-2', isMine ? 'flex-row-reverse' : 'flex-row')}
                   >
-                    <div
-                      className={clsx(
-                        'max-w-xs px-3 py-2 text-sm',
-                        isMine ? 'bg-primary text-on-primary' : 'bg-surface-muted text-foreground',
-                      )}
-                    >
-                      {message.text}
+                    {!isMine && <Avatar name={activeOther?.name ?? '?'} className="h-7 w-7 text-xs" />}
+                    <div className={clsx('flex max-w-xs flex-col', isMine ? 'items-end' : 'items-start')}>
+                      <div
+                        className={clsx(
+                          'rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
+                          isMine
+                            ? 'rounded-br-md bg-accent text-on-accent'
+                            : 'rounded-bl-md bg-accent-soft text-foreground',
+                        )}
+                      >
+                        {message.text}
+                      </div>
+                      <span className="mt-1 text-[10px] text-foreground-muted">
+                        {formatDate(message.createdAt)}
+                      </span>
                     </div>
-                    <span className="mt-1 text-[10px] text-foreground-muted">
-                      {formatDate(message.createdAt)}
-                    </span>
                   </div>
                 )
               })}
             </div>
 
-            <form onSubmit={handleSend} className="flex items-center gap-2 border-t border-border p-3">
+            <form onSubmit={handleSend} className="flex shrink-0 items-center gap-2 border-t border-border p-4">
               <input
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
                 placeholder="Nachricht schreiben…"
                 aria-label="Nachricht schreiben"
-                className="h-11 flex-1 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-12 flex-1 rounded-full border border-border bg-surface-muted/60 px-5 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
               <button
                 type="submit"
                 aria-label="Senden"
-                className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center bg-primary text-on-primary hover:opacity-90 disabled:opacity-50"
+                className="flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-full bg-accent text-on-accent shadow-sm transition-all motion-safe:active:scale-90 hover:bg-accent-strong hover:text-on-primary disabled:opacity-50"
                 disabled={!draft.trim()}
               >
-                <PaperPlaneRight size={18} aria-hidden />
+                <PaperPlaneRight size={18} weight="fill" aria-hidden />
               </button>
             </form>
           </>
