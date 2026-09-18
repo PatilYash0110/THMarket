@@ -8,13 +8,20 @@ import {
   User,
 } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import logo from '../../media/thm_market_logo.jpg'
 import { useAuth } from '../context/AuthContext'
 import { useMessages } from '../context/MessagesContext'
 import { Button } from './Button'
 
 const SEARCH_DEBOUNCE_MS = 300
+
+// Matches /listing/:id (a single-segment listing detail page) but not
+// /listing/new or /listing/:id/edit — searching for other listings while
+// reading one isn't a useful action there the way it is everywhere else.
+function isListingDetailPath(pathname: string): boolean {
+  return /^\/listing\/(?!new$)[^/]+$/.test(pathname)
+}
 
 function SearchBar({ className }: { className?: string }) {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -61,6 +68,8 @@ function SearchBar({ className }: { className?: string }) {
 export function Navbar() {
   const { currentUser, logout } = useAuth()
   const { unreadTotal } = useMessages()
+  const location = useLocation()
+  const showSearch = Boolean(currentUser) && !isListingDetailPath(location.pathname)
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-surface/70 backdrop-blur-xl backdrop-saturate-150">
@@ -70,7 +79,7 @@ export function Navbar() {
             <img src={logo} alt="THMarket" className="h-12 w-auto" />
           </Link>
 
-          {currentUser && <SearchBar className="hidden md:flex md:max-w-md" />}
+          {showSearch && <SearchBar className="hidden md:flex md:max-w-md" />}
 
           <nav className="ml-auto flex items-center gap-2">
             {currentUser?.role === 'ADMIN' && (
@@ -165,7 +174,7 @@ export function Navbar() {
           </nav>
         </div>
 
-        {currentUser && <SearchBar className="md:hidden" />}
+        {showSearch && <SearchBar className="md:hidden" />}
       </div>
     </header>
   )
