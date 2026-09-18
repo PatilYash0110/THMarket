@@ -1,3 +1,5 @@
+import type { ListingStatus } from './listing'
+
 export interface Message {
   id: string
   conversationId: string
@@ -10,7 +12,7 @@ export interface Message {
 // message history for one thread is fetched separately, lazily, once opened.
 export interface Conversation {
   id: string
-  listing: { id: string; title: string } | null
+  listing: { id: string; title: string; status: ListingStatus } | null
   buyer: { id: string; name: string } | null
   seller: { id: string; name: string } | null
   messages: Message[]

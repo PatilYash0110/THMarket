@@ -2,6 +2,7 @@ import { PaperPlaneRight } from '@phosphor-icons/react'
 import clsx from 'clsx'
 import { type FormEvent, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { Badge } from '../components/Badge'
 import { EmptyState } from '../components/EmptyState'
 import { useAuth } from '../context/AuthContext'
 import { useMessages } from '../context/MessagesContext'
@@ -64,6 +65,7 @@ export function Messages() {
       ? activeConversation.seller
       : activeConversation.buyer
     : undefined
+  const activeSold = activeConversation?.listing?.status === 'VERKAUFT'
 
   return (
     <div className="grid h-[calc(100dvh-8rem)] grid-cols-1 overflow-hidden rounded-3xl border border-border bg-surface shadow-sm md:grid-cols-[300px_1fr]">
@@ -74,6 +76,7 @@ export function Messages() {
           const lastMessage = conversation.messages[0]
           const isActive = conversation.id === activeConversation?.id
           const unread = conversation.unreadCount > 0
+          const sold = conversation.listing?.status === 'VERKAUFT'
 
           return (
             <Link
@@ -81,19 +84,27 @@ export function Messages() {
               to={`/messages/${conversation.id}`}
               className={clsx(
                 'flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors',
+                sold && 'opacity-60',
                 isActive ? 'bg-accent-soft' : 'hover:bg-surface-muted',
               )}
             >
-              <Avatar name={other?.name ?? '?'} className="h-11 w-11" />
+              <Avatar name={other?.name ?? '?'} className={clsx('h-11 w-11', sold && 'grayscale')} />
               <div className="min-w-0 flex-1">
-                <p
-                  className={clsx(
-                    'truncate text-sm text-foreground',
-                    unread ? 'font-semibold' : 'font-medium',
+                <div className="flex items-center gap-1.5">
+                  <p
+                    className={clsx(
+                      'truncate text-sm text-foreground',
+                      unread ? 'font-semibold' : 'font-medium',
+                    )}
+                  >
+                    {conversation.listing?.title ?? 'Inserat'}
+                  </p>
+                  {sold && (
+                    <span className="shrink-0">
+                      <Badge tone="neutral">Verkauft</Badge>
+                    </span>
                   )}
-                >
-                  {conversation.listing?.title ?? 'Inserat'}
-                </p>
+                </div>
                 <p
                   className={clsx(
                     'truncate text-xs',
@@ -123,12 +134,15 @@ export function Messages() {
           </div>
         ) : (
           <>
-            <header className="flex shrink-0 items-center gap-3 border-b border-border px-5 py-4">
-              <Avatar name={activeOther?.name ?? '?'} className="h-10 w-10" />
+            <header className={clsx('flex shrink-0 items-center gap-3 border-b border-border px-5 py-4', activeSold && 'opacity-60')}>
+              <Avatar name={activeOther?.name ?? '?'} className={clsx('h-10 w-10', activeSold && 'grayscale')} />
               <div>
-                <p className="font-display text-base font-semibold text-foreground">
-                  {activeConversation.listing?.title ?? 'Inserat'}
-                </p>
+                <div className="flex items-center gap-1.5">
+                  <p className="font-display text-base font-semibold text-foreground">
+                    {activeConversation.listing?.title ?? 'Inserat'}
+                  </p>
+                  {activeSold && <Badge tone="neutral">Verkauft</Badge>}
+                </div>
                 <p className="text-xs text-foreground-muted">mit {activeOther?.name ?? 'Gelöschter Nutzer'}</p>
               </div>
             </header>
