@@ -48,10 +48,20 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
       return
     }
 
-    fetchConversations().then(setConversations).catch(() => setConversations([]))
+    const socket = getSocket()
+    // Join every conversation's room up front, not just whichever one gets
+    // opened — otherwise a live 'message' event for a thread the user
+    // hasn't visited this session never reaches this socket at all (the
+    // server only broadcasts to clients that joined that room), so the
+    // unread badge would silently miss it until the next full page load.
+    fetchConversations()
+      .then((fetched) => {
+        setConversations(fetched)
+        fetched.forEach((conversation) => socket.emit('joinConversation', conversation.id))
+      })
+      .catch(() => setConversations([]))
     connectSocket()
 
-    const socket = getSocket()
     function handleIncoming(message: Message) {
       const isActive = message.conversationId === activeConversationIdRef.current
       const isMine = message.senderId === currentUser!.id
@@ -113,6 +123,7 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
       const withoutExisting = prev.filter((existing) => existing.id !== conversation.id)
       return [conversation, ...withoutExisting].sort(byActivity)
     })
+    getSocket().emit('joinConversation', conversation.id)
     return conversation
   }
 
