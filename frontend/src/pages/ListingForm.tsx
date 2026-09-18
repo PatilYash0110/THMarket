@@ -7,7 +7,6 @@ import { generateListingDescription, uploadListingImages } from '../api/listings
 import { Button } from '../components/Button'
 import { useAuth } from '../context/AuthContext'
 import { useListings } from '../context/ListingsContext'
-import { placeholderImage } from '../lib/placeholder'
 import type { Listing, ListingCategory } from '../types'
 
 const CATEGORIES: ListingCategory[] = [
@@ -198,6 +197,10 @@ function ListingFormFields({
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     if (submitting) return
+    if (images.length === 0) {
+      setImageError('Bitte füge mindestens ein Foto hinzu.')
+      return
+    }
     setSubmitting(true)
     try {
       const priceCents = Math.round(Number.parseFloat(price.replace(',', '.')) * 100)
@@ -205,10 +208,9 @@ function ListingFormFields({
       const newFiles = images.filter((item): item is Extract<ImageItem, { kind: 'new' }> => item.kind === 'new')
       const uploadedUrls = newFiles.length > 0 ? await uploadListingImages(newFiles.map((item) => item.file)) : []
       let uploadIndex = 0
-      const resolvedImages = images.map((item) =>
+      const finalImages = images.map((item) =>
         item.kind === 'existing' ? item.url : uploadedUrls[uploadIndex++],
       )
-      const finalImages = resolvedImages.length > 0 ? resolvedImages : [placeholderImage(title)]
 
       if (isEditing && existing) {
         await updateListing(existing.id, {
@@ -342,7 +344,7 @@ function ListingFormFields({
         <div className="flex flex-col gap-1.5 rounded-2xl border border-border bg-surface p-5 text-sm shadow-sm">
           <div className="mb-2.5 flex items-center justify-between gap-2">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground-muted">Fotos</h2>
-            <span className="text-xs text-foreground-muted">optional</span>
+            <span className="text-xs text-foreground-muted">Pflicht</span>
           </div>
           <div className="flex flex-wrap gap-3">
             {images.map((image) => {
@@ -389,8 +391,8 @@ function ListingFormFields({
             </p>
           )}
           <span className="mt-1.5 text-xs text-foreground-muted">
-            Wähle Fotos von deinem Gerät — bis zu {MAX_IMAGES}. Sie helfen auch der KI unten, eine
-            Beschreibung vorzuschlagen. Ohne Angabe wird ein Platzhalter verwendet.
+            Wähle mindestens ein Foto von deinem Gerät — bis zu {MAX_IMAGES}. Sie helfen auch der
+            KI unten, eine Beschreibung vorzuschlagen.
           </span>
         </div>
 
