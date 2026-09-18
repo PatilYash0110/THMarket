@@ -2,6 +2,16 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { PrismaService } from '../prisma/prisma.service';
 
 const USER_SELECT = { id: true, name: true } as const;
+// Shared by startConversation() and listConversations() so both always
+// return the same shape — messages is always present as an array (empty for
+// a brand-new thread), never omitted, matching the frontend's Conversation
+// type exactly.
+const CONVERSATION_INCLUDE = {
+  listing: { select: { id: true, title: true } },
+  buyer: { select: USER_SELECT },
+  seller: { select: USER_SELECT },
+  messages: { take: 1, orderBy: { createdAt: 'desc' } },
+} as const;
 
 @Injectable()
 export class ChatService {
@@ -30,11 +40,7 @@ export class ChatService {
       where: { listingId_buyerId: { listingId, buyerId } },
       create: { listingId, buyerId, sellerId: listing.sellerId },
       update: {},
-      include: {
-        listing: { select: { id: true, title: true } },
-        buyer: { select: USER_SELECT },
-        seller: { select: USER_SELECT },
-      },
+      include: CONVERSATION_INCLUDE,
     });
   }
 
@@ -47,12 +53,7 @@ export class ChatService {
   async listConversations(userId: string) {
     const conversations = await this.prisma.conversation.findMany({
       where: { OR: [{ buyerId: userId }, { sellerId: userId }] },
-      include: {
-        listing: { select: { id: true, title: true } },
-        buyer: { select: USER_SELECT },
-        seller: { select: USER_SELECT },
-        messages: { take: 1, orderBy: { createdAt: 'desc' } },
-      },
+      include: CONVERSATION_INCLUDE,
     });
     const activityTime = (c: (typeof conversations)[number]) =>
       (c.messages[0]?.createdAt ?? c.createdAt).getTime();
