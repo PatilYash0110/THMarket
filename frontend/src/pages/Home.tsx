@@ -80,10 +80,10 @@ export function Home() {
             type="button"
             onClick={() => setCategory(null)}
             className={clsx(
-              'cursor-pointer border px-3 py-1.5 text-xs font-medium uppercase tracking-wide transition-colors',
+              'cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-medium uppercase tracking-wide transition-all motion-safe:active:scale-95',
               !category
-                ? 'border-primary bg-primary text-on-primary'
-                : 'border-border text-foreground-muted hover:border-foreground hover:text-foreground',
+                ? 'border-primary bg-primary text-on-primary shadow-sm'
+                : 'border-border bg-surface text-foreground-muted hover:border-border-strong hover:text-foreground',
             )}
           >
             Alle
@@ -94,22 +94,23 @@ export function Home() {
               type="button"
               onClick={() => setCategory(cat)}
               className={clsx(
-                'cursor-pointer border px-3 py-1.5 text-xs font-medium uppercase tracking-wide transition-colors',
+                'cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-medium uppercase tracking-wide transition-all motion-safe:active:scale-95',
                 category === cat
-                  ? 'border-primary bg-primary text-on-primary'
-                  : 'border-border text-foreground-muted hover:border-foreground hover:text-foreground',
+                  ? 'border-accent bg-accent text-on-accent shadow-sm'
+                  : 'border-border bg-surface text-foreground-muted hover:border-border-strong hover:text-foreground',
               )}
             >
               {cat}
             </button>
           ))}
         </div>
+
         <label className="flex items-center gap-2 text-xs text-foreground-muted">
           Sortieren
           <select
             value={sort}
             onChange={(event) => setSort(event.target.value as SortOption)}
-            className="border border-border bg-background px-2 py-1.5 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded-lg border border-border bg-surface px-2.5 py-1.5 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <option value="neueste">Neueste zuerst</option>
             <option value="preis-auf">Preis aufsteigend</option>
@@ -117,6 +118,7 @@ export function Home() {
           </select>
         </label>
       </div>
+
       {filtered.length === 0 ? (
         <EmptyState
           title="Keine Inserate gefunden"
@@ -124,8 +126,14 @@ export function Home() {
         />
       ) : (
         <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
-          {filtered.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
+          {filtered.map((listing, index) => (
+            <div
+              key={listing.id}
+              className="motion-safe:animate-fade-in-up"
+              style={{ animationDelay: `${Math.min(index, 12) * 40}ms` }}
+            >
+              <ListingCard listing={listing} />
+            </div>
           ))}
         </div>
       )}
