@@ -1,38 +1,41 @@
 import { PaperPlaneRight } from '@phosphor-icons/react'
 import clsx from 'clsx'
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { EmptyState } from '../components/EmptyState'
 import { useAuth } from '../context/AuthContext'
-import { useListings } from '../context/ListingsContext'
 import { useMessages } from '../context/MessagesContext'
 import { formatDate } from '../lib/format'
-import { findUserById } from '../mocks/users'
 
 export function Messages() {
   const { currentUser } = useAuth()
   const { conversationId } = useParams<{ conversationId?: string }>()
-  const { conversations, sendMessage } = useMessages()
-  const { getListing } = useListings()
+  const { conversations, getMessages, openConversation, sendMessage } = useMessages()
   const [draft, setDraft] = useState('')
+
+  const activeConversation = conversationId
+    ? conversations.find((conversation) => conversation.id === conversationId)
+    : undefined
+
+  // Lazily fetches the full history and joins the socket room only once a
+  // thread is actually opened — the list view only ever carries a preview.
+  useEffect(() => {
+    if (activeConversation) {
+      openConversation(activeConversation.id)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeConversation?.id])
 
   if (!currentUser) return null
 
-  const myConversations = conversations.filter((conversation) =>
-    conversation.participantIds.includes(currentUser.id),
-  )
-  const activeConversation = conversationId
-    ? myConversations.find((conversation) => conversation.id === conversationId)
-    : undefined
-
   function handleSend(event: FormEvent) {
     event.preventDefault()
-    if (!activeConversation || !draft.trim() || !currentUser) return
-    sendMessage(activeConversation.id, currentUser.id, draft.trim())
+    if (!activeConversation || !draft.trim()) return
+    sendMessage(activeConversation.id, draft.trim())
     setDraft('')
   }
 
-  if (myConversations.length === 0) {
+  if (conversations.length === 0) {
     return (
       <EmptyState
         title="Noch keine Unterhaltungen"
@@ -44,11 +47,10 @@ export function Messages() {
   return (
     <div className="grid grid-cols-1 border border-border md:grid-cols-[280px_1fr]">
       <aside className="border-b border-border md:border-b-0 md:border-r">
-        {myConversations.map((conversation) => {
-          const listing = getListing(conversation.listingId)
-          const otherId = conversation.participantIds.find((id) => id !== currentUser.id)
-          const other = otherId ? findUserById(otherId) : undefined
-          const lastMessage = conversation.messages[conversation.messages.length - 1]
+        {conversations.map((conversation) => {
+          const isBuyer = conversation.buyer?.id === currentUser.id
+          const other = isBuyer ? conversation.seller : conversation.buyer
+          const lastMessage = conversation.messages[0]
 
           return (
             <Link
@@ -59,8 +61,8 @@ export function Messages() {
                 conversation.id === activeConversation?.id && 'bg-surface-muted',
               )}
             >
-              <p className="text-sm font-medium text-foreground">{listing?.title ?? 'Inserat'}</p>
-              <p className="text-xs text-foreground-muted">mit {other?.name ?? 'Nutzer'}</p>
+              <p className="text-sm font-medium text-foreground">{conversation.listing?.title ?? 'Inserat'}</p>
+              <p className="text-xs text-foreground-muted">mit {other?.name ?? 'Gelöschter Nutzer'}</p>
               {lastMessage && (
                 <p className="mt-1 truncate text-xs text-foreground-muted">{lastMessage.text}</p>
               )}
@@ -78,12 +80,12 @@ export function Messages() {
           <>
             <header className="border-b border-border px-4 py-3">
               <p className="text-sm font-medium text-foreground">
-                {getListing(activeConversation.listingId)?.title ?? 'Inserat'}
+                {activeConversation.listing?.title ?? 'Inserat'}
               </p>
             </header>
 
             <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
-              {activeConversation.messages.map((message) => {
+              {getMessages(activeConversation.id).map((message) => {
                 const isMine = message.senderId === currentUser.id
                 return (
                   <div
@@ -99,7 +101,7 @@ export function Messages() {
                       {message.text}
                     </div>
                     <span className="mt-1 text-[10px] text-foreground-muted">
-                      {formatDate(message.sentAt)}
+                      {formatDate(message.createdAt)}
                     </span>
                   </div>
                 )

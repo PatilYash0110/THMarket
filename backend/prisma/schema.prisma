@@ -39,6 +39,9 @@ model User {
   reportsFiled             Report[]        @relation("ReportsFiled")
   reportsReceived          Report[]        @relation("ReportsReceived")
   auditLogEntries          AuditLogEntry[]
+  conversationsAsBuyer     Conversation[]  @relation("ConversationsAsBuyer")
+  conversationsAsSeller    Conversation[]  @relation("ConversationsAsSeller")
+  messagesSent             Message[]
 }
 
 enum ListingStatus {
@@ -77,6 +80,7 @@ model Listing {
   buyer              User?         @relation("ListingBuyer", fields: [buyerId], references: [id])
   favorites          Favorite[]
   reports            Report[]
+  conversations      Conversation[]
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 
@@ -149,4 +153,39 @@ model AuditLogEntry {
   targetType String?
   targetId   String?
   createdAt  DateTime @default(now())
+}
+
+// One thread per (listing, buyer) pair, strictly between that buyer and the
+// listing's seller — "bound to a listing" per CLAUDE.md. All three party
+// relations are nullable with onDelete: SetNull, same reasoning as Report/
+// AuditLogEntry: a conversation must stay legible after its listing is
+// deleted or either side's account is removed by admin, not disappear.
+model Conversation {
+  id        String    @id @default(cuid())
+  listingId String?
+  listing   Listing?  @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  buyerId   String?
+  buyer     User?     @relation("ConversationsAsBuyer", fields: [buyerId], references: [id], onDelete: SetNull)
+  sellerId  String?
+  seller    User?     @relation("ConversationsAsSeller", fields: [sellerId], references: [id], onDelete: SetNull)
+  messages  Message[]
+  createdAt DateTime  @default(now())
+
+  // Makes "start a conversation" idempotent: messaging the same seller about
+  // the same listing twice reopens the same thread instead of forking a new
+  // one (enforced via a single atomic upsert(), not a separate check).
+  @@unique([listingId, buyerId])
+  @@index([sellerId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String?
+  sender         User?        @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  text           String
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
 }

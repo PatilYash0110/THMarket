@@ -20,13 +20,16 @@
     "test:e2e": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@google/genai": "^2.23.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^12.0.0",
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^12.0.1",
     "@nestjs/passport": "^12.0.0",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/platform-socket.io": "^11.2.5",
     "@nestjs/throttler": "^6.7.0",
+    "@nestjs/websockets": "^11.2.5",
     "@prisma/client": "^6.19.3",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
@@ -37,7 +40,8 @@
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "socket.io": "^4.8.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

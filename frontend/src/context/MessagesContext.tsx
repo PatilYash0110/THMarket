@@ -1,41 +1,96 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { fetchConversationMessages, fetchConversations, startConversation as startConversationApi } from '../api/messages'
+import { connectSocket, disconnectSocket, getSocket } from '../lib/socket'
 import type { Conversation, Message } from '../types'
-import { INITIAL_CONVERSATIONS } from '../mocks/conversations'
+import { useAuth } from './AuthContext'
 
 interface MessagesContextValue {
   conversations: Conversation[]
-  getConversation: (id: string) => Conversation | undefined
-  sendMessage: (conversationId: string, senderId: string, text: string) => void
+  getMessages: (conversationId: string) => Message[]
+  openConversation: (conversationId: string) => Promise<void>
+  sendMessage: (conversationId: string, text: string) => void
+  startConversation: (listingId: string) => Promise<Conversation>
 }
 
 const MessagesContext = createContext<MessagesContextValue | undefined>(undefined)
 
-export function MessagesProvider({ children }: { children: ReactNode }) {
-  const [conversations, setConversations] = useState<Conversation[]>(INITIAL_CONVERSATIONS)
+// Newest-activity-first, same rule as the backend's own listConversations()
+// sort — re-applied here since a live 'message' event updates one
+// conversation's preview in place rather than refetching the whole list.
+function byActivity(a: Conversation, b: Conversation): number {
+  const timeOf = (c: Conversation) => new Date(c.messages[0]?.createdAt ?? 0).getTime()
+  return timeOf(b) - timeOf(a)
+}
 
-  function getConversation(id: string) {
-    return conversations.find((conversation) => conversation.id === id)
+export function MessagesProvider({ children }: { children: ReactNode }) {
+  const { currentUser } = useAuth()
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [messagesByConversation, setMessagesByConversation] = useState<Record<string, Message[]>>({})
+  const messagesByConversationRef = useRef(messagesByConversation)
+  messagesByConversationRef.current = messagesByConversation
+
+  useEffect(() => {
+    if (!currentUser) {
+      disconnectSocket()
+      setConversations([])
+      setMessagesByConversation({})
+      return
+    }
+
+    fetchConversations().then(setConversations).catch(() => setConversations([]))
+    connectSocket()
+
+    const socket = getSocket()
+    function handleIncoming(message: Message) {
+      setConversations((prev) =>
+        prev
+          .map((conversation) =>
+            conversation.id === message.conversationId ? { ...conversation, messages: [message] } : conversation,
+          )
+          .sort(byActivity),
+      )
+      if (messagesByConversationRef.current[message.conversationId]) {
+        setMessagesByConversation((prev) => ({
+          ...prev,
+          [message.conversationId]: [...prev[message.conversationId], message],
+        }))
+      }
+    }
+    socket.on('message', handleIncoming)
+
+    return () => {
+      socket.off('message', handleIncoming)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser])
+
+  function getMessages(conversationId: string): Message[] {
+    return messagesByConversation[conversationId] ?? []
   }
 
-  function sendMessage(conversationId: string, senderId: string, text: string) {
-    const message: Message = {
-      id: `message-${Date.now()}`,
-      conversationId,
-      senderId,
-      text,
-      sentAt: new Date().toISOString(),
-    }
-    setConversations((prev) =>
-      prev.map((conversation) =>
-        conversation.id === conversationId
-          ? { ...conversation, messages: [...conversation.messages, message] }
-          : conversation,
-      ),
-    )
+  async function openConversation(conversationId: string): Promise<void> {
+    const messages = await fetchConversationMessages(conversationId)
+    setMessagesByConversation((prev) => ({ ...prev, [conversationId]: messages }))
+    getSocket().emit('joinConversation', conversationId)
+  }
+
+  function sendMessage(conversationId: string, text: string): void {
+    getSocket().emit('sendMessage', { conversationId, text })
+  }
+
+  async function startConversation(listingId: string): Promise<Conversation> {
+    const conversation = await startConversationApi(listingId)
+    setConversations((prev) => {
+      const withoutExisting = prev.filter((existing) => existing.id !== conversation.id)
+      return [conversation, ...withoutExisting].sort(byActivity)
+    })
+    return conversation
   }
 
   return (
-    <MessagesContext.Provider value={{ conversations, getConversation, sendMessage }}>
+    <MessagesContext.Provider
+      value={{ conversations, getMessages, openConversation, sendMessage, startConversation }}
+    >
       {children}
     </MessagesContext.Provider>
   )

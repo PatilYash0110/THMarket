@@ -118,3 +118,24 @@ export async function uploadListingImages(files: File[]): Promise<string[]> {
   const { urls } = (await response.json()) as { urls: string[] }
   return urls
 }
+
+export async function generateListingDescription(
+  images: File[],
+  hint?: string,
+  title?: string,
+  category?: string,
+): Promise<string> {
+  const formData = new FormData()
+  images.forEach((file) => formData.append('files', file))
+  if (hint) formData.append('hint', hint)
+  if (title) formData.append('title', title)
+  if (category) formData.append('category', category)
+  const response = await fetch(`${API_URL}/listings/generate-description`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: formData,
+  })
+  if (!response.ok) throw new ApiError(await parseErrorMessage(response))
+  const { description } = (await response.json()) as { description: string }
+  return description
+}
