@@ -1,11 +1,13 @@
 import { Flag, Heart, PencilSimple, ShieldCheck, SmileySad } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { ApiError } from '../api/auth'
 import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
 import { ReportForm } from '../components/ReportForm'
 import { useAuth } from '../context/AuthContext'
 import { useListings } from '../context/ListingsContext'
+import { useMessages } from '../context/MessagesContext'
 import { formatDate, formatPrice } from '../lib/format'
 
 type ReportTarget = 'LISTING' | 'USER' | null
@@ -14,9 +16,12 @@ export function ListingDetail() {
   const { id } = useParams<{ id: string }>()
   const { getListing, isFavorite, toggleFavorite, loading } = useListings()
   const { currentUser } = useAuth()
+  const { startConversation } = useMessages()
   const navigate = useNavigate()
   const [activeImage, setActiveImage] = useState(0)
   const [reporting, setReporting] = useState<ReportTarget>(null)
+  const [contacting, setContacting] = useState(false)
+  const [contactError, setContactError] = useState<string | null>(null)
 
   const listing = id ? getListing(id) : undefined
 
@@ -49,12 +54,21 @@ export function ListingDetail() {
   const isAdmin = currentUser?.role === 'ADMIN'
   const favorite = isFavorite(listing.id)
 
-  function handleContactSeller() {
+  const handleContactSeller = async () => {
     if (!currentUser) {
       navigate('/login')
       return
     }
-    navigate('/messages')
+    setContactError(null)
+    setContacting(true)
+    try {
+      const conversation = await startConversation(listing.id)
+      navigate(`/messages/${conversation.id}`)
+    } catch (err) {
+      setContactError(err instanceof ApiError ? err.message : 'Kontakt fehlgeschlagen. Bitte versuche es erneut.')
+    } finally {
+      setContacting(false)
+    }
   }
 
   return (
@@ -152,8 +166,8 @@ export function ListingDetail() {
               </Link>
             )}
             {!sold && (
-              <Button variant="secondary" size="lg" onClick={handleContactSeller}>
-                Anbieter kontaktieren
+              <Button variant="secondary" size="lg" disabled={contacting} onClick={handleContactSeller}>
+                {contacting ? 'Wird geöffnet…' : 'Anbieter kontaktieren'}
               </Button>
             )}
             <Button
@@ -175,6 +189,12 @@ export function ListingDetail() {
               Inserat melden
             </button>
           </div>
+        )}
+
+        {contactError && (
+          <p role="alert" className="text-sm text-destructive">
+            {contactError}
+          </p>
         )}
 
         {reporting === 'LISTING' && (
