@@ -2,6 +2,20 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
+// `name` is user-supplied (the registration form) and interpolated into
+// these HTML bodies below — without this, a name like `<img src=x
+// onerror=...>` would ride along verbatim into an email an HTML-rendering
+// mail client executes. Only ever mailed to that same user's own inbox, so
+// the realistic impact is self-XSS at best, but it costs nothing to escape.
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
@@ -11,26 +25,16 @@ export class MailService {
     const user = this.config.get<string>('GMAIL_USER');
     const pass = this.config.get<string>('GMAIL_APP_PASSWORD');
 
-    if (user && pass) {
-      const transportOptions = {
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        requireTLS: true,
-        auth: { user, pass },
-        family: 4,
-      };
-      this.transporter = nodemailer.createTransport(transportOptions);
-    } else {
-      this.transporter = null;
-    }
+    this.transporter =
+      user && pass
+        ? nodemailer.createTransport({
+            service: 'gmail',
+            auth: { user, pass },
+          })
+        : null;
   }
 
-  async sendVerificationEmail(
-    to: string,
-    name: string,
-    verifyUrl: string,
-  ): Promise<void> {
+  async sendVerificationEmail(to: string, name: string, verifyUrl: string): Promise<void> {
     if (!this.transporter) {
       this.logger.warn(
         `GMAIL_USER/GMAIL_APP_PASSWORD not set — logging verification link instead of sending email.`,
@@ -46,7 +50,7 @@ export class MailService {
       text: `Hallo ${name},\n\nbitte bestätige deine E-Mail-Adresse, um dein THMarket-Konto zu aktivieren:\n${verifyUrl}\n\nDieser Link ist 24 Stunden gültig.`,
       html: `
         <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
-          <p>Hallo ${name},</p>
+          <p>Hallo ${escapeHtml(name)},</p>
           <p>bitte bestätige deine E-Mail-Adresse, um dein THMarket-Konto zu aktivieren:</p>
           <p>
             <a href="${verifyUrl}" style="display:inline-block;background:#1b1e21;color:#fff;padding:12px 24px;text-decoration:none;">
@@ -57,15 +61,10 @@ export class MailService {
         </div>
       `,
     });
-
     this.logger.log(`Verification email sent to ${to}`);
   }
 
-  async sendPasswordResetEmail(
-    to: string,
-    name: string,
-    resetUrl: string,
-  ): Promise<void> {
+  async sendPasswordResetEmail(to: string, name: string, resetUrl: string): Promise<void> {
     if (!this.transporter) {
       this.logger.warn(
         `GMAIL_USER/GMAIL_APP_PASSWORD not set — logging password reset link instead of sending email.`,
@@ -81,7 +80,7 @@ export class MailService {
       text: `Hallo ${name},\n\ndu hast angefordert, dein THMarket-Passwort zurückzusetzen:\n${resetUrl}\n\nDieser Link ist 1 Stunde gültig. Falls du das nicht warst, kannst du diese E-Mail ignorieren.`,
       html: `
         <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
-          <p>Hallo ${name},</p>
+          <p>Hallo ${escapeHtml(name)},</p>
           <p>du hast angefordert, dein THMarket-Passwort zurückzusetzen:</p>
           <p>
             <a href="${resetUrl}" style="display:inline-block;background:#1b1e21;color:#fff;padding:12px 24px;text-decoration:none;">
