@@ -76,7 +76,7 @@ export function Navbar() {
       <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex h-10 items-center gap-6">
           <Link to="/" className="flex shrink-0 items-center">
-            <img src={logo} alt="THMarket" className="h-12 w-auto" />
+            <img src={logo} alt="THMarket" className="h-16 w-auto" />
           </Link>
 
           {showSearch && <SearchBar className="hidden md:flex md:max-w-md" />}
