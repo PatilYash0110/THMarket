@@ -50,7 +50,7 @@ export function Register() {
     return (
       <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-4 py-10 text-center">
         <EnvelopeSimple size={40} className="text-accent" aria-hidden />
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+        <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">
           Bestätige deine E-Mail-Adresse
         </h1>
         <p className="text-sm text-foreground-muted">
@@ -68,7 +68,7 @@ export function Register() {
   return (
     <div className="mx-auto flex w-full max-w-sm flex-col gap-5 py-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Registrieren</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Registrieren</h1>
         <p className="mt-2 text-sm text-foreground-muted">
           Nur mit einer verifizierten <span className="font-medium text-foreground">@thm.de</span>-Adresse möglich.
         </p>
@@ -83,7 +83,7 @@ export function Register() {
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="Max Mustermann"
-            className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
         </label>
         <label className="flex flex-col gap-1.5 text-sm">
@@ -95,7 +95,7 @@ export function Register() {
             onChange={(event) => setEmail(event.target.value)}
             placeholder="max.mustermann@thm.de"
             aria-describedby={error ? 'email-error' : undefined}
-            className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
           {error && (
             <span id="email-error" role="alert" className="text-xs text-destructive">
@@ -113,7 +113,7 @@ export function Register() {
             onChange={(event) => setPassword(event.target.value)}
             placeholder="Sicheres Passwort"
             aria-describedby={passwordError ? 'password-error password-requirements' : 'password-requirements'}
-            className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
           {passwordError && (
             <span id="password-error" role="alert" className="text-xs text-destructive">
