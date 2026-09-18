@@ -107,8 +107,8 @@ export class ListingsController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id/sold')
-  markSold(@Param('id') id: string) {
-    return this.listingsService.markSold(id);
+  markSold(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.listingsService.markSold(id, user.sub, user.role);
   }
 
   @UseGuards(JwtAuthGuard)
