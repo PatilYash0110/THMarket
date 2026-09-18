@@ -12,6 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { memoryStorage } from 'multer';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { CurrentUser } from '../auth/current-user.decorator';
@@ -20,6 +21,7 @@ import type { JwtPayload } from '../auth/jwt.strategy';
 import { GeminiService } from '../gemini/gemini.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { GenerateDescriptionDto } from './dto/generate-description.dto';
+import { isLikelyImage } from './image-sniff';
 import { PurchaseListingDto } from './dto/purchase-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 import { ListingsService } from './listings.service';
@@ -70,33 +72,74 @@ export class ListingsController {
     return this.listingsService.create(user.sub, user.role, dto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // Throttled — beyond the ordinary request-flooding concern, each upload
+  // here now also triggers a Gemini moderation call per image (see below),
+  // so an unthrottled loop would run up real API cost/quota too, not just
+  // Cloudinary storage.
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Post('upload')
   @UseInterceptors(FilesInterceptor('files', MAX_IMAGES, IMAGE_FILE_INTERCEPTOR_OPTIONS))
   async upload(@UploadedFiles() files: Express.Multer.File[]) {
-    const urls = await this.cloudinary.uploadImages(files ?? []);
+    const images = files ?? [];
+    await this.assertImagesAreSafe(images);
+    const urls = await this.cloudinary.uploadImages(images);
     return { urls };
   }
 
   // Only the seller's currently-selected, not-yet-uploaded photos are sent
   // here — not any of the listing's already-Cloudinary-hosted images, which
   // would need a separate fetch-and-reconvert round trip for no real benefit.
-  @UseGuards(JwtAuthGuard)
+  // Throttled tighter than most routes (3/min, via @Throttle overriding the
+  // module's default 5/min): this calls the paid Gemini API directly off an
+  // authenticated-but-otherwise-unrestricted route, previously with no rate
+  // limit at all — a compromised or malicious account could otherwise spam
+  // it to exhaust quota/run up cost with nothing but a valid login.
+  @Throttle({ default: { limit: 3, ttl: 60_000 } })
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Post('generate-description')
   @UseInterceptors(FilesInterceptor('files', MAX_IMAGES, IMAGE_FILE_INTERCEPTOR_OPTIONS))
   async generateDescription(
     @UploadedFiles() files: Express.Multer.File[] | undefined,
     @Body() dto: GenerateDescriptionDto,
   ) {
-    if ((!files || files.length === 0) && !dto.hint) {
+    const images = files ?? [];
+    if (images.length === 0 && !dto.hint) {
       throw new BadRequestException('Bitte mindestens ein Foto oder einen Hinweis angeben.');
     }
+    this.assertImagesLookLikeImages(images);
     const description = await this.gemini.generateDescription(
-      (files ?? []).map((file) => ({ buffer: file.buffer, mimetype: file.mimetype })),
+      images.map((file) => ({ buffer: file.buffer, mimetype: file.mimetype })),
       dto.hint,
       { title: dto.title, category: dto.category },
     );
     return { description };
+  }
+
+  // The multer fileFilter only ever saw the client-supplied Content-Type
+  // header (spoofable, and not even available yet as real bytes at that
+  // point) — this re-checks each file's actual magic number now that
+  // memoryStorage() has the full buffer.
+  private assertImagesLookLikeImages(files: Express.Multer.File[]): void {
+    if (files.some((file) => !isLikelyImage(file.buffer))) {
+      throw new BadRequestException('Eine der Dateien ist kein gültiges Bild.');
+    }
+  }
+
+  // Only the /upload path (permanently published, Cloudinary-hosted
+  // listing photos) runs full content moderation — generate-description's
+  // images are ephemeral (sent to Gemini for a description draft, never
+  // stored or shown to anyone), so moderating those too would just add
+  // latency/cost for no one ever seeing that image.
+  private async assertImagesAreSafe(files: Express.Multer.File[]): Promise<void> {
+    this.assertImagesLookLikeImages(files);
+    const verdicts = await Promise.all(
+      files.map((file) => this.gemini.moderateImage({ buffer: file.buffer, mimetype: file.mimetype })),
+    );
+    if (verdicts.some((safe) => !safe)) {
+      throw new BadRequestException(
+        'Eines der Fotos wurde als unangemessen eingestuft und konnte nicht hochgeladen werden.',
+      );
+    }
   }
 
   @UseGuards(JwtAuthGuard)
