@@ -27,7 +27,7 @@ function ListingSection({
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
+        <h2 className="font-display text-lg font-semibold tracking-tight text-foreground">{title}</h2>
         {action}
       </div>
 
@@ -76,7 +76,7 @@ export function Profile() {
   return (
     <div className="flex flex-col gap-10">
       {currentUser.warningMessage && (
-        <div className="flex items-start justify-between gap-4 border border-destructive bg-destructive/5 p-4">
+        <div className="flex items-start justify-between gap-4 rounded-2xl border border-destructive/30 bg-destructive/5 p-4">
           <div className="flex items-start gap-2.5">
             <Warning size={18} weight="fill" className="mt-0.5 shrink-0 text-destructive" aria-hidden />
             <div>
@@ -89,23 +89,23 @@ export function Profile() {
             onClick={handleDismissWarning}
             disabled={dismissing}
             aria-label="Verwarnung ausblenden"
-            className="cursor-pointer text-foreground-muted hover:text-foreground disabled:cursor-not-allowed"
+            className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full text-foreground-muted transition-colors hover:bg-surface hover:text-foreground disabled:cursor-not-allowed"
           >
             <X size={16} aria-hidden />
           </button>
         </div>
       )}
 
-      <div className="flex flex-col gap-6 border border-border p-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-6 rounded-2xl border border-border bg-surface p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center bg-surface-muted text-lg font-semibold text-foreground">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-soft text-lg font-semibold text-accent-strong">
             {currentUser.name.charAt(0)}
           </div>
           <div>
-            <p className="text-lg font-semibold text-foreground">{currentUser.name}</p>
+            <p className="font-display text-lg font-semibold text-foreground">{currentUser.name}</p>
             <p className="text-sm text-foreground-muted">{currentUser.email}</p>
             {currentUser.verified && (
-              <p className="mt-1 flex items-center gap-1 text-xs text-accent">
+              <p className="mt-1 flex items-center gap-1 text-xs text-accent-strong">
                 <ShieldCheck size={14} weight="fill" aria-hidden />
                 Verifizierte THM-Adresse
               </p>
@@ -114,14 +114,14 @@ export function Profile() {
           <Link
             to="/settings"
             aria-label="Kontoeinstellungen"
-            className="flex h-9 w-9 items-center justify-center text-foreground-muted hover:text-foreground"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-foreground-muted transition-colors hover:bg-surface-muted hover:text-foreground"
           >
             <Gear size={20} aria-hidden />
           </Link>
         </div>
 
-        <div className="flex items-center gap-3 border border-border px-4 py-3">
-          <Wallet size={20} className="text-accent" aria-hidden />
+        <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface-muted/60 px-4 py-3">
+          <Wallet size={20} className="text-accent-strong" aria-hidden />
           <div>
             <p className="text-xs uppercase tracking-wide text-foreground-muted">Guthaben</p>
             <p className="text-lg font-semibold text-foreground">
