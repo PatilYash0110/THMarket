@@ -25,7 +25,7 @@ export function Withdraw() {
     return (
       <div className="mx-auto flex max-w-sm flex-col items-center gap-4 py-16 text-center">
         <CheckCircle size={40} className="text-accent" aria-hidden />
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">Auszahlung erfolgreich</h1>
+        <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">Auszahlung erfolgreich</h1>
         <p className="text-sm text-foreground-muted">
           Das Geld wurde an die angegebene Karte gesendet (Mock). Verbleibendes Guthaben:{' '}
           <span className="font-medium text-foreground">{formatPrice(currentUser.balanceCents)}</span>
@@ -80,7 +80,7 @@ export function Withdraw() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-8 py-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Guthaben auszahlen</h1>
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Guthaben auszahlen</h1>
       <p className="-mt-4 text-sm text-foreground-muted">
         Verfügbares Guthaben: <span className="font-medium text-foreground">{formatPrice(currentUser.balanceCents)}</span>
       </p>
@@ -96,7 +96,7 @@ export function Withdraw() {
             step="0.01"
             value={amount}
             onChange={(event) => setAmount(event.target.value)}
-            className="h-11 border border-border bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
         </label>
 
@@ -109,7 +109,7 @@ export function Withdraw() {
               value={cardNumber}
               onChange={(event) => setCardNumber(event.target.value)}
               placeholder="4242 4242 4242 4242"
-              className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </label>
           <div className="grid grid-cols-2 gap-3">
@@ -120,7 +120,7 @@ export function Withdraw() {
                 value={cardExpiry}
                 onChange={(event) => setCardExpiry(event.target.value)}
                 placeholder="12/29"
-                className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </label>
             <label className="flex flex-col gap-1.5 text-sm">
@@ -130,7 +130,7 @@ export function Withdraw() {
                 value={cardCvc}
                 onChange={(event) => setCardCvc(event.target.value)}
                 placeholder="123"
-                className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </label>
           </div>

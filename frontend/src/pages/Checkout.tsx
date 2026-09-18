@@ -27,6 +27,10 @@ export function Checkout() {
     return <Navigate to="/login" replace />
   }
 
+  // Wait for the initial listings fetch before deciding "not purchasable" —
+  // on a fresh page load, `listings` is still empty for a moment and the
+  // guard below would otherwise redirect away from a perfectly valid
+  // checkout page.
   if (loading) {
     return null
   }
@@ -38,7 +42,7 @@ export function Checkout() {
     return (
       <div className="mx-auto flex max-w-sm flex-col items-center gap-4 py-16 text-center">
         <CheckCircle size={40} className="text-accent" aria-hidden />
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">Kauf abgeschlossen</h1>
+        <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">Kauf abgeschlossen</h1>
         <p className="text-sm text-foreground-muted">
           Du hast <span className="font-medium text-foreground">{listing.title}</span> erfolgreich gekauft.
         </p>
@@ -86,20 +90,20 @@ export function Checkout() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-8 py-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Kauf abschließen</h1>
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Kauf abschließen</h1>
 
-      <div className="flex items-center justify-between border border-border p-4">
+      <div className="flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-sm">
         <div>
           <p className="text-sm font-medium text-foreground">{listing.title}</p>
           <p className="text-xs text-foreground-muted">{listing.category}</p>
         </div>
-        <p className="text-lg font-semibold text-foreground">{formatPrice(listing.priceCents)}</p>
+        <p className="text-lg font-semibold tabular-nums text-coral">{formatPrice(listing.priceCents)}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-1 text-sm font-medium text-foreground">Zahlungsart</legend>
-          <label className="flex items-center gap-2 border border-border px-3 py-2.5 text-sm text-foreground has-[:checked]:border-foreground">
+          <label className="flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground transition-colors has-[:checked]:border-accent has-[:checked]:bg-accent-soft">
             <input
               type="radio"
               name="mode"
@@ -109,7 +113,7 @@ export function Checkout() {
             />
             Simulation (kein echtes Geld)
           </label>
-          <label className="flex items-center gap-2 border border-border px-3 py-2.5 text-sm text-foreground has-[:checked]:border-foreground">
+          <label className="flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground transition-colors has-[:checked]:border-accent has-[:checked]:bg-accent-soft">
             <input
               type="radio"
               name="mode"
@@ -131,7 +135,7 @@ export function Checkout() {
                 value={cardNumber}
                 onChange={(event) => setCardNumber(event.target.value)}
                 placeholder="4242 4242 4242 4242"
-                className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -142,7 +146,7 @@ export function Checkout() {
                   value={cardExpiry}
                   onChange={(event) => setCardExpiry(event.target.value)}
                   placeholder="12/29"
-                  className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />
               </label>
               <label className="flex flex-col gap-1.5 text-sm">
@@ -152,7 +156,7 @@ export function Checkout() {
                   value={cardCvc}
                   onChange={(event) => setCardCvc(event.target.value)}
                   placeholder="123"
-                  className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />
               </label>
             </div>
