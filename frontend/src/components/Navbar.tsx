@@ -16,11 +16,11 @@ import { Button } from './Button'
 
 const SEARCH_DEBOUNCE_MS = 300
 
-// Matches /listing/:id (a single-segment listing detail page) but not
-// /listing/new or /listing/:id/edit — searching for other listings while
-// reading one isn't a useful action there the way it is everywhere else.
-function isListingDetailPath(pathname: string): boolean {
-  return /^\/listing\/(?!new$)[^/]+$/.test(pathname)
+// The search bar only makes sense on the browse grid itself — everywhere
+// else (a listing's own detail page, the create/edit form, messages,
+// profile, admin, ...) it's a control with nothing meaningful to do.
+function isBrowsePath(pathname: string): boolean {
+  return pathname === '/'
 }
 
 function SearchBar({ className }: { className?: string }) {
@@ -69,7 +69,7 @@ export function Navbar() {
   const { currentUser, logout } = useAuth()
   const { unreadTotal } = useMessages()
   const location = useLocation()
-  const showSearch = Boolean(currentUser) && !isListingDetailPath(location.pathname)
+  const showSearch = Boolean(currentUser) && isBrowsePath(location.pathname)
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-surface/70 backdrop-blur-xl backdrop-saturate-150">
