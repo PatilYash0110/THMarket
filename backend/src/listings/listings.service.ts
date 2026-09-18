@@ -11,7 +11,7 @@ import { CreateListingDto } from './dto/create-listing.dto';
 import { PurchaseListingDto } from './dto/purchase-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 
-const SELLER_SELECT = { name: true, verified: true } as const;
+const SELLER_SELECT = { name: true, email: true, verified: true } as const;
 
 @Injectable()
 export class ListingsService {
@@ -37,9 +37,7 @@ export class ListingsService {
 
   async create(sellerId: string, role: string, dto: CreateListingDto) {
     if (role !== 'STUDENT') {
-      throw new ForbiddenException(
-        'Admin-Konten können keine Inserate erstellen.',
-      );
+      throw new ForbiddenException('Admin-Konten können keine Inserate erstellen.');
     }
 
     return this.prisma.listing.create({
@@ -64,13 +62,23 @@ export class ListingsService {
     });
   }
 
-  // Deliberately no ownership check: the seller can self-mark their own
-  // listing sold from the edit page, with no payment involved. (Buyer-paid
-  // purchases go through `purchase()` below, which does check ownership.)
-  // After that split, this route is still callable directly by anyone
-  // authenticated for €0 — a documented, pre-existing, still-accepted gap,
-  // not something this change closes.
-  //
+  // Self-service route only: the seller marks their own listing sold from
+  // the edit page, with no payment involved. Previously had no ownership
+  // check at all — any authenticated student could PATCH any other
+  // student's listing to VERKAUFT for free, which is a real griefing
+  // vector on a marketplace (silently kill a competitor's active listing).
+  // Now requires the caller to be that listing's seller, or an admin.
+  async markSold(id: string, userId: string, role: string) {
+    const listing = await this.prisma.listing.findUnique({ where: { id }, select: { sellerId: true } });
+    if (!listing) {
+      throw new NotFoundException('Inserat nicht gefunden.');
+    }
+    if (role !== 'ADMIN' && listing.sellerId !== userId) {
+      throw new ForbiddenException('Du kannst nur eigene Inserate als verkauft markieren.');
+    }
+    return this.markSoldInternal(id);
+  }
+
   // Uses a conditional `updateMany` rather than a plain findUnique+update:
   // two concurrent calls could otherwise both read `AKTIV` before either
   // writes, and both then succeed, since a plain `.update()` has no way to
@@ -80,18 +88,15 @@ export class ListingsService {
   // genuinely gets `count: 0` under Postgres's default READ COMMITTED.
   //
   // `buyerId` is optional and only ever passed by purchase()'s simulation
-  // branch below — the self-service PATCH :id/sold route (no real buyer)
+  // branch below — markSold() above (the self-service route, no real buyer)
   // calls this with no second argument, leaving buyerId untouched.
-  async markSold(id: string, buyerId?: string) {
+  private async markSoldInternal(id: string, buyerId?: string) {
     const result = await this.prisma.listing.updateMany({
       where: { id, status: 'AKTIV' },
       data: { status: 'VERKAUFT', ...(buyerId ? { buyerId } : {}) },
     });
     if (result.count === 0) {
-      const exists = await this.prisma.listing.findUnique({
-        where: { id },
-        select: { id: true },
-      });
+      const exists = await this.prisma.listing.findUnique({ where: { id }, select: { id: true } });
       if (!exists) {
         throw new NotFoundException('Inserat nicht gefunden.');
       }
@@ -109,14 +114,14 @@ export class ListingsService {
   // buyer, credits the seller, and flips the listing to VERKAUFT — or rolls
   // back entirely if any of those three checks fails. Both the listing
   // status gate and the buyer-balance gate use the same conditional
-  // `updateMany` pattern as `markSold`: wrapping plain reads-then-writes in
-  // `$transaction` alone would NOT prevent two concurrent purchases from
-  // both passing their checks before either writes, which would double-sell
-  // the listing and double-charge/credit both sides.
+  // `updateMany` pattern as `markSoldInternal`: wrapping plain reads-then-
+  // writes in `$transaction` alone would NOT prevent two concurrent
+  // purchases from both passing their checks before either writes, which
+  // would double-sell the listing and double-charge/credit both sides.
   async purchase(id: string, buyerId: string, dto: PurchaseListingDto) {
     if (dto.paymentMethod === 'simulation') {
       validateMockCard(dto.card!);
-      return this.markSold(id, buyerId);
+      return this.markSoldInternal(id, buyerId);
     }
 
     const listing = await this.prisma.listing.findUnique({ where: { id } });
@@ -124,9 +129,7 @@ export class ListingsService {
       throw new NotFoundException('Inserat nicht gefunden.');
     }
     if (listing.sellerId === buyerId) {
-      throw new ForbiddenException(
-        'Du kannst dein eigenes Inserat nicht kaufen.',
-      );
+      throw new ForbiddenException('Du kannst dein eigenes Inserat nicht kaufen.');
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -143,9 +146,7 @@ export class ListingsService {
         data: { balanceCents: { decrement: listing.priceCents } },
       });
       if (debited.count === 0) {
-        throw new BadRequestException(
-          'Nicht genügend Guthaben für diesen Kauf.',
-        );
+        throw new BadRequestException('Nicht genügend Guthaben für diesen Kauf.');
       }
 
       // sellerId is nullable at the schema level (a seller's account can be
@@ -154,9 +155,7 @@ export class ListingsService {
       // a user still has any AKTIV listings, precisely to prevent this from
       // happening mid-purchase.
       if (!listing.sellerId) {
-        throw new ConflictException(
-          'Der Verkäufer dieses Inserats existiert nicht mehr.',
-        );
+        throw new ConflictException('Der Verkäufer dieses Inserats existiert nicht mehr.');
       }
 
       await tx.user.update({
@@ -164,10 +163,7 @@ export class ListingsService {
         data: { balanceCents: { increment: listing.priceCents } },
       });
 
-      const buyer = await tx.user.findUniqueOrThrow({
-        where: { id: buyerId },
-        select: { balanceCents: true },
-      });
+      const buyer = await tx.user.findUniqueOrThrow({ where: { id: buyerId }, select: { balanceCents: true } });
       const updated = await tx.listing.findUniqueOrThrow({
         where: { id },
         include: { seller: { select: SELLER_SELECT } },
@@ -189,24 +185,24 @@ export class ListingsService {
     });
 
     if (result.count === 0) {
-      const listing = await this.prisma.listing.findUnique({
-        where: { id },
-        select: { sellerId: true, status: true },
-      });
+      const listing = await this.prisma.listing.findUnique({ where: { id }, select: { sellerId: true, status: true } });
       if (!listing) {
         throw new NotFoundException('Inserat nicht gefunden.');
       }
       if (listing.sellerId !== userId) {
         throw new ForbiddenException('Du kannst nur eigene Inserate löschen.');
       }
-      throw new ConflictException(
-        'Verkaufte Inserate können nicht gelöscht werden.',
-      );
+      throw new ConflictException('Verkaufte Inserate können nicht gelöscht werden.');
     }
   }
 
   async addFavorite(userId: string, listingId: string) {
-    await this.findOne(listingId);
+    const listing = await this.findOne(listingId);
+    if (listing.sellerId === userId) {
+      throw new ForbiddenException(
+        'Du kannst eigene Inserate nicht zu deinen Favoriten hinzufügen.',
+      );
+    }
     await this.prisma.favorite.upsert({
       where: { userId_listingId: { userId, listingId } },
       update: {},

@@ -20,7 +20,7 @@ export function PasswordStrengthMeter({ password }: { password: string }) {
           <div
             key={segmentIndex}
             className={clsx(
-              'h-1 flex-1 transition-colors duration-200 ease-out',
+              'h-1.5 flex-1 rounded-full transition-colors duration-200 ease-out',
               segmentIndex < config.segments ? config.barColor : 'bg-border',
             )}
           />

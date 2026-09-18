@@ -46,7 +46,7 @@ export function VerifyEmail() {
       {status === 'success' && (
         <>
           <CheckCircle size={40} className="text-accent" aria-hidden />
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">
             E-Mail-Adresse bestätigt
           </h1>
           <p className="text-sm text-foreground-muted">
@@ -61,7 +61,7 @@ export function VerifyEmail() {
       {status === 'error' && (
         <>
           <XCircle size={40} className="text-destructive" aria-hidden />
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">
             Bestätigung fehlgeschlagen
           </h1>
           <p className="text-sm text-foreground-muted">{message}</p>
@@ -73,7 +73,7 @@ export function VerifyEmail() {
               value={resendEmail}
               onChange={(event) => setResendEmail(event.target.value)}
               placeholder="max.mustermann@thm.de"
-              className="h-10 w-full border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
             {resendEmail.trim() && <ResendVerificationButton email={resendEmail.trim()} />}
           </div>

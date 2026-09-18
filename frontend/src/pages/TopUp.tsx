@@ -27,7 +27,7 @@ export function TopUp() {
     return (
       <div className="mx-auto flex max-w-sm flex-col items-center gap-4 py-16 text-center">
         <CheckCircle size={40} className="text-accent" aria-hidden />
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">Guthaben aufgeladen</h1>
+        <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">Guthaben aufgeladen</h1>
         <p className="text-sm text-foreground-muted">
           Dein neues Guthaben: <span className="font-medium text-foreground">{formatPrice(currentUser.balanceCents)}</span>
         </p>
@@ -66,7 +66,7 @@ export function TopUp() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-8 py-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Guthaben aufladen</h1>
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Guthaben aufladen</h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <label className="flex flex-col gap-1.5 text-sm">
@@ -79,7 +79,7 @@ export function TopUp() {
             step="0.01"
             value={amount}
             onChange={(event) => setAmount(event.target.value)}
-            className="h-11 border border-border bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
           <div className="flex gap-2">
             {PRESET_AMOUNTS_EUR.map((preset) => (
@@ -87,7 +87,7 @@ export function TopUp() {
                 key={preset}
                 type="button"
                 onClick={() => setAmount(String(preset))}
-                className="cursor-pointer border border-border px-3 py-1.5 text-xs font-medium text-foreground-muted hover:border-foreground hover:text-foreground"
+                className="cursor-pointer rounded-full border border-border bg-surface px-3.5 py-1.5 text-xs font-medium text-foreground-muted transition-colors hover:border-accent hover:text-accent-strong"
               >
                 {preset} €
               </button>
@@ -104,7 +104,7 @@ export function TopUp() {
               value={cardNumber}
               onChange={(event) => setCardNumber(event.target.value)}
               placeholder="4242 4242 4242 4242"
-              className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </label>
           <div className="grid grid-cols-2 gap-3">
@@ -115,7 +115,7 @@ export function TopUp() {
                 value={cardExpiry}
                 onChange={(event) => setCardExpiry(event.target.value)}
                 placeholder="12/29"
-                className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </label>
             <label className="flex flex-col gap-1.5 text-sm">
@@ -125,7 +125,7 @@ export function TopUp() {
                 value={cardCvc}
                 onChange={(event) => setCardCvc(event.target.value)}
                 placeholder="123"
-                className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </label>
           </div>

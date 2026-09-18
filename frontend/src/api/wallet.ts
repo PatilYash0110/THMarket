@@ -1,12 +1,6 @@
 import { ApiError, parseErrorMessage } from './auth'
 
 const API_URL = import.meta.env.VITE_API_URL as string
-const TOKEN_STORAGE_KEY = 'thmarket.token'
-
-function authHeaders(): HeadersInit {
-  const token = localStorage.getItem(TOKEN_STORAGE_KEY)
-  return token ? { Authorization: `Bearer ${token}` } : {}
-}
 
 export async function topUpBalance(input: {
   amountCents: number
@@ -14,7 +8,8 @@ export async function topUpBalance(input: {
 }): Promise<{ balanceCents: number }> {
   const response = await fetch(`${API_URL}/wallet/topup`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(input),
   })
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
@@ -27,7 +22,8 @@ export async function withdrawBalance(input: {
 }): Promise<{ balanceCents: number }> {
   const response = await fetch(`${API_URL}/wallet/withdraw`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(input),
   })
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))

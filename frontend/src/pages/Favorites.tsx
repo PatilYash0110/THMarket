@@ -10,7 +10,7 @@ export function Favorites() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Favoriten</h1>
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Favoriten</h1>
 
       {favorites.length === 0 ? (
         <EmptyState

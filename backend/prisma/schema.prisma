@@ -170,6 +170,12 @@ model Conversation {
   seller    User?     @relation("ConversationsAsSeller", fields: [sellerId], references: [id], onDelete: SetNull)
   messages  Message[]
   createdAt DateTime  @default(now())
+  // Set to now() whenever that side opens/fetches this conversation's
+  // messages — unread count for a user is just "messages sent by the other
+  // party after my own <side>LastReadAt". Two columns rather than a join
+  // table since a conversation only ever has exactly two participants.
+  buyerLastReadAt  DateTime?
+  sellerLastReadAt DateTime?
 
   // Makes "start a conversation" idempotent: messaging the same seller about
   // the same listing twice reopens the same thread instead of forking a new

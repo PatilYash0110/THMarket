@@ -1,4 +1,5 @@
 import { Plus, Sparkle, X } from '@phosphor-icons/react'
+import clsx from 'clsx'
 import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { ApiError } from '../api/auth'
@@ -6,7 +7,6 @@ import { generateListingDescription, uploadListingImages } from '../api/listings
 import { Button } from '../components/Button'
 import { useAuth } from '../context/AuthContext'
 import { useListings } from '../context/ListingsContext'
-import { placeholderImage } from '../lib/placeholder'
 import type { Listing, ListingCategory } from '../types'
 
 const CATEGORIES: ListingCategory[] = [
@@ -197,6 +197,10 @@ function ListingFormFields({
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     if (submitting) return
+    if (images.length === 0) {
+      setImageError('Bitte füge mindestens ein Foto hinzu.')
+      return
+    }
     setSubmitting(true)
     try {
       const priceCents = Math.round(Number.parseFloat(price.replace(',', '.')) * 100)
@@ -204,10 +208,9 @@ function ListingFormFields({
       const newFiles = images.filter((item): item is Extract<ImageItem, { kind: 'new' }> => item.kind === 'new')
       const uploadedUrls = newFiles.length > 0 ? await uploadListingImages(newFiles.map((item) => item.file)) : []
       let uploadIndex = 0
-      const resolvedImages = images.map((item) =>
+      const finalImages = images.map((item) =>
         item.kind === 'existing' ? item.url : uploadedUrls[uploadIndex++],
       )
-      const finalImages = resolvedImages.length > 0 ? resolvedImages : [placeholderImage(title)]
 
       if (isEditing && existing) {
         await updateListing(existing.id, {
@@ -272,105 +275,88 @@ function ListingFormFields({
 
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-8 py-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-        {isEditing ? 'Inserat bearbeiten' : 'Inserat erstellen'}
-      </h1>
+      <div>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+          {isEditing ? 'Inserat bearbeiten' : 'Inserat erstellen'}
+        </h1>
+        <p className="mt-2 text-sm text-foreground-muted">
+          Titel, Kategorie und Preis reichen zum Start — für die Beschreibung kann die KI aus
+          deinen Fotos einen Vorschlag erstellen.
+        </p>
+      </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-foreground">Titel</span>
-          <input
-            required
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            placeholder="z. B. MacBook Air M1, 256GB"
-            className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </label>
+        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5 shadow-sm">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground-muted">Details</h2>
 
-        <div className="grid grid-cols-2 gap-4">
           <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-foreground">Kategorie</span>
-            <select
-              value={category}
-              onChange={(event) => setCategory(event.target.value as ListingCategory)}
-              className="h-11 border border-border bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-foreground">Preis (€)</span>
+            <span className="font-medium text-foreground">Titel</span>
             <input
               required
-              type="number"
-              min="0"
-              step="0.01"
-              value={price}
-              onChange={(event) => setPrice(event.target.value)}
-              placeholder="0,00"
-              className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              placeholder="z. B. MacBook Air M1, 256GB"
+              className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
+          </label>
+
+          <div className="grid grid-cols-2 gap-4">
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="font-medium text-foreground">Kategorie</span>
+              <select
+                value={category}
+                onChange={(event) => setCategory(event.target.value as ListingCategory)}
+                className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="font-medium text-foreground">Preis (€)</span>
+              <input
+                required
+                type="number"
+                min="0"
+                step="0.01"
+                value={price}
+                onChange={(event) => setPrice(event.target.value)}
+                placeholder="0,00"
+                className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </label>
+          </div>
+
+          <label className="flex items-center gap-2 border-t border-border pt-4 text-sm text-foreground">
+            <input
+              type="checkbox"
+              checked={sofortkauf}
+              onChange={(event) => setSofortkauf(event.target.checked)}
+              className="h-4 w-4 accent-accent"
+            />
+            Sofortkauf ermöglichen (sonst nur „Anbieter kontaktieren")
           </label>
         </div>
 
-        <div className="flex flex-col gap-1.5 text-sm">
-          <div className="flex items-center justify-between gap-2">
-            <span className="font-medium text-foreground">Beschreibung</span>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              disabled={generating}
-              onClick={handleGenerateDescription}
-            >
-              <Sparkle size={14} aria-hidden />
-              {generating ? 'Wird generiert…' : 'Mit KI generieren'}
-            </Button>
+        <div className="flex flex-col gap-1.5 rounded-2xl border border-border bg-surface p-5 text-sm shadow-sm">
+          <div className="mb-2.5 flex items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground-muted">Fotos</h2>
+            <span className="text-xs text-foreground-muted">Pflicht</span>
           </div>
-          <input
-            value={aiHint}
-            onChange={(event) => setAiHint(event.target.value)}
-            placeholder="Hinweis für die KI (optional), z. B. kleiner Kratzer am Rahmen"
-            className="h-10 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-          <textarea
-            required
-            rows={5}
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            placeholder="Zustand, Details, Abholung…"
-            className="border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-          {aiError ? (
-            <p role="alert" className="text-xs text-destructive">
-              {aiError}
-            </p>
-          ) : (
-            <span className="text-xs text-foreground-muted">
-              Manuelle Eingabe, oder Foto(s)/Hinweis oben angeben und auf „Mit KI generieren" klicken —
-              der Vorschlag bleibt danach frei bearbeitbar.
-            </span>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-foreground">Fotos (optional)</span>
           <div className="flex flex-wrap gap-3">
             {images.map((image) => {
               const src = image.kind === 'existing' ? image.url : image.previewUrl
               return (
-                <div key={src} className="group relative h-24 w-24 shrink-0 overflow-hidden border border-border">
+                <div key={src} className="group relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-border">
                   <img src={src} alt="" className="h-full w-full object-cover" aria-hidden />
                   <button
                     type="button"
                     onClick={() => removeImage(image)}
                     aria-label="Bild entfernen"
-                    className="absolute right-1 top-1 flex h-6 w-6 cursor-pointer items-center justify-center bg-background/90 text-foreground hover:text-destructive"
+                    className="absolute right-1 top-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-surface/90 text-foreground shadow-sm hover:text-destructive"
                   >
                     <X size={14} aria-hidden />
                   </button>
@@ -381,7 +367,7 @@ function ListingFormFields({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex h-24 w-24 shrink-0 cursor-pointer flex-col items-center justify-center gap-1 border border-dashed border-border text-foreground-muted hover:border-foreground hover:text-foreground"
+                className="flex h-24 w-24 shrink-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-border-strong text-foreground-muted transition-colors hover:border-accent hover:text-accent-strong"
               >
                 <Plus size={20} aria-hidden />
                 <span className="text-xs">Hinzufügen</span>
@@ -400,27 +386,82 @@ function ListingFormFields({
             className="hidden"
           />
           {imageError && (
-            <p role="alert" className="text-xs text-destructive">
+            <p role="alert" className="mt-1.5 text-xs text-destructive">
               {imageError}
             </p>
           )}
-          <span className="text-xs text-foreground-muted">
-            Wähle Fotos von deinem Gerät — bis zu {MAX_IMAGES}. Ohne Angabe wird ein Platzhalter
-            verwendet.
+          <span className="mt-1.5 text-xs text-foreground-muted">
+            Wähle mindestens ein Foto von deinem Gerät — bis zu {MAX_IMAGES}. Sie helfen auch der
+            KI unten, eine Beschreibung vorzuschlagen.
           </span>
         </div>
 
-        <label className="flex items-center gap-2 text-sm text-foreground">
+        <div className="flex flex-col gap-1.5 rounded-2xl border border-border bg-surface p-5 text-sm shadow-sm">
+          <div className="mb-2.5 flex items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground-muted">Beschreibung</h2>
+            <button
+              type="button"
+              disabled={generating}
+              onClick={handleGenerateDescription}
+              className={clsx(
+                'group inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 motion-safe:active:scale-95',
+                'disabled:cursor-wait disabled:active:scale-100',
+                generating
+                  ? 'border-accent/40 bg-accent-soft text-accent-strong'
+                  : 'border-accent/30 bg-accent-soft text-accent-strong shadow-sm hover:border-accent hover:bg-accent hover:text-on-accent hover:shadow-md',
+              )}
+            >
+              <Sparkle
+                size={14}
+                weight={generating ? 'fill' : 'regular'}
+                className={clsx(
+                  generating
+                    ? 'motion-safe:animate-spin'
+                    : 'transition-transform duration-200 group-hover:rotate-12 group-hover:scale-110',
+                )}
+                aria-hidden
+              />
+              {generating ? 'Wird generiert…' : 'Mit KI generieren'}
+            </button>
+          </div>
           <input
-            type="checkbox"
-            checked={sofortkauf}
-            onChange={(event) => setSofortkauf(event.target.checked)}
-            className="h-4 w-4 accent-accent"
+            value={aiHint}
+            onChange={(event) => setAiHint(event.target.value)}
+            placeholder="Hinweis für die KI (optional), z. B. kleiner Kratzer am Rahmen"
+            className="h-10 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
-          Sofortkauf ermöglichen (sonst nur „Anbieter kontaktieren")
-        </label>
+          {generating && (
+            <div className="flex items-center gap-2 rounded-lg border border-accent/30 bg-accent-soft/60 px-3 py-2 text-xs font-medium text-accent-strong motion-safe:animate-fade-in">
+              <span className="flex gap-1" aria-hidden>
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-accent-strong [animation-delay:-0.3s]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-accent-strong [animation-delay:-0.15s]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-accent-strong" />
+              </span>
+              KI analysiert deine Fotos und erstellt einen Vorschlag…
+            </div>
+          )}
+          <textarea
+            required
+            rows={5}
+            disabled={generating}
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            placeholder="Zustand, Details, Abholung…"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-wait disabled:opacity-60"
+          />
+          {aiError ? (
+            <p role="alert" className="text-xs text-destructive">
+              {aiError}
+            </p>
+          ) : (
+            <span className="text-xs text-foreground-muted">
+              Manuelle Eingabe, oder Foto(s)/Hinweis oben angeben und auf „Mit KI generieren" klicken —
+              der Vorschlag bleibt danach frei bearbeitbar.
+            </span>
+          )}
+        </div>
 
-        <div className="mt-2 flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3">
           <Button type="submit" size="lg" disabled={submitting}>
             {submitting ? 'Wird gespeichert…' : isEditing ? 'Änderungen speichern' : 'Inserat veröffentlichen'}
           </Button>

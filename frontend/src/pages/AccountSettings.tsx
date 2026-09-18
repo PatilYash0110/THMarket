@@ -71,9 +71,9 @@ export function AccountSettings() {
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-10 py-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Kontoeinstellungen</h1>
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Kontoeinstellungen</h1>
 
-      <form onSubmit={handleNameSubmit} className="flex flex-col gap-4 border border-border p-6">
+      <form onSubmit={handleNameSubmit} className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6 shadow-sm">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground-muted">Name</h2>
         <label className="flex flex-col gap-1.5 text-sm">
           <span className="font-medium text-foreground">Name</span>
@@ -81,7 +81,7 @@ export function AccountSettings() {
             required
             value={name}
             onChange={(event) => setName(event.target.value)}
-            className="h-11 border border-border bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
         </label>
         {nameError && (
@@ -100,7 +100,7 @@ export function AccountSettings() {
         </Button>
       </form>
 
-      <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-4 border border-border p-6">
+      <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6 shadow-sm">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground-muted">Passwort ändern</h2>
         <label className="flex flex-col gap-1.5 text-sm">
           <span className="font-medium text-foreground">Aktuelles Passwort</span>
@@ -109,7 +109,7 @@ export function AccountSettings() {
             required
             value={currentPassword}
             onChange={(event) => setCurrentPassword(event.target.value)}
-            className="h-11 border border-border bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
         </label>
         <label className="flex flex-col gap-1.5 text-sm">
@@ -120,7 +120,7 @@ export function AccountSettings() {
             minLength={8}
             value={newPassword}
             onChange={(event) => setNewPassword(event.target.value)}
-            className="h-11 border border-border bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
           <span className="text-xs text-foreground-muted">{PASSWORD_REQUIREMENTS_TEXT}</span>
           {newPassword && <PasswordStrengthMeter password={newPassword} />}

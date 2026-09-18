@@ -1,15 +1,15 @@
 import { io, type Socket } from 'socket.io-client'
 
 const API_URL = import.meta.env.VITE_API_URL as string
-const TOKEN_STORAGE_KEY = 'thmarket.token'
 
 // One lazily-created singleton — connected only once MessagesProvider knows
-// a logged-in user exists (autoConnect: false), and the JWT is read fresh
-// at connect time rather than baked in here, since this module loads once
-// at app startup, well before a user may have logged in.
+// a logged-in user exists (autoConnect: false). `withCredentials` makes the
+// browser attach the same httpOnly auth cookie the REST API uses to the
+// socket.io handshake request automatically, the same way `credentials:
+// 'include'` does for fetch() elsewhere — no token read out of JS needed.
 const socket: Socket = io(`${API_URL}/chat`, {
   autoConnect: false,
-  auth: (callback) => callback({ token: localStorage.getItem(TOKEN_STORAGE_KEY) }),
+  withCredentials: true,
 })
 
 export function connectSocket(): void {

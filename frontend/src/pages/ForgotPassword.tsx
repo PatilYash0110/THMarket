@@ -28,7 +28,7 @@ export function ForgotPassword() {
     return (
       <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-4 py-10 text-center">
         <EnvelopeSimple size={40} className="text-accent" aria-hidden />
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">E-Mail gesendet</h1>
+        <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">E-Mail gesendet</h1>
         <p className="text-sm text-foreground-muted">
           Falls ein Konto mit dieser E-Mail existiert, haben wir einen Link zum Zurücksetzen des
           Passworts gesendet.
@@ -43,7 +43,7 @@ export function ForgotPassword() {
   return (
     <div className="mx-auto flex w-full max-w-sm flex-col gap-5 py-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Passwort vergessen</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Passwort vergessen</h1>
         <p className="mt-2 text-sm text-foreground-muted">
           Gib deine THM E-Mail-Adresse ein, um einen Link zum Zurücksetzen zu erhalten.
         </p>
@@ -58,7 +58,7 @@ export function ForgotPassword() {
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="max.mustermann@thm.de"
-            className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
         </label>
         {error && (

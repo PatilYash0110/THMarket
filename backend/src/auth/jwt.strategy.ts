@@ -1,8 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import type { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PrismaService } from '../prisma/prisma.service';
+import { AUTH_COOKIE_NAME } from './auth-cookie';
 
 export interface JwtPayload {
   sub: string;
@@ -12,6 +14,14 @@ export interface JwtPayload {
   iat?: number;
 }
 
+// Cookie first (the browser flow, set by AuthController.login as httpOnly —
+// invisible to JS, so an XSS payload can no longer read it out of
+// localStorage the way the previous token storage allowed), falling back to
+// a Bearer header so non-browser clients (curl, Postman, tests) still work.
+function cookieExtractor(req: Request): string | null {
+  return req?.cookies?.[AUTH_COOKIE_NAME] ?? null;
+}
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
@@ -19,7 +29,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly prisma: PrismaService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor, ExtractJwt.fromAuthHeaderAsBearerToken()]),
       ignoreExpiration: false,
       secretOrKey: config.getOrThrow<string>('JWT_SECRET'),
     });
@@ -36,14 +46,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       select: { passwordChangedAt: true },
     });
 
-    if (
-      user?.passwordChangedAt &&
-      payload.iat &&
-      payload.iat * 1000 < user.passwordChangedAt.getTime()
-    ) {
-      throw new UnauthorizedException(
-        'Sitzung abgelaufen. Bitte melde dich erneut an.',
-      );
+    if (user?.passwordChangedAt && payload.iat && payload.iat * 1000 < user.passwordChangedAt.getTime()) {
+      throw new UnauthorizedException('Sitzung abgelaufen. Bitte melde dich erneut an.');
     }
 
     return payload;

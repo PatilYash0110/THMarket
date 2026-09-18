@@ -24,4 +24,14 @@ export class ChatController {
   getMessages(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     return this.chatService.getMessages(user.sub, id);
   }
+
+  // Called by the frontend when a thread is actually opened — separate from
+  // getMessages() above so a component can re-mark a still-open thread read
+  // (e.g. after a live socket message arrives while it's on screen) without
+  // needing to refetch the whole message history again.
+  @Post(':id/read')
+  async markRead(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    await this.chatService.markRead(user.sub, id);
+    return { read: true };
+  }
 }

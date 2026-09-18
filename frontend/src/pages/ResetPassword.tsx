@@ -23,7 +23,7 @@ export function ResetPassword() {
     return (
       <div className="mx-auto flex max-w-sm flex-col items-center gap-4 py-16 text-center">
         <XCircle size={40} className="text-destructive" aria-hidden />
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">Ungültiger Link</h1>
+        <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">Ungültiger Link</h1>
         <p className="text-sm text-foreground-muted">Kein Reset-Code gefunden.</p>
         <Link to="/forgot-password" className="text-sm font-medium text-accent underline">
           Neuen Link anfordern
@@ -36,7 +36,7 @@ export function ResetPassword() {
     return (
       <div className="mx-auto flex max-w-sm flex-col items-center gap-4 py-16 text-center">
         <CheckCircle size={40} className="text-accent" aria-hidden />
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">Passwort zurückgesetzt</h1>
+        <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">Passwort zurückgesetzt</h1>
         <p className="text-sm text-foreground-muted">Du kannst dich jetzt mit deinem neuen Passwort anmelden.</p>
         <Link to="/login" className="text-sm font-medium text-accent underline">
           Zur Anmeldung
@@ -67,7 +67,7 @@ export function ResetPassword() {
   return (
     <div className="mx-auto flex w-full max-w-sm flex-col gap-5 py-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Neues Passwort</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Neues Passwort</h1>
         <p className="mt-2 text-sm text-foreground-muted">Wähle ein neues Passwort für dein Konto.</p>
       </div>
 
@@ -82,7 +82,7 @@ export function ResetPassword() {
             onChange={(event) => setPassword(event.target.value)}
             placeholder="Sicheres Passwort"
             aria-describedby={passwordError ? 'password-error password-requirements' : 'password-requirements'}
-            className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
           {passwordError && (
             <span id="password-error" role="alert" className="text-xs text-destructive">

@@ -1,11 +1,17 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
-import { fetchConversationMessages, fetchConversations, startConversation as startConversationApi } from '../api/messages'
+import {
+  fetchConversationMessages,
+  fetchConversations,
+  markConversationRead,
+  startConversation as startConversationApi,
+} from '../api/messages'
 import { connectSocket, disconnectSocket, getSocket } from '../lib/socket'
 import type { Conversation, Message } from '../types'
 import { useAuth } from './AuthContext'
 
 interface MessagesContextValue {
   conversations: Conversation[]
+  unreadTotal: number
   getMessages: (conversationId: string) => Message[]
   openConversation: (conversationId: string) => Promise<void>
   sendMessage: (conversationId: string, text: string) => void
@@ -28,27 +34,53 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
   const [messagesByConversation, setMessagesByConversation] = useState<Record<string, Message[]>>({})
   const messagesByConversationRef = useRef(messagesByConversation)
   messagesByConversationRef.current = messagesByConversation
+  // Which thread the user currently has open — a live message for that
+  // thread gets marked read immediately instead of bumping its badge, since
+  // they're already looking at it.
+  const activeConversationIdRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (!currentUser) {
       disconnectSocket()
       setConversations([])
       setMessagesByConversation({})
+      activeConversationIdRef.current = null
       return
     }
 
-    fetchConversations().then(setConversations).catch(() => setConversations([]))
+    const socket = getSocket()
+    // Join every conversation's room up front, not just whichever one gets
+    // opened — otherwise a live 'message' event for a thread the user
+    // hasn't visited this session never reaches this socket at all (the
+    // server only broadcasts to clients that joined that room), so the
+    // unread badge would silently miss it until the next full page load.
+    fetchConversations()
+      .then((fetched) => {
+        setConversations(fetched)
+        fetched.forEach((conversation) => socket.emit('joinConversation', conversation.id))
+      })
+      .catch(() => setConversations([]))
     connectSocket()
 
-    const socket = getSocket()
     function handleIncoming(message: Message) {
+      const isActive = message.conversationId === activeConversationIdRef.current
+      const isMine = message.senderId === currentUser!.id
       setConversations((prev) =>
         prev
           .map((conversation) =>
-            conversation.id === message.conversationId ? { ...conversation, messages: [message] } : conversation,
+            conversation.id === message.conversationId
+              ? {
+                  ...conversation,
+                  messages: [message],
+                  unreadCount: isActive || isMine ? 0 : conversation.unreadCount + 1,
+                }
+              : conversation,
           )
           .sort(byActivity),
       )
+      if (isActive && !isMine) {
+        markConversationRead(message.conversationId).catch(() => {})
+      }
       if (messagesByConversationRef.current[message.conversationId]) {
         setMessagesByConversation((prev) => ({
           ...prev,
@@ -69,9 +101,16 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
   }
 
   async function openConversation(conversationId: string): Promise<void> {
+    activeConversationIdRef.current = conversationId
     const messages = await fetchConversationMessages(conversationId)
     setMessagesByConversation((prev) => ({ ...prev, [conversationId]: messages }))
     getSocket().emit('joinConversation', conversationId)
+    setConversations((prev) =>
+      prev.map((conversation) =>
+        conversation.id === conversationId ? { ...conversation, unreadCount: 0 } : conversation,
+      ),
+    )
+    markConversationRead(conversationId).catch(() => {})
   }
 
   function sendMessage(conversationId: string, text: string): void {
@@ -84,12 +123,15 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
       const withoutExisting = prev.filter((existing) => existing.id !== conversation.id)
       return [conversation, ...withoutExisting].sort(byActivity)
     })
+    getSocket().emit('joinConversation', conversation.id)
     return conversation
   }
 
+  const unreadTotal = conversations.reduce((sum, conversation) => sum + conversation.unreadCount, 0)
+
   return (
     <MessagesContext.Provider
-      value={{ conversations, getMessages, openConversation, sendMessage, startConversation }}
+      value={{ conversations, unreadTotal, getMessages, openConversation, sendMessage, startConversation }}
     >
       {children}
     </MessagesContext.Provider>

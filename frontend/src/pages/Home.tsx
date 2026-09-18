@@ -27,17 +27,34 @@ export function Home() {
   const query = searchParams.get('q') ?? ''
   const category = searchParams.get('category') as ListingCategory | null
   const sort = (searchParams.get('sort') as SortOption | null) ?? 'neueste'
+  const minPrice = searchParams.get('minPrice') ?? ''
+  const maxPrice = searchParams.get('maxPrice') ?? ''
 
   const filtered = useMemo(() => {
     let result = listings.filter((listing) => listing.status === 'AKTIV')
 
     if (query) {
       const lower = query.toLowerCase()
-      result = result.filter((listing) => listing.title.toLowerCase().includes(lower))
+      // Matches the description too, not just the title — a search for
+      // "Kratzer" or a brand name mentioned only in the body text used to
+      // come back empty even when a listing plainly said so.
+      result = result.filter(
+        (listing) =>
+          listing.title.toLowerCase().includes(lower) || listing.description.toLowerCase().includes(lower),
+      )
     }
 
     if (category) {
       result = result.filter((listing) => listing.category === category)
+    }
+
+    const minCents = minPrice ? Math.round(Number.parseFloat(minPrice) * 100) : null
+    const maxCents = maxPrice ? Math.round(Number.parseFloat(maxPrice) * 100) : null
+    if (minCents !== null && Number.isFinite(minCents)) {
+      result = result.filter((listing) => listing.priceCents >= minCents)
+    }
+    if (maxCents !== null && Number.isFinite(maxCents)) {
+      result = result.filter((listing) => listing.priceCents <= maxCents)
     }
 
     result = [...result].sort((a, b) => {
@@ -47,7 +64,7 @@ export function Home() {
     })
 
     return result
-  }, [listings, query, category, sort])
+  }, [listings, query, category, sort, minPrice, maxPrice])
 
   function setCategory(next: ListingCategory | null) {
     const params = new URLSearchParams(searchParams)
@@ -62,6 +79,13 @@ export function Home() {
     setSearchParams(params)
   }
 
+  function setPriceBound(key: 'minPrice' | 'maxPrice', value: string) {
+    const params = new URLSearchParams(searchParams)
+    if (value) params.set(key, value)
+    else params.delete(key)
+    setSearchParams(params, { replace: true })
+  }
+
   if (loading) return null
 
   if (!currentUser) {
@@ -74,16 +98,16 @@ export function Home() {
 
   return (
     <div className="flex flex-col gap-10">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4">
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => setCategory(null)}
             className={clsx(
-              'cursor-pointer border px-3 py-1.5 text-xs font-medium uppercase tracking-wide transition-colors',
+              'cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-medium uppercase tracking-wide transition-all motion-safe:active:scale-95',
               !category
-                ? 'border-primary bg-primary text-on-primary'
-                : 'border-border text-foreground-muted hover:border-foreground hover:text-foreground',
+                ? 'border-primary bg-primary text-on-primary shadow-sm'
+                : 'border-border bg-surface text-foreground-muted hover:border-border-strong hover:text-foreground',
             )}
           >
             Alle
@@ -94,38 +118,75 @@ export function Home() {
               type="button"
               onClick={() => setCategory(cat)}
               className={clsx(
-                'cursor-pointer border px-3 py-1.5 text-xs font-medium uppercase tracking-wide transition-colors',
+                'cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-medium uppercase tracking-wide transition-all motion-safe:active:scale-95',
                 category === cat
-                  ? 'border-primary bg-primary text-on-primary'
-                  : 'border-border text-foreground-muted hover:border-foreground hover:text-foreground',
+                  ? 'border-accent bg-accent text-on-accent shadow-sm'
+                  : 'border-border bg-surface text-foreground-muted hover:border-border-strong hover:text-foreground',
               )}
             >
               {cat}
             </button>
           ))}
         </div>
-        <label className="flex items-center gap-2 text-xs text-foreground-muted">
-          Sortieren
-          <select
-            value={sort}
-            onChange={(event) => setSort(event.target.value as SortOption)}
-            className="border border-border bg-background px-2 py-1.5 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <option value="neueste">Neueste zuerst</option>
-            <option value="preis-auf">Preis aufsteigend</option>
-            <option value="preis-ab">Preis absteigend</option>
-          </select>
-        </label>
+
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-xs text-foreground-muted">
+            <span>Preis</span>
+            <input
+              type="number"
+              inputMode="decimal"
+              min="0"
+              step="1"
+              value={minPrice}
+              onChange={(event) => setPriceBound('minPrice', event.target.value)}
+              placeholder="Von €"
+              aria-label="Mindestpreis in Euro"
+              className="h-9 w-24 rounded-lg border border-border bg-surface px-2.5 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+            <span aria-hidden>–</span>
+            <input
+              type="number"
+              inputMode="decimal"
+              min="0"
+              step="1"
+              value={maxPrice}
+              onChange={(event) => setPriceBound('maxPrice', event.target.value)}
+              placeholder="Bis €"
+              aria-label="Höchstpreis in Euro"
+              className="h-9 w-24 rounded-lg border border-border bg-surface px-2.5 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+          </div>
+
+          <label className="flex items-center gap-2 text-xs text-foreground-muted">
+            Sortieren
+            <select
+              value={sort}
+              onChange={(event) => setSort(event.target.value as SortOption)}
+              className="rounded-lg border border-border bg-surface px-2.5 py-1.5 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <option value="neueste">Neueste zuerst</option>
+              <option value="preis-auf">Preis aufsteigend</option>
+              <option value="preis-ab">Preis absteigend</option>
+            </select>
+          </label>
+        </div>
       </div>
+
       {filtered.length === 0 ? (
         <EmptyState
           title="Keine Inserate gefunden"
-          description="Versuche eine andere Suche oder Kategorie."
+          description="Versuche eine andere Suche, Kategorie oder Preisspanne."
         />
       ) : (
         <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
-          {filtered.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
+          {filtered.map((listing, index) => (
+            <div
+              key={listing.id}
+              className="motion-safe:animate-fade-in-up"
+              style={{ animationDelay: `${Math.min(index, 12) * 40}ms` }}
+            >
+              <ListingCard listing={listing} />
+            </div>
           ))}
         </div>
       )}
