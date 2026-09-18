@@ -8,7 +8,7 @@ import {
   User,
 } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import logo from '../../media/thm_market_logo.jpg'
 import { useAuth } from '../context/AuthContext'
 import { Button } from './Button'
@@ -43,7 +43,7 @@ function SearchBar({ className }: { className?: string }) {
   }, [query])
 
   return (
-    <div className={`flex w-full items-center gap-2 border border-border px-3 focus-within:ring-2 focus-within:ring-ring ${className ?? ''}`}>
+    <div className={`flex w-full items-center gap-2 rounded-full border border-border bg-surface px-4 transition-shadow focus-within:shadow-sm focus-within:ring-2 focus-within:ring-ring ${className ?? ''}`}>
       <MagnifyingGlass size={18} className="text-foreground-muted" aria-hidden />
       <input
         type="search"
@@ -59,15 +59,9 @@ function SearchBar({ className }: { className?: string }) {
 
 export function Navbar() {
   const { currentUser, logout } = useAuth()
-  const navigate = useNavigate()
-
-  function handleLogout() {
-    logout()
-    navigate('/')
-  }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background">
+    <header className="sticky top-0 z-40 border-b border-border/80 bg-surface/70 backdrop-blur-xl backdrop-saturate-150">
       <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex h-10 items-center gap-6">
           <Link to="/" className="flex shrink-0 items-center">
@@ -80,7 +74,7 @@ export function Navbar() {
             {currentUser?.role === 'ADMIN' && (
               <Link
                 to="/admin"
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium uppercase tracking-wide text-foreground hover:text-accent"
+                className="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium uppercase tracking-wide text-foreground transition-colors hover:bg-accent-soft hover:text-accent-strong"
               >
                 <ShieldCheck size={18} aria-hidden />
                 Admin
@@ -92,14 +86,14 @@ export function Navbar() {
                 <Link
                   to="/favorites"
                   aria-label="Favoriten"
-                  className="flex h-10 w-10 items-center justify-center text-foreground hover:text-accent"
+                  className="flex h-10 w-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-coral-soft hover:text-coral"
                 >
                   <Heart size={20} aria-hidden />
                 </Link>
                 <Link
                   to="/messages"
                   aria-label="Nachrichten"
-                  className="flex h-10 w-10 items-center justify-center text-foreground hover:text-accent"
+                  className="flex h-10 w-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent-soft hover:text-accent-strong"
                 >
                   <ChatCircle size={20} aria-hidden />
                 </Link>
@@ -112,7 +106,7 @@ export function Navbar() {
                 <Link
                   to="/listing/new"
                   aria-label="Verkaufen"
-                  className="flex h-10 w-10 items-center justify-center bg-primary text-on-primary sm:hidden"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-on-primary shadow-sm sm:hidden"
                 >
                   <Plus size={20} aria-hidden />
                 </Link>
@@ -124,22 +118,22 @@ export function Navbar() {
                 {currentUser.role === 'STUDENT' && (
                   <Link
                     to="/profile"
-                    className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-accent"
+                    className="flex items-center gap-2 rounded-full px-2 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-accent-soft hover:text-accent-strong"
                   >
                     <User size={20} aria-hidden />
                     <span className="hidden lg:inline">{currentUser.name}</span>
                   </Link>
                 )}
                 <span className="hidden sm:inline-block">
-                  <Button size="sm" variant="ghost" onClick={handleLogout}>
+                  <Button size="sm" variant="ghost" onClick={logout}>
                     Abmelden
                   </Button>
                 </span>
                 <button
                   type="button"
-                  onClick={handleLogout}
+                  onClick={logout}
                   aria-label="Abmelden"
-                  className="flex h-10 w-10 cursor-pointer items-center justify-center text-foreground hover:text-accent sm:hidden"
+                  className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-foreground transition-colors hover:bg-surface-muted sm:hidden"
                 >
                   <SignOut size={20} aria-hidden />
                 </button>
