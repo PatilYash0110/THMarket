@@ -1,8 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { fetchCurrentUser, loginUser } from '../api/auth'
+import { fetchCurrentUser, loginUser, logoutUser } from '../api/auth'
 import type { User } from '../types'
-
-const TOKEN_STORAGE_KEY = 'thmarket.token'
 
 interface AuthContextValue {
   currentUser: User | null
@@ -19,31 +17,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
+  // The access token now lives only in an httpOnly cookie the browser
+  // attaches automatically — there's nothing in JS to read on mount any
+  // more, so "am I logged in" is answered by asking the server directly. A
+  // 401 here just means no valid session cookie, not a real error.
   useEffect(() => {
-    const token = localStorage.getItem(TOKEN_STORAGE_KEY)
-    if (!token) {
-      setLoading(false)
-      return
-    }
-
-    fetchCurrentUser(token)
+    fetchCurrentUser()
       .then(setCurrentUser)
-      .catch(() => {
-        localStorage.removeItem(TOKEN_STORAGE_KEY)
-        setCurrentUser(null)
-      })
+      .catch(() => setCurrentUser(null))
       .finally(() => setLoading(false))
   }, [])
 
   async function login(email: string, password: string) {
-    const { accessToken, user } = await loginUser({ email, password })
-    localStorage.setItem(TOKEN_STORAGE_KEY, accessToken)
+    const { user } = await loginUser({ email, password })
     setCurrentUser(user)
   }
 
   function logout() {
-    localStorage.removeItem(TOKEN_STORAGE_KEY)
     setCurrentUser(null)
+    // Fire-and-forget: the cookie-clearing round trip doesn't need to block
+    // the UI from reflecting "logged out" immediately.
+    void logoutUser()
   }
 
   function setBalance(balanceCents: number) {

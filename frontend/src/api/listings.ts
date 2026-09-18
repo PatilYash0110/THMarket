@@ -2,12 +2,6 @@ import { ApiError, parseErrorMessage } from './auth'
 import type { Listing } from '../types'
 
 const API_URL = import.meta.env.VITE_API_URL as string
-const TOKEN_STORAGE_KEY = 'thmarket.token'
-
-function authHeaders(): HeadersInit {
-  const token = localStorage.getItem(TOKEN_STORAGE_KEY)
-  return token ? { Authorization: `Bearer ${token}` } : {}
-}
 
 export async function fetchListings(): Promise<Listing[]> {
   const response = await fetch(`${API_URL}/listings`)
@@ -32,7 +26,8 @@ export async function createListing(input: {
 }): Promise<Listing> {
   const response = await fetch(`${API_URL}/listings`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(input),
   })
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
@@ -42,7 +37,8 @@ export async function createListing(input: {
 export async function updateListing(id: string, updates: Partial<Listing>): Promise<Listing> {
   const response = await fetch(`${API_URL}/listings/${id}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(updates),
   })
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
@@ -52,7 +48,7 @@ export async function updateListing(id: string, updates: Partial<Listing>): Prom
 export async function markListingSold(id: string): Promise<Listing> {
   const response = await fetch(`${API_URL}/listings/${id}/sold`, {
     method: 'PATCH',
-    headers: authHeaders(),
+    credentials: 'include',
   })
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
   return response.json()
@@ -67,7 +63,8 @@ export async function purchaseListing(
 ): Promise<Listing & { buyerBalanceCents?: number }> {
   const response = await fetch(`${API_URL}/listings/${id}/purchase`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(input),
   })
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
@@ -77,7 +74,7 @@ export async function purchaseListing(
 export async function deleteListing(id: string): Promise<void> {
   const response = await fetch(`${API_URL}/listings/${id}`, {
     method: 'DELETE',
-    headers: authHeaders(),
+    credentials: 'include',
   })
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
 }
@@ -85,7 +82,7 @@ export async function deleteListing(id: string): Promise<void> {
 export async function addFavorite(id: string): Promise<void> {
   const response = await fetch(`${API_URL}/listings/${id}/favorite`, {
     method: 'POST',
-    headers: authHeaders(),
+    credentials: 'include',
   })
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
 }
@@ -93,14 +90,14 @@ export async function addFavorite(id: string): Promise<void> {
 export async function removeFavorite(id: string): Promise<void> {
   const response = await fetch(`${API_URL}/listings/${id}/favorite`, {
     method: 'DELETE',
-    headers: authHeaders(),
+    credentials: 'include',
   })
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
 }
 
 export async function fetchFavoriteListingIds(): Promise<string[]> {
   const response = await fetch(`${API_URL}/listings/favorites`, {
-    headers: authHeaders(),
+    credentials: 'include',
   })
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
   return response.json()
@@ -111,7 +108,7 @@ export async function uploadListingImages(files: File[]): Promise<string[]> {
   files.forEach((file) => formData.append('files', file))
   const response = await fetch(`${API_URL}/listings/upload`, {
     method: 'POST',
-    headers: authHeaders(),
+    credentials: 'include',
     body: formData,
   })
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
@@ -132,7 +129,7 @@ export async function generateListingDescription(
   if (category) formData.append('category', category)
   const response = await fetch(`${API_URL}/listings/generate-description`, {
     method: 'POST',
-    headers: authHeaders(),
+    credentials: 'include',
     body: formData,
   })
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
