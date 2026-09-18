@@ -86,7 +86,7 @@ function ReportsTab() {
     <div className="flex flex-col gap-3">
       {reports.length === 0 && <p className="text-sm text-foreground-muted">Keine Meldungen vorhanden.</p>}
       {reports.map((report) => (
-        <div key={report.id} className="flex flex-col gap-2 border border-border p-4 text-sm">
+        <div key={report.id} className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-4 text-sm shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="font-medium text-foreground">
               {report.targetType === 'LISTING' ? 'Inserat: ' : 'Nutzer: '}
@@ -180,7 +180,7 @@ function UsersTab() {
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id} className="border-b border-border">
+            <tr key={user.id} className="border-b border-border transition-colors hover:bg-surface-muted/40">
               <td className="py-3 pr-4 text-foreground">{user.name}</td>
               <td className="py-3 pr-4 text-foreground-muted">{user.email}</td>
               <td className="py-3 pr-4">
@@ -258,7 +258,7 @@ function ListingsTab() {
         </thead>
         <tbody>
           {listings.map((listing) => (
-            <tr key={listing.id} className="border-b border-border">
+            <tr key={listing.id} className="border-b border-border transition-colors hover:bg-surface-muted/40">
               <td className="py-3 pr-4 text-foreground">{listing.title}</td>
               <td className="py-3 pr-4 text-foreground-muted">{listing.seller?.name ?? 'Gelöschter Nutzer'}</td>
               <td className="py-3 pr-4 text-foreground-muted">{formatPrice(listing.priceCents)}</td>
@@ -297,7 +297,7 @@ function AuditLogTab() {
     <ul className="flex flex-col gap-3">
       {entries.length === 0 && <p className="text-sm text-foreground-muted">Noch keine Einträge.</p>}
       {entries.map((entry) => (
-        <li key={entry.id} className="border border-border px-4 py-3 text-sm">
+        <li key={entry.id} className="rounded-2xl border border-border bg-surface px-4 py-3 text-sm shadow-sm">
           <p className="text-foreground">{entry.action}</p>
           <p className="mt-1 text-xs text-foreground-muted">
             {entry.actor?.name ?? 'Unbekannt'} · {formatDate(entry.createdAt)}
@@ -313,7 +313,7 @@ export function Admin() {
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Admin-Bereich</h1>
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Admin-Bereich</h1>
 
       <div className="flex gap-1 border-b border-border">
         {TABS.map((item) => (
@@ -321,9 +321,9 @@ export function Admin() {
             key={item.id}
             type="button"
             onClick={() => setTab(item.id)}
-            className={`cursor-pointer border-b-2 px-4 py-2.5 text-sm font-medium ${
+            className={`cursor-pointer border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
               tab === item.id
-                ? 'border-foreground text-foreground'
+                ? 'border-accent text-accent-strong'
                 : 'border-transparent text-foreground-muted hover:text-foreground'
             }`}
           >
