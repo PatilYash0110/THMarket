@@ -1,13 +1,8 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query, Res, UseGuards } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import type { Response } from 'express';
+import { AUTH_COOKIE_NAME, buildAuthCookieOptions } from './auth-cookie';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './current-user.decorator';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
@@ -21,7 +16,10 @@ import type { JwtPayload } from './jwt.strategy';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly config: ConfigService,
+  ) {}
 
   // Throttled: public, unauthenticated, and triggers an outbound email —
   // without a limit, a script iterating over addresses could exhaust the
@@ -43,9 +41,29 @@ export class AuthController {
     return this.authService.resendVerification(dto);
   }
 
+  // Throttled like the other public, unauthenticated auth routes — without
+  // it, this is a plain unlimited password-guessing oracle against any
+  // known @thm.de address (bcrypt slows a single guess down, not a script
+  // making thousands of them).
+  @UseGuards(ThrottlerGuard)
   @Post('login')
-  login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+  async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
+    const { accessToken, user } = await this.authService.login(dto);
+    res.cookie(
+      AUTH_COOKIE_NAME,
+      accessToken,
+      buildAuthCookieOptions(this.config.get<string>('JWT_EXPIRES_IN') ?? '7d'),
+    );
+    // accessToken itself never reaches the response body — it lives only in
+    // the httpOnly cookie set above, so page JS (including an XSS payload)
+    // has no way to read it out, unlike the old localStorage-based flow.
+    return { user };
+  }
+
+  @Post('logout')
+  logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie(AUTH_COOKIE_NAME, { path: '/' });
+    return { loggedOut: true };
   }
 
   @UseGuards(ThrottlerGuard)
@@ -67,10 +85,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('me')
-  updateProfile(
-    @CurrentUser() user: JwtPayload,
-    @Body() dto: UpdateProfileDto,
-  ) {
+  updateProfile(@CurrentUser() user: JwtPayload, @Body() dto: UpdateProfileDto) {
     return this.authService.updateProfile(user.sub, dto);
   }
 
