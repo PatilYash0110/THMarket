@@ -5,6 +5,7 @@ import { AdminModule } from './admin/admin.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { ChatModule } from './chat/chat.module';
 import { ListingsModule } from './listings/listings.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { WalletModule } from './wallet/wallet.module';
@@ -21,6 +22,7 @@ import { WalletModule } from './wallet/wallet.module';
     ListingsModule,
     WalletModule,
     AdminModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
