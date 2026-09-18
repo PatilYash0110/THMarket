@@ -36,12 +36,13 @@ export class ChatService {
       throw new ForbiddenException('Du kannst dir nicht selbst schreiben.');
     }
 
-    return this.prisma.conversation.upsert({
+    const conversation = await this.prisma.conversation.upsert({
       where: { listingId_buyerId: { listingId, buyerId } },
       create: { listingId, buyerId, sellerId: listing.sellerId },
       update: {},
       include: CONVERSATION_INCLUDE,
     });
+    return { ...conversation, unreadCount: await this.countUnread(conversation, buyerId) };
   }
 
   // Newest-activity-first; only the single latest message per conversation
@@ -55,9 +56,61 @@ export class ChatService {
       where: { OR: [{ buyerId: userId }, { sellerId: userId }] },
       include: CONVERSATION_INCLUDE,
     });
-    const activityTime = (c: (typeof conversations)[number]) =>
+    const withUnread = await Promise.all(
+      conversations.map(async (conversation) => ({
+        ...conversation,
+        unreadCount: await this.countUnread(conversation, userId),
+      })),
+    );
+    const activityTime = (c: (typeof withUnread)[number]) =>
       (c.messages[0]?.createdAt ?? c.createdAt).getTime();
-    return [...conversations].sort((a, b) => activityTime(b) - activityTime(a));
+    return [...withUnread].sort((a, b) => activityTime(b) - activityTime(a));
+  }
+
+  // Messages sent by the OTHER party after MY own <side>LastReadAt — a null
+  // LastReadAt (never opened this thread) counts every message from them.
+  // `senderId: { not: userId }` also naturally excludes my own messages
+  // from my own unread count without a separate check.
+  private async countUnread(
+    conversation: {
+      id: string;
+      buyerId: string | null;
+      sellerId: string | null;
+      buyerLastReadAt: Date | null;
+      sellerLastReadAt: Date | null;
+    },
+    userId: string,
+  ): Promise<number> {
+    const lastReadAt = conversation.buyerId === userId ? conversation.buyerLastReadAt : conversation.sellerLastReadAt;
+    return this.prisma.message.count({
+      where: {
+        conversationId: conversation.id,
+        senderId: { not: userId },
+        ...(lastReadAt ? { createdAt: { gt: lastReadAt } } : {}),
+      },
+    });
+  }
+
+  // Called when a user actually opens a thread (GET messages, or the
+  // frontend explicitly marking it read) — stamps that side's
+  // <side>LastReadAt to now, which is what countUnread() above measures
+  // against for every future listConversations() call.
+  async markRead(userId: string, conversationId: string): Promise<void> {
+    const conversation = await this.prisma.conversation.findUnique({
+      where: { id: conversationId },
+      select: { buyerId: true, sellerId: true },
+    });
+    if (!conversation) {
+      throw new NotFoundException('Unterhaltung nicht gefunden.');
+    }
+    if (conversation.buyerId !== userId && conversation.sellerId !== userId) {
+      throw new ForbiddenException('Du bist kein Teil dieser Unterhaltung.');
+    }
+    const field = conversation.buyerId === userId ? 'buyerLastReadAt' : 'sellerLastReadAt';
+    await this.prisma.conversation.update({
+      where: { id: conversationId },
+      data: { [field]: new Date() },
+    });
   }
 
   async isParticipant(userId: string, conversationId: string): Promise<boolean> {
