@@ -23,7 +23,7 @@ export interface Listing {
   // listing sells (VERKAUFT listings survive with sellerId set to null so
   // completed-sale history isn't destroyed — see backend AdminService).
   sellerId: string | null
-  seller: { name: string; verified: boolean } | null
+  seller: { name: string; email: string; verified: boolean } | null
   buyerId: string | null
   createdAt: string
 }

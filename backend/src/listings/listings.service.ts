@@ -11,7 +11,7 @@ import { CreateListingDto } from './dto/create-listing.dto';
 import { PurchaseListingDto } from './dto/purchase-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 
-const SELLER_SELECT = { name: true, verified: true } as const;
+const SELLER_SELECT = { name: true, email: true, verified: true } as const;
 
 @Injectable()
 export class ListingsService {
