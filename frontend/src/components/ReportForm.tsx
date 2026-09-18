@@ -49,7 +49,7 @@ export function ReportForm({ targetType, targetId, onCancel }: ReportFormProps) 
 
   if (submitted) {
     return (
-      <div className="flex flex-col items-center gap-2 border border-border p-4 text-center">
+      <div className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-surface p-4 text-center">
         <CheckCircle size={24} className="text-accent" aria-hidden />
         <p className="text-sm text-foreground">Danke, deine Meldung wurde übermittelt.</p>
         <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
@@ -60,13 +60,13 @@ export function ReportForm({ targetType, targetId, onCancel }: ReportFormProps) 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3 border border-border p-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4">
       <label className="flex flex-col gap-1.5 text-sm">
         <span className="font-medium text-foreground">Grund</span>
         <select
           value={reason}
           onChange={(event) => setReason(event.target.value)}
-          className="h-10 border border-border bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="h-10 rounded-lg border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {REPORT_REASONS.map((option) => (
             <option key={option} value={option}>
@@ -82,7 +82,7 @@ export function ReportForm({ targetType, targetId, onCancel }: ReportFormProps) 
           value={message}
           onChange={(event) => setMessage(event.target.value)}
           placeholder="Beschreibe kurz, worum es geht…"
-          className="border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
       </label>
       {error && (

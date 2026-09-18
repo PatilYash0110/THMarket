@@ -272,7 +272,7 @@ function ListingFormFields({
 
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-8 py-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
         {isEditing ? 'Inserat bearbeiten' : 'Inserat erstellen'}
       </h1>
 
@@ -284,7 +284,7 @@ function ListingFormFields({
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder="z. B. MacBook Air M1, 256GB"
-            className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
         </label>
 
@@ -294,7 +294,7 @@ function ListingFormFields({
             <select
               value={category}
               onChange={(event) => setCategory(event.target.value as ListingCategory)}
-              className="h-11 border border-border bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {CATEGORIES.map((cat) => (
                 <option key={cat} value={cat}>
@@ -313,7 +313,7 @@ function ListingFormFields({
               value={price}
               onChange={(event) => setPrice(event.target.value)}
               placeholder="0,00"
-              className="h-11 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </label>
         </div>
@@ -336,7 +336,7 @@ function ListingFormFields({
             value={aiHint}
             onChange={(event) => setAiHint(event.target.value)}
             placeholder="Hinweis für die KI (optional), z. B. kleiner Kratzer am Rahmen"
-            className="h-10 border border-border bg-background px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-10 rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
           <textarea
             required
@@ -344,7 +344,7 @@ function ListingFormFields({
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             placeholder="Zustand, Details, Abholung…"
-            className="border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
           {aiError ? (
             <p role="alert" className="text-xs text-destructive">
@@ -364,13 +364,13 @@ function ListingFormFields({
             {images.map((image) => {
               const src = image.kind === 'existing' ? image.url : image.previewUrl
               return (
-                <div key={src} className="group relative h-24 w-24 shrink-0 overflow-hidden border border-border">
+                <div key={src} className="group relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-border">
                   <img src={src} alt="" className="h-full w-full object-cover" aria-hidden />
                   <button
                     type="button"
                     onClick={() => removeImage(image)}
                     aria-label="Bild entfernen"
-                    className="absolute right-1 top-1 flex h-6 w-6 cursor-pointer items-center justify-center bg-background/90 text-foreground hover:text-destructive"
+                    className="absolute right-1 top-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-surface/90 text-foreground shadow-sm hover:text-destructive"
                   >
                     <X size={14} aria-hidden />
                   </button>
@@ -381,7 +381,7 @@ function ListingFormFields({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex h-24 w-24 shrink-0 cursor-pointer flex-col items-center justify-center gap-1 border border-dashed border-border text-foreground-muted hover:border-foreground hover:text-foreground"
+                className="flex h-24 w-24 shrink-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-border-strong text-foreground-muted transition-colors hover:border-accent hover:text-accent-strong"
               >
                 <Plus size={20} aria-hidden />
                 <span className="text-xs">Hinzufügen</span>
