@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import logo from '../../media/thm_market_logo.jpg'
 import { useAuth } from '../context/AuthContext'
+import { useMessages } from '../context/MessagesContext'
 import { Button } from './Button'
 
 const SEARCH_DEBOUNCE_MS = 300
@@ -59,6 +60,7 @@ function SearchBar({ className }: { className?: string }) {
 
 export function Navbar() {
   const { currentUser, logout } = useAuth()
+  const { unreadTotal } = useMessages()
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-surface/70 backdrop-blur-xl backdrop-saturate-150">
@@ -92,10 +94,18 @@ export function Navbar() {
                 </Link>
                 <Link
                   to="/messages"
-                  aria-label="Nachrichten"
-                  className="flex h-10 w-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent-soft hover:text-accent-strong"
+                  aria-label={unreadTotal > 0 ? `Nachrichten (${unreadTotal} ungelesen)` : 'Nachrichten'}
+                  className="relative flex h-10 w-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent-soft hover:text-accent-strong"
                 >
                   <ChatCircle size={20} aria-hidden />
+                  {unreadTotal > 0 && (
+                    <span
+                      aria-hidden
+                      className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[10px] font-semibold leading-none text-on-primary"
+                    >
+                      {unreadTotal > 9 ? '9+' : unreadTotal}
+                    </span>
+                  )}
                 </Link>
                 <Link to="/listing/new" className="hidden sm:block">
                   <Button size="sm" variant="primary">

@@ -73,6 +73,7 @@ export function Messages() {
           const other = isBuyer ? conversation.seller : conversation.buyer
           const lastMessage = conversation.messages[0]
           const isActive = conversation.id === activeConversation?.id
+          const unread = conversation.unreadCount > 0
 
           return (
             <Link
@@ -85,13 +86,31 @@ export function Messages() {
             >
               <Avatar name={other?.name ?? '?'} className="h-11 w-11" />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-foreground">
+                <p
+                  className={clsx(
+                    'truncate text-sm text-foreground',
+                    unread ? 'font-semibold' : 'font-medium',
+                  )}
+                >
                   {conversation.listing?.title ?? 'Inserat'}
                 </p>
-                <p className="truncate text-xs text-foreground-muted">
+                <p
+                  className={clsx(
+                    'truncate text-xs',
+                    unread ? 'font-medium text-foreground' : 'text-foreground-muted',
+                  )}
+                >
                   {lastMessage ? lastMessage.text : `mit ${other?.name ?? 'Gelöschter Nutzer'}`}
                 </p>
               </div>
+              {unread && (
+                <span
+                  aria-label={`${conversation.unreadCount} ungelesene Nachrichten`}
+                  className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-coral px-1 text-[10px] font-semibold leading-none text-on-primary"
+                >
+                  {conversation.unreadCount > 9 ? '9+' : conversation.unreadCount}
+                </span>
+              )}
             </Link>
           )
         })}

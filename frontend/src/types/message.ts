@@ -14,4 +14,8 @@ export interface Conversation {
   buyer: { id: string; name: string } | null
   seller: { id: string; name: string } | null
   messages: Message[]
+  // Messages from the other party sent after my own last-read timestamp —
+  // computed server-side (see backend/src/chat/chat.service.ts's
+  // countUnread), not something the client can derive on its own.
+  unreadCount: number
 }

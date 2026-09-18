@@ -25,3 +25,11 @@ export async function startConversation(listingId: string): Promise<Conversation
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
   return response.json()
 }
+
+export async function markConversationRead(id: string): Promise<void> {
+  const response = await fetch(`${API_URL}/conversations/${id}/read`, {
+    method: 'POST',
+    credentials: 'include',
+  })
+  if (!response.ok) throw new ApiError(await parseErrorMessage(response))
+}
