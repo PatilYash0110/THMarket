@@ -1,15 +1,7 @@
-import {
-  ArrayMaxSize,
-  IsBoolean,
-  IsIn,
-  IsInt,
-  IsString,
-  Min,
-  MinLength,
-} from 'class-validator';
+import { ArrayMaxSize, IsBoolean, IsIn, IsInt, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
 
-// Manuell synchron gehalten mit frontend/src/types/listing.ts's ListingCategory-
-// Union — kein gemeinsames Paket in diesem Monorepo, um das zu deduplizieren.
+// Kept manually in sync with frontend/src/types/listing.ts's ListingCategory
+// union — no shared package in this monorepo to dedupe it.
 export const LISTING_CATEGORIES = [
   'Elektronik',
   'Bücher & Skripte',
@@ -22,22 +14,25 @@ export const LISTING_CATEGORIES = [
 export class CreateListingDto {
   @IsString()
   @MinLength(1)
+  @MaxLength(200)
   title: string;
 
   @IsString()
   @MinLength(1)
+  @MaxLength(5000)
   description: string;
 
   @IsInt()
   @Min(0)
+  @Max(100_000_00, { message: 'Preis darf 1.000.000 € nicht überschreiten.' })
   priceCents: number;
 
   @IsIn(LISTING_CATEGORIES)
   category: string;
 
-  // Nicht @IsUrl() — ein Inserat ohne Fotos übermittelt einen lokalen
-  // `data:image/svg+xml,...`-Platzhalter (frontend/src/lib/placeholder.ts)
-  // neben echten Cloudinary-URLs, und IsUrl würde das data:-Schema ablehnen.
+  // Not @IsUrl() — a listing with zero photos submits a single local
+  // `data:image/svg+xml,...` placeholder (frontend/src/lib/placeholder.ts)
+  // alongside real Cloudinary URLs, and IsUrl rejects the data: scheme.
   @IsString({ each: true })
   @ArrayMaxSize(6)
   images: string[];
