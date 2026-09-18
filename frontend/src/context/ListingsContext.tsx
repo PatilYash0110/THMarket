@@ -101,6 +101,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
       await removeFavorite(id)
       setFavoriteIds((prev) => prev.filter((favoriteId) => favoriteId !== id))
     } else {
+      if (currentUser && currentUser.id === getListing(id)?.sellerId) return
       await addFavorite(id)
       setFavoriteIds((prev) => [...prev, id])
     }

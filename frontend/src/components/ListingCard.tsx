@@ -1,14 +1,17 @@
 import { Heart } from '@phosphor-icons/react'
 import clsx from 'clsx'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { useListings } from '../context/ListingsContext'
 import { formatPrice } from '../lib/format'
 import type { Listing } from '../types'
 import { Badge } from './Badge'
 
 export function ListingCard({ listing }: { listing: Listing }) {
+  const { currentUser } = useAuth()
   const { isFavorite, toggleFavorite } = useListings()
   const favorite = isFavorite(listing.id)
+  const isOwner = currentUser?.id === listing.sellerId
   const sold = listing.status === 'VERKAUFT'
 
   return (
@@ -32,15 +35,17 @@ export function ListingCard({ listing }: { listing: Listing }) {
         </div>
       </Link>
 
-      <button
-        type="button"
-        aria-label={favorite ? 'Von Favoriten entfernen' : 'Zu Favoriten hinzufügen'}
-        aria-pressed={favorite}
-        onClick={() => toggleFavorite(listing.id)}
-        className="absolute right-3 top-3 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-surface/90 text-foreground shadow-sm transition-all duration-150 hover:text-coral motion-safe:active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        <Heart size={18} weight={favorite ? 'fill' : 'regular'} className={favorite ? 'text-coral' : undefined} aria-hidden />
-      </button>
+      {(!isOwner || favorite) && (
+        <button
+          type="button"
+          aria-label={favorite ? 'Von Favoriten entfernen' : 'Zu Favoriten hinzufügen'}
+          aria-pressed={favorite}
+          onClick={() => toggleFavorite(listing.id)}
+          className="absolute right-3 top-3 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-surface/90 text-foreground shadow-sm transition-all duration-150 hover:text-coral motion-safe:active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <Heart size={18} weight={favorite ? 'fill' : 'regular'} className={favorite ? 'text-coral' : undefined} aria-hidden />
+        </button>
+      )}
 
       <div className="mt-3 flex flex-col gap-1">
         <Link to={`/listing/${listing.id}`} className="text-sm font-medium text-foreground hover:underline">

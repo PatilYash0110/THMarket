@@ -197,7 +197,12 @@ export class ListingsService {
   }
 
   async addFavorite(userId: string, listingId: string) {
-    await this.findOne(listingId);
+    const listing = await this.findOne(listingId);
+    if (listing.sellerId === userId) {
+      throw new ForbiddenException(
+        'Du kannst eigene Inserate nicht zu deinen Favoriten hinzufügen.',
+      );
+    }
     await this.prisma.favorite.upsert({
       where: { userId_listingId: { userId, listingId } },
       update: {},
