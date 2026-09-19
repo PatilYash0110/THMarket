@@ -56,6 +56,14 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
   // Previously had no .catch at all — an API outage left `listings` at its
   // initial [], which the Home page can't distinguish from "genuinely no
   // results", plus an unhandled promise rejection in the console.
+  //
+  // Also re-runs when a guest logs in (currentUser?.id going from
+  // undefined to set): GET /listings now requires auth (S-01), so a guest
+  // redirected to a listing by RequireStudent, who then logs in, would
+  // otherwise be stuck with the failed/empty fetch from before they were
+  // authenticated — the exact listing they were sent to view would show
+  // as "not found". Keyed on the id, not the whole `currentUser` object,
+  // so an unrelated update (balance, profile) doesn't also refetch.
   useEffect(() => {
     setLoading(true)
     setError(null)
@@ -63,7 +71,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
       .then(setListings)
       .catch(() => setError('Inserate konnten nicht geladen werden.'))
       .finally(() => setLoading(false))
-  }, [retryToken])
+  }, [retryToken, currentUser?.id])
 
   useEffect(() => {
     if (!currentUser) {
