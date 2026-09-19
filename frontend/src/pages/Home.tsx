@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { useMemo } from 'react'
 import { Navigate, useSearchParams } from 'react-router-dom'
+import { Button } from '../components/Button'
 import { EmptyState } from '../components/EmptyState'
 import { ListingCard } from '../components/ListingCard'
 import { useAuth } from '../context/AuthContext'
@@ -21,7 +22,7 @@ type SortOption = 'neueste' | 'preis-auf' | 'preis-ab'
 
 export function Home() {
   const { currentUser, loading } = useAuth()
-  const { listings } = useListings()
+  const { listings, loading: listingsLoading, error: listingsError, retry } = useListings()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const query = searchParams.get('q') ?? ''
@@ -172,7 +173,31 @@ export function Home() {
         </div>
       </div>
 
-      {filtered.length === 0 ? (
+      {listingsLoading ? (
+        // Placeholder cards instead of "Keine Inserate gefunden" flashing
+        // while the real fetch is still in flight — that empty-state text
+        // used to render for a moment on every load, not just when there
+        // genuinely are no results.
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 8 }, (_, index) => (
+            <div key={index} className="flex flex-col gap-2 motion-safe:animate-pulse">
+              <div className="aspect-square rounded-2xl bg-surface-muted" />
+              <div className="h-3.5 w-3/4 rounded-full bg-surface-muted" />
+              <div className="h-3.5 w-1/3 rounded-full bg-surface-muted" />
+            </div>
+          ))}
+        </div>
+      ) : listingsError ? (
+        <EmptyState
+          title="Inserate konnten nicht geladen werden"
+          description={listingsError}
+          action={
+            <Button variant="secondary" size="sm" onClick={retry}>
+              Erneut versuchen
+            </Button>
+          }
+        />
+      ) : filtered.length === 0 ? (
         <EmptyState
           title="Keine Inserate gefunden"
           description="Versuche eine andere Suche, Kategorie oder Preisspanne."

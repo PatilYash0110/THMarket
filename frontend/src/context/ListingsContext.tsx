@@ -31,6 +31,8 @@ interface ListingsContextValue {
   listings: Listing[]
   favoriteIds: string[]
   loading: boolean
+  error: string | null
+  retry: () => void
   getListing: (id: string) => Listing | undefined
   addListing: (input: CreateListingInput) => Promise<Listing>
   updateListing: (id: string, updates: Partial<Listing>) => Promise<Listing>
@@ -48,20 +50,37 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
   const [listings, setListings] = useState<Listing[]>([])
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [retryToken, setRetryToken] = useState(0)
 
+  // Previously had no .catch at all — an API outage left `listings` at its
+  // initial [], which the Home page can't distinguish from "genuinely no
+  // results", plus an unhandled promise rejection in the console.
   useEffect(() => {
+    setLoading(true)
+    setError(null)
     fetchListings()
       .then(setListings)
+      .catch(() => setError('Inserate konnten nicht geladen werden.'))
       .finally(() => setLoading(false))
-  }, [])
+  }, [retryToken])
 
   useEffect(() => {
     if (!currentUser) {
       setFavoriteIds([])
       return
     }
-    fetchFavoriteListingIds().then(setFavoriteIds)
+    // Favorites are a secondary affordance shown as filled hearts on cards
+    // that already loaded some other way — silently keeping the existing
+    // (possibly empty) list on failure is enough here, no dedicated error UI.
+    fetchFavoriteListingIds()
+      .then(setFavoriteIds)
+      .catch(() => {})
   }, [currentUser])
+
+  function retry() {
+    setRetryToken((prev) => prev + 1)
+  }
 
   function getListing(id: string) {
     return listings.find((listing) => listing.id === id)
@@ -117,6 +136,8 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
         listings,
         favoriteIds,
         loading,
+        error,
+        retry,
         getListing,
         addListing,
         updateListing,
