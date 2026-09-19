@@ -26,7 +26,7 @@ function Avatar({ name, className }: { name: string; className?: string }) {
 export function Messages() {
   const { currentUser } = useAuth()
   const { conversationId } = useParams<{ conversationId?: string }>()
-  const { conversations, getMessages, openConversation, sendMessage } = useMessages()
+  const { conversations, getMessages, openConversation, clearActiveConversation, sendMessage } = useMessages()
   const [draft, setDraft] = useState('')
 
   const activeConversation = conversationId
@@ -35,9 +35,15 @@ export function Messages() {
 
   // Lazily fetches the full history and joins the socket room only once a
   // thread is actually opened — the list view only ever carries a preview.
+  // Cleanup clears the "currently open" marker on unmount/thread switch —
+  // without it, a thread visited once would keep being treated as active
+  // forever, and its unread badge would never increment again.
   useEffect(() => {
     if (activeConversation) {
       openConversation(activeConversation.id)
+    }
+    return () => {
+      clearActiveConversation()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConversation?.id])

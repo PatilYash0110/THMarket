@@ -14,6 +14,7 @@ interface MessagesContextValue {
   unreadTotal: number
   getMessages: (conversationId: string) => Message[]
   openConversation: (conversationId: string) => Promise<void>
+  clearActiveConversation: () => void
   sendMessage: (conversationId: string, text: string) => void
   startConversation: (listingId: string) => Promise<Conversation>
 }
@@ -34,6 +35,8 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
   const [messagesByConversation, setMessagesByConversation] = useState<Record<string, Message[]>>({})
   const messagesByConversationRef = useRef(messagesByConversation)
   messagesByConversationRef.current = messagesByConversation
+  const conversationsRef = useRef(conversations)
+  conversationsRef.current = conversations
   // Which thread the user currently has open — a live message for that
   // thread gets marked read immediately instead of bumping its badge, since
   // they're already looking at it.
@@ -90,8 +93,22 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
     }
     socket.on('message', handleIncoming)
 
+    // Re-join every conversation's room after a reconnect (sleep, Wi-Fi
+    // blip, server restart) — socket.io drops all room membership on
+    // disconnect, so without this a client that reconnects silently stops
+    // receiving 'message' events for every thread until a full page reload.
+    // Reads conversationsRef rather than closing over `conversations`
+    // directly, since this listener is registered once per currentUser
+    // change and would otherwise always re-join the room list from the
+    // moment it was attached.
+    function handleReconnect() {
+      conversationsRef.current.forEach((conversation) => socket.emit('joinConversation', conversation.id))
+    }
+    socket.on('connect', handleReconnect)
+
     return () => {
       socket.off('message', handleIncoming)
+      socket.off('connect', handleReconnect)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser])
@@ -113,6 +130,15 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
     markConversationRead(conversationId).catch(() => {})
   }
 
+  // Called when the message thread view unmounts/switches threads, so a
+  // conversation viewed once doesn't permanently stay "active" — without
+  // this, handleIncoming above would keep treating every later message on
+  // that thread as already-read (isActive stays true forever) and its
+  // unread badge would never increment again.
+  function clearActiveConversation(): void {
+    activeConversationIdRef.current = null
+  }
+
   function sendMessage(conversationId: string, text: string): void {
     getSocket().emit('sendMessage', { conversationId, text })
   }
@@ -131,7 +157,15 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
 
   return (
     <MessagesContext.Provider
-      value={{ conversations, unreadTotal, getMessages, openConversation, sendMessage, startConversation }}
+      value={{
+        conversations,
+        unreadTotal,
+        getMessages,
+        openConversation,
+        clearActiveConversation,
+        sendMessage,
+        startConversation,
+      }}
     >
       {children}
     </MessagesContext.Provider>
