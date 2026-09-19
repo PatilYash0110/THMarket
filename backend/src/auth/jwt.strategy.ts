@@ -1,10 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { AUTH_COOKIE_NAME } from './auth-cookie';
+import { assertSessionStillValid } from './session-validation';
 
 export interface JwtPayload {
   sub: string;
@@ -35,21 +36,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  // Rejects tokens issued before the user's last password change/reset.
-  // JWTs are otherwise stateless — without this, a password reset done
-  // because of a suspected compromise would accomplish nothing, since a
-  // token issued before the reset keeps working until it naturally expires
-  // (JWT_EXPIRES_IN, up to 7 days).
+  // Rejects tokens issued before the user's last password change/reset, or
+  // belonging to a since-deleted account. JWTs are otherwise stateless —
+  // without this, a password reset done because of a suspected compromise
+  // would accomplish nothing, since a token issued before the reset keeps
+  // working until it naturally expires (JWT_EXPIRES_IN, up to 7 days).
   async validate(payload: JwtPayload): Promise<JwtPayload> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: payload.sub },
-      select: { passwordChangedAt: true },
-    });
-
-    if (user?.passwordChangedAt && payload.iat && payload.iat * 1000 < user.passwordChangedAt.getTime()) {
-      throw new UnauthorizedException('Sitzung abgelaufen. Bitte melde dich erneut an.');
-    }
-
+    await assertSessionStillValid(this.prisma, payload.sub, payload.iat);
     return payload;
   }
 }
