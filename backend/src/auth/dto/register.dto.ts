@@ -8,6 +8,7 @@ import {
 const THM_EMAIL_PATTERN = /^[^\s@]+@([a-z0-9-]+\.)*thm\.de$/i;
 
 export class RegisterDto {
+  @Transform(({ value }: { value: string }) => value?.trim())
   @IsString()
   @MinLength(1)
   @MaxLength(100)
