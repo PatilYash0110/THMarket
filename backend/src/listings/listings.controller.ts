@@ -48,6 +48,7 @@ export class ListingsController {
     private readonly gemini: GeminiService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.listingsService.findAll();
@@ -61,6 +62,7 @@ export class ListingsController {
     return this.listingsService.listFavoriteIds(user.sub);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.listingsService.findOne(id);
