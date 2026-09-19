@@ -114,8 +114,23 @@ export class AuthService {
       where: { emailVerificationToken: token },
     });
 
+    if (!user) {
+      throw new NotFoundException(
+        'Der Bestätigungslink ist ungültig oder abgelaufen.',
+      );
+    }
+
+    // Idempotent: a mail scanner (Outlook SafeLinks, Gmail prefetch) that
+    // fetches the link before the student clicks it, or the student
+    // clicking twice, must not turn an already-successful verification
+    // into an "invalid link" error. The token is intentionally left in
+    // place (not nulled) so it keeps resolving to this user on a repeat
+    // hit — a fresh resend overwrites it anyway.
+    if (user.verified) {
+      return { email: user.email };
+    }
+
     if (
-      !user ||
       !user.emailVerificationExpires ||
       user.emailVerificationExpires < new Date()
     ) {
@@ -126,11 +141,7 @@ export class AuthService {
 
     await this.prisma.user.update({
       where: { id: user.id },
-      data: {
-        verified: true,
-        emailVerificationToken: null,
-        emailVerificationExpires: null,
-      },
+      data: { verified: true },
     });
 
     return { email: user.email };

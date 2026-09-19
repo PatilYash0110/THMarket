@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Query, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Patch, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import type { Response } from 'express';
@@ -32,7 +32,16 @@ export class AuthController {
   }
 
   @Get('verify-email')
-  verifyEmail(@Query('token') token: string) {
+  verifyEmail(@Query('token') token?: string) {
+    // A missing/blank token previously reached Prisma's findUnique as
+    // `undefined`, which throws a validation error there instead of a
+    // normal 400 — mapped to the same "invalid link" response the service
+    // already uses for an unrecognized token.
+    if (!token) {
+      throw new BadRequestException(
+        'Der Bestätigungslink ist ungültig oder abgelaufen.',
+      );
+    }
     return this.authService.verifyEmail(token);
   }
 
