@@ -54,6 +54,9 @@ export class ListingsService {
     if (listing.sellerId !== userId) {
       throw new ForbiddenException('Du kannst nur eigene Inserate bearbeiten.');
     }
+    if (listing.status === 'VERKAUFT') {
+      throw new ConflictException('Verkaufte Inserate können nicht mehr bearbeitet werden.');
+    }
 
     return this.prisma.listing.update({
       where: { id },
