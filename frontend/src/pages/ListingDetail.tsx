@@ -1,5 +1,5 @@
 import { Flag, Heart, MagnifyingGlassPlus, PencilSimple, ShieldCheck, SmileySad } from '@phosphor-icons/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ApiError } from '../api/auth'
 import { Badge } from '../components/Badge'
@@ -15,7 +15,7 @@ type ReportTarget = 'LISTING' | 'USER' | null
 
 export function ListingDetail() {
   const { id } = useParams<{ id: string }>()
-  const { getListing, isFavorite, toggleFavorite, loading } = useListings()
+  const { getListing, refreshListing, isFavorite, toggleFavorite, loading } = useListings()
   const { currentUser } = useAuth()
   const { startConversation } = useMessages()
   const navigate = useNavigate()
@@ -26,6 +26,15 @@ export function ListingDetail() {
   const [contactError, setContactError] = useState<string | null>(null)
 
   const listing = id ? getListing(id) : undefined
+
+  // The shared `listings` list is only fetched once per session — without
+  // this, a listing sold (or edited) by someone else while this page was
+  // cached still shows its old status/price/Kaufen button until a full
+  // reload.
+  useEffect(() => {
+    if (id) refreshListing(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
 
   // Wait for the listings list to finish its initial fetch before deciding
   // "not found" — on a fresh page load (e.g. a hard reload of this URL),

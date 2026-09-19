@@ -4,6 +4,7 @@ import {
   createListing,
   deleteListing as deleteListingRequest,
   fetchFavoriteListingIds,
+  fetchListingById,
   fetchListings,
   markListingSold,
   purchaseListing as purchaseListingRequest,
@@ -34,6 +35,7 @@ interface ListingsContextValue {
   error: string | null
   retry: () => void
   getListing: (id: string) => Listing | undefined
+  refreshListing: (id: string) => Promise<void>
   addListing: (input: CreateListingInput) => Promise<Listing>
   updateListing: (id: string, updates: Partial<Listing>) => Promise<Listing>
   markAsSold: (id: string) => Promise<Listing>
@@ -94,6 +96,26 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
     return listings.find((listing) => listing.id === id)
   }
 
+  // The main `listings` fetch only happens once per session/login — a
+  // listing sold by someone else in the meantime still shows "Kaufen" and
+  // 409s at checkout until a full reload. Detail/checkout pages call this
+  // on mount to get that one listing's current state without refetching
+  // the whole list. Silently keeps the existing (possibly stale) entry on
+  // failure rather than erroring the whole page over one listing.
+  async function refreshListing(id: string): Promise<void> {
+    try {
+      const fresh = await fetchListingById(id)
+      setListings((prev) => {
+        if (!fresh) return prev.filter((listing) => listing.id !== id)
+        return prev.some((listing) => listing.id === id)
+          ? prev.map((listing) => (listing.id === id ? fresh : listing))
+          : [...prev, fresh]
+      })
+    } catch {
+      // keep whatever was already loaded
+    }
+  }
+
   async function addListing(input: CreateListingInput) {
     const listing = await createListing(input)
     setListings((prev) => [listing, ...prev])
@@ -147,6 +169,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
         error,
         retry,
         getListing,
+        refreshListing,
         addListing,
         updateListing,
         markAsSold,
