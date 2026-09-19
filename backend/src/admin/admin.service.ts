@@ -37,6 +37,7 @@ export class AdminService {
           'Du kannst dein eigenes Inserat nicht melden.',
         );
       }
+      await this.assertNoOpenDuplicateReport(reporterId, { listingId: listing.id });
       return this.prisma.report.create({
         data: {
           targetType: 'LISTING',
@@ -59,6 +60,7 @@ export class AdminService {
     if (user.id === reporterId) {
       throw new ForbiddenException('Du kannst dich nicht selbst melden.');
     }
+    await this.assertNoOpenDuplicateReport(reporterId, { reportedUserId: user.id });
     return this.prisma.report.create({
       data: {
         targetType: 'USER',
@@ -69,6 +71,24 @@ export class AdminService {
         reporterId,
       },
     });
+  }
+
+  // Application-level dedup rather than a DB unique constraint — avoids a
+  // schema migration against the live database, and correctly allows a NEW
+  // report after an earlier one on the same target was already resolved
+  // (only an OFFEN sibling blocks a new one).
+  private async assertNoOpenDuplicateReport(
+    reporterId: string,
+    target: { listingId: string } | { reportedUserId: string },
+  ): Promise<void> {
+    const existing = await this.prisma.report.findFirst({
+      where: { reporterId, status: 'OFFEN', ...target },
+    });
+    if (existing) {
+      throw new ConflictException(
+        'Du hast dieses Ziel bereits gemeldet. Die Meldung wird noch bearbeitet.',
+      );
+    }
   }
 
   // Joined with the LIVE listing/reportedUser (not just targetLabel) so

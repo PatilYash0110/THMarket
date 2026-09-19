@@ -10,6 +10,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import type { ReportStatus } from '@prisma/client';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -29,6 +30,7 @@ export class AdminController {
   // No AdminGuard here on purpose: any authenticated STUDENT can file a
   // report. Admins act directly instead (they have no reason to report
   // anything through this endpoint).
+  @UseGuards(ThrottlerGuard)
   @Post('reports')
   createReport(@CurrentUser() user: JwtPayload, @Body() dto: CreateReportDto) {
     if (user.role !== 'STUDENT') {
