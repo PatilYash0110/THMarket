@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -12,6 +13,8 @@ import {
 } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import type { ReportStatus } from '@prisma/client';
+
+const REPORT_STATUSES: ReportStatus[] = ['OFFEN', 'GESCHLOSSEN'];
 import { CurrentUser } from '../auth/current-user.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { JwtPayload } from '../auth/jwt.strategy';
@@ -43,8 +46,14 @@ export class AdminController {
 
   @UseGuards(AdminGuard)
   @Get('reports')
-  listReports(@Query('status') status?: ReportStatus) {
-    return this.adminService.listReports(status);
+  listReports(@Query('status') status?: string) {
+    // An unrecognized value previously reached Prisma as an invalid enum
+    // filter, which throws there instead of failing validation here —
+    // surfaced as an unhandled 500.
+    if (status && !REPORT_STATUSES.includes(status as ReportStatus)) {
+      throw new BadRequestException('Ungültiger Status.');
+    }
+    return this.adminService.listReports(status as ReportStatus | undefined);
   }
 
   @UseGuards(AdminGuard)

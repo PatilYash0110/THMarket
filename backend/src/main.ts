@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
+import { MulterExceptionFilter } from './common/multer-exception.filter';
 
 const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
   .split(',')
@@ -62,6 +63,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.useGlobalFilters(new MulterExceptionFilter());
 
   app.enableCors({
     origin: ALLOWED_ORIGINS,
