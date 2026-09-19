@@ -12,6 +12,8 @@ import {
 import type { Server, Socket } from 'socket.io';
 import { AUTH_COOKIE_NAME } from '../auth/auth-cookie';
 import type { JwtPayload } from '../auth/jwt.strategy';
+import { assertSessionStillValid } from '../auth/session-validation';
+import { PrismaService } from '../prisma/prisma.service';
 import { ChatService } from './chat.service';
 
 const MAX_MESSAGE_LENGTH = 2000;
@@ -44,6 +46,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly chatService: ChatService,
+    private readonly prisma: PrismaService,
   ) {}
 
   // The JWT arrives either via the httpOnly auth cookie (same one the HTTP
@@ -61,6 +64,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const payload = await this.jwt.verifyAsync<JwtPayload>(token, {
         secret: this.config.getOrThrow<string>('JWT_SECRET'),
       });
+      await assertSessionStillValid(this.prisma, payload.sub, payload.iat);
       client.data.userId = payload.sub;
     } catch {
       client.disconnect();
