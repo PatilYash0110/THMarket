@@ -117,6 +117,7 @@ function ListingFormFields({
     (existing?.images ?? []).map((url) => ({ kind: 'existing', url })),
   )
   const [imageError, setImageError] = useState<string | null>(null)
+  const [formError, setFormError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const objectUrlsRef = useRef(new Set<string>())
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -202,6 +203,7 @@ function ListingFormFields({
       return
     }
     setSubmitting(true)
+    setFormError(null)
     try {
       const priceCents = Math.round(Number.parseFloat(price.replace(',', '.')) * 100)
 
@@ -234,6 +236,10 @@ function ListingFormFields({
         images: finalImages,
       })
       navigate(`/listing/${newListing.id}`)
+    } catch (err) {
+      setFormError(
+        err instanceof ApiError ? err.message : 'Inserat konnte nicht gespeichert werden. Bitte versuche es erneut.',
+      )
     } finally {
       setSubmitting(false)
     }
@@ -460,6 +466,12 @@ function ListingFormFields({
             </span>
           )}
         </div>
+
+        {formError && (
+          <p role="alert" className="text-sm text-destructive">
+            {formError}
+          </p>
+        )}
 
         <div className="flex flex-wrap gap-3">
           <Button type="submit" size="lg" disabled={submitting}>
