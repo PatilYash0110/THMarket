@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -83,9 +82,13 @@ export class AuthService {
       where: { email: dto.email },
     });
     if (existing) {
-      throw new ConflictException(
-        'Diese E-Mail-Adresse ist bereits registriert.',
-      );
+      // Same success shape as a real registration, not a 409 — a distinct
+      // "already registered" response would let an attacker enumerate
+      // which @thm.de addresses have accounts. The account's actual owner
+      // still gets a useful signal via email; the API response leaks
+      // nothing either way.
+      await this.mail.sendAccountExistsEmail(existing.email, existing.name);
+      return { email: dto.email };
     }
 
     const passwordHash = await bcrypt.hash(dto.password, BCRYPT_ROUNDS);

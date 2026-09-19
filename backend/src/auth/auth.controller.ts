@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Get, Patch, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { AccountThrottlerGuard } from './account-throttler.guard';
 import { AUTH_COOKIE_NAME, buildAuthCookieOptions } from './auth-cookie';
@@ -25,6 +25,12 @@ export class AuthController {
   // Throttled: public, unauthenticated, and triggers an outbound email —
   // without a limit, a script iterating over addresses could exhaust the
   // Gmail account's daily send quota and break email delivery for everyone.
+  // A higher limit than login/forgot-password: guards run before the
+  // validation pipe in Nest's request pipeline, so DTO validation failures
+  // (a password typo, a missing field) consume this budget exactly like a
+  // real submission — this endpoint isn't a password-guessing oracle the
+  // way login is, so it can afford more headroom for input mistakes.
+  @Throttle({ default: { limit: 15, ttl: 60_000 } })
   @UseGuards(ThrottlerGuard)
   @Post('register')
   register(@Body() dto: RegisterDto) {
