@@ -194,15 +194,15 @@ export class AuthService {
       dto.password,
       user.passwordHash,
     );
-    if (!passwordMatches) {
+    // Unverified accounts get the same generic error as a wrong password,
+    // regardless of whether the password itself was correct — a distinct
+    // "please verify" response here would let an attacker confirm a
+    // guessed/stolen password is correct before the account is ever
+    // verified. The resend-verification flow is the intended path for a
+    // legitimate unverified user, and doesn't require a correct password.
+    if (!passwordMatches || !user.verified) {
       throw new UnauthorizedException(
         'Ungültige E-Mail-Adresse oder Passwort.',
-      );
-    }
-
-    if (!user.verified) {
-      throw new ForbiddenException(
-        'Bitte bestätige zuerst deine E-Mail-Adresse.',
       );
     }
 

@@ -2,6 +2,7 @@ import { type FormEvent, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api/auth'
 import { Button } from '../components/Button'
+import { ResendVerificationButton } from '../components/ResendVerificationButton'
 import { useAuth } from '../context/AuthContext'
 
 export function Login() {
@@ -70,9 +71,16 @@ export function Login() {
           </Link>
         </label>
         {error && (
-          <p id="login-error" role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
+          <div className="flex flex-col items-start gap-2">
+            <p id="login-error" role="alert" className="text-sm text-destructive">
+              {error}
+            </p>
+            {/* Always offered on any login failure, not just an "unverified"
+                one — the backend no longer distinguishes wrong password from
+                unverified in its error (see S-12), so this can't leak which
+                case applies; it's just a safe next step either way. */}
+            {email && <ResendVerificationButton email={email} />}
+          </div>
         )}
         <Button type="submit" size="lg" className="mt-1" disabled={submitting}>
           {submitting ? 'Anmelden…' : 'Anmelden'}
