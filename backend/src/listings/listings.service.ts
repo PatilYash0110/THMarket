@@ -228,6 +228,11 @@ export class ListingsService {
         'Du kannst eigene Inserate nicht zu deinen Favoriten hinzufügen.',
       );
     }
+    if (listing.status !== 'AKTIV') {
+      throw new ForbiddenException(
+        'Verkaufte Inserate können nicht favorisiert werden.',
+      );
+    }
     await this.prisma.favorite.upsert({
       where: { userId_listingId: { userId, listingId } },
       update: {},
