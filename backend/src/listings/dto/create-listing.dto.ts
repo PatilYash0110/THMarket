@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   ArrayMaxSize,
   ArrayMinSize,
@@ -5,6 +6,7 @@ import {
   IsIn,
   IsInt,
   IsString,
+  Matches,
   Max,
   MaxLength,
   Min,
@@ -23,11 +25,13 @@ export const LISTING_CATEGORIES = [
 ] as const;
 
 export class CreateListingDto {
+  @Transform(({ value }) => value?.trim())
   @IsString()
   @MinLength(1)
   @MaxLength(200)
   title: string;
 
+  @Transform(({ value }) => value?.trim())
   @IsString()
   @MinLength(1)
   @MaxLength(5000)
@@ -47,6 +51,7 @@ export class CreateListingDto {
   // Not @IsUrl(): kept as plain strings rather than tying this DTO to
   // Cloudinary's URL shape specifically.
   @IsString({ each: true })
+  @Matches(/^https:\/\/res\.cloudinary\.com\//, { each: true })
   @ArrayMinSize(1, { message: 'Mindestens ein Foto ist erforderlich.' })
   @ArrayMaxSize(6)
   images: string[];
