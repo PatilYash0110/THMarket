@@ -1,6 +1,6 @@
 import { PaperPlaneRight } from '@phosphor-icons/react'
 import clsx from 'clsx'
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Badge } from '../components/Badge'
 import { EmptyState } from '../components/EmptyState'
@@ -32,6 +32,8 @@ export function Messages() {
   const activeConversation = conversationId
     ? conversations.find((conversation) => conversation.id === conversationId)
     : undefined
+  const activeMessages = activeConversation ? getMessages(activeConversation.id) : []
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Lazily fetches the full history and joins the socket room only once a
   // thread is actually opened — the list view only ever carries a preview.
@@ -47,6 +49,15 @@ export function Messages() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConversation?.id])
+
+  // A thread previously always opened scrolled to the top — the newest
+  // messages (what anyone opening a chat actually wants to see) were below
+  // the fold. Re-runs whenever the message count changes too, so a live
+  // incoming message while the thread is open also stays pinned to the
+  // bottom.
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView()
+  }, [activeConversation?.id, activeMessages.length])
 
   if (!currentUser) return null
 
@@ -154,7 +165,7 @@ export function Messages() {
             </header>
 
             <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-5">
-              {getMessages(activeConversation.id).map((message) => {
+              {activeMessages.map((message) => {
                 const isMine = message.senderId === currentUser.id
                 return (
                   <div
@@ -180,6 +191,7 @@ export function Messages() {
                   </div>
                 )
               })}
+              <div ref={messagesEndRef} />
             </div>
 
             <form onSubmit={handleSend} className="flex shrink-0 items-center gap-2 border-t border-border p-4">
