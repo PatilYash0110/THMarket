@@ -118,8 +118,30 @@ export class ListingsService {
   // writes in `$transaction` alone would NOT prevent two concurrent
   // purchases from both passing their checks before either writes, which
   // would double-sell the listing and double-charge/credit both sides.
-  async purchase(id: string, buyerId: string, dto: PurchaseListingDto) {
+  async purchase(id: string, buyerId: string, role: string, dto: PurchaseListingDto) {
     if (dto.paymentMethod === 'simulation') {
+      // No balance change here on purpose — Simulation stays a no-money
+      // demo of the card-checkout UI. It still needs the same eligibility
+      // guards as a real purchase, though: without these, any student
+      // could mark ANY listing sold for free, including one with
+      // Sofortkauf disabled, their own, or (since there was no role check)
+      // even an admin account could "buy" something.
+      if (role !== 'STUDENT') {
+        throw new ForbiddenException('Nur Studierende können Inserate kaufen.');
+      }
+      const listing = await this.prisma.listing.findUnique({
+        where: { id },
+        select: { sellerId: true, sofortkaufMoeglich: true },
+      });
+      if (!listing) {
+        throw new NotFoundException('Inserat nicht gefunden.');
+      }
+      if (!listing.sofortkaufMoeglich) {
+        throw new ForbiddenException('Für dieses Inserat ist kein Sofortkauf möglich.');
+      }
+      if (listing.sellerId === buyerId) {
+        throw new ForbiddenException('Du kannst dein eigenes Inserat nicht kaufen.');
+      }
       validateMockCard(dto.card!);
       return this.markSoldInternal(id, buyerId);
     }

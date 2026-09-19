@@ -166,7 +166,7 @@ export class ListingsController {
   @UseGuards(JwtAuthGuard)
   @Post(':id/purchase')
   purchase(@Param('id') id: string, @CurrentUser() user: JwtPayload, @Body() dto: PurchaseListingDto) {
-    return this.listingsService.purchase(id, user.sub, dto);
+    return this.listingsService.purchase(id, user.sub, user.role, dto);
   }
 
   @UseGuards(JwtAuthGuard)
