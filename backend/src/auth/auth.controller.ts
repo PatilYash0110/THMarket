@@ -2,6 +2,7 @@ import { Body, Controller, Get, Patch, Post, Query, Res, UseGuards } from '@nest
 import { ConfigService } from '@nestjs/config';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import type { Response } from 'express';
+import { AccountThrottlerGuard } from './account-throttler.guard';
 import { AUTH_COOKIE_NAME, buildAuthCookieOptions } from './auth-cookie';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './current-user.decorator';
@@ -44,8 +45,11 @@ export class AuthController {
   // Throttled like the other public, unauthenticated auth routes — without
   // it, this is a plain unlimited password-guessing oracle against any
   // known @thm.de address (bcrypt slows a single guess down, not a script
-  // making thousands of them).
-  @UseGuards(ThrottlerGuard)
+  // making thousands of them). Keyed on email+IP (AccountThrottlerGuard),
+  // not IP alone: campus NAT shares one IP across many students, so a
+  // plain IP bucket would let one targeted account's guesses starve
+  // everyone else's login attempts on the same connection.
+  @UseGuards(AccountThrottlerGuard)
   @Post('login')
   async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
     const { accessToken, user } = await this.authService.login(dto);
@@ -66,7 +70,7 @@ export class AuthController {
     return { loggedOut: true };
   }
 
-  @UseGuards(ThrottlerGuard)
+  @UseGuards(AccountThrottlerGuard)
   @Post('forgot-password')
   forgotPassword(@Body() dto: ForgotPasswordDto) {
     return this.authService.forgotPassword(dto);
