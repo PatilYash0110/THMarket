@@ -1,3 +1,4 @@
+import { forwardRef, Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import {
@@ -45,7 +46,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
-    private readonly chatService: ChatService,
+    @Inject(forwardRef(() => ChatService)) private readonly chatService: ChatService,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -66,6 +67,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
       await assertSessionStillValid(this.prisma, payload.sub, payload.iat);
       client.data.userId = payload.sub;
+      // A per-user room, joined regardless of which conversation rooms get
+      // joined afterward — lets notifyConversationStarted() below reach a
+      // seller for a conversation that didn't exist yet at connect time,
+      // which 'conversation:<id>' rooms alone can never cover.
+      await client.join(`user:${payload.sub}`);
     } catch {
       client.disconnect();
     }
@@ -73,6 +79,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleDisconnect(client: Socket): void {
     this.messageTimestamps.delete(client.id);
+  }
+
+  // Called by ChatService right after a brand-new conversation is created,
+  // so the seller's first message from a buyer arrives live instead of
+  // only showing up on their next full page load — the seller's socket has
+  // no reason to have ever joined 'conversation:<id>' for a thread that
+  // didn't exist yet when they connected.
+  notifyConversationStarted(sellerId: string, conversation: unknown): void {
+    this.server.to(`user:${sellerId}`).emit('conversationStarted', conversation);
   }
 
   @SubscribeMessage('joinConversation')

@@ -93,6 +93,20 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
     }
     socket.on('message', handleIncoming)
 
+    // A brand-new conversation the seller had no reason to have joined the
+    // room for yet (it didn't exist at connect time) — the server emits
+    // this to the user's own 'user:<id>' room. Joining its conversation
+    // room here means the seller's next live 'message' in it also arrives
+    // without needing a page reload first.
+    function handleConversationStarted(conversation: Conversation) {
+      setConversations((prev) => {
+        const withoutExisting = prev.filter((existing) => existing.id !== conversation.id)
+        return [conversation, ...withoutExisting].sort(byActivity)
+      })
+      socket.emit('joinConversation', conversation.id)
+    }
+    socket.on('conversationStarted', handleConversationStarted)
+
     // Re-join every conversation's room after a reconnect (sleep, Wi-Fi
     // blip, server restart) — socket.io drops all room membership on
     // disconnect, so without this a client that reconnects silently stops
@@ -108,6 +122,7 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
 
     return () => {
       socket.off('message', handleIncoming)
+      socket.off('conversationStarted', handleConversationStarted)
       socket.off('connect', handleReconnect)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

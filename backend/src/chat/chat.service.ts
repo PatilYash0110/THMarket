@@ -1,5 +1,6 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { ChatGateway } from './chat.gateway';
 
 const USER_SELECT = { id: true, name: true } as const;
 // Shared by startConversation() and listConversations() so both always
@@ -15,7 +16,10 @@ const CONVERSATION_INCLUDE = {
 
 @Injectable()
 export class ChatService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => ChatGateway)) private readonly chatGateway: ChatGateway,
+  ) {}
 
   // Idempotent via a single atomic upsert on the (listingId, buyerId) unique
   // key, not a separate find-then-create — messaging the same seller about
@@ -42,7 +46,13 @@ export class ChatService {
       update: {},
       include: CONVERSATION_INCLUDE,
     });
-    return { ...conversation, unreadCount: await this.countUnread(conversation, buyerId) };
+    const result = { ...conversation, unreadCount: await this.countUnread(conversation, buyerId) };
+    // Reaches the seller even if this is a brand-new thread they've never
+    // joined the room for — see ChatGateway.notifyConversationStarted().
+    // Harmless to call on a reopened existing thread too: their socket
+    // already has this conversation, so a repeat event just gets merged.
+    this.chatGateway.notifyConversationStarted(listing.sellerId, result);
+    return result;
   }
 
   // Newest-activity-first; only the single latest message per conversation
