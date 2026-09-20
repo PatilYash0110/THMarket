@@ -61,6 +61,17 @@ export class AdminService {
       throw new ForbiddenException('Du kannst dich nicht selbst melden.');
     }
     await this.assertNoOpenDuplicateReport(reporterId, { reportedUserId: user.id });
+
+    // Both are just admin-review context, not the report's target, so a
+    // bad/missing value here doesn't block filing the report — it's simply
+    // dropped instead. conversationId specifically is verified to actually
+    // involve both the reporter and the reported user first: without that,
+    // a client could attach an arbitrary conversationId to a report and
+    // hand an admin a reason to open a private chat neither of them is
+    // actually part of.
+    const listingId = dto.listingId && (await this.prisma.listing.findUnique({ where: { id: dto.listingId }, select: { id: true } })) ? dto.listingId : undefined;
+    const conversationId = dto.conversationId && (await this.isConversationBetween(dto.conversationId, reporterId, user.id)) ? dto.conversationId : undefined;
+
     return this.prisma.report.create({
       data: {
         targetType: 'USER',
@@ -69,8 +80,20 @@ export class AdminService {
         reason: dto.reason,
         message: dto.message,
         reporterId,
+        listingId,
+        conversationId,
       },
     });
+  }
+
+  private async isConversationBetween(conversationId: string, userAId: string, userBId: string): Promise<boolean> {
+    const conversation = await this.prisma.conversation.findUnique({
+      where: { id: conversationId },
+      select: { buyerId: true, sellerId: true },
+    });
+    if (!conversation) return false;
+    const participants = [conversation.buyerId, conversation.sellerId];
+    return participants.includes(userAId) && participants.includes(userBId);
   }
 
   // Application-level dedup rather than a DB unique constraint — avoids a

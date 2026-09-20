@@ -1,10 +1,11 @@
-import { ClockCounterClockwise, Flag, ImageBroken, Tag, Users } from '@phosphor-icons/react'
+import { ChatCircle, ClockCounterClockwise, Flag, ImageBroken, Tag, Users } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   deleteAdminListing,
   deleteAdminUser,
+  fetchAdminConversationMessages,
   fetchAdminUsers,
   fetchAuditLog,
   fetchReports,
@@ -17,7 +18,64 @@ import { Button } from '../components/Button'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useAuth } from '../context/AuthContext'
 import { formatDate, formatPrice } from '../lib/format'
-import type { AdminUser, AuditLogEntry, Listing, Report, ResolveReportAction } from '../types'
+import type { AdminUser, AuditLogEntry, Listing, Message, Report, ResolveReportAction } from '../types'
+
+// Read-only, collapsed by default — a report can link the exact
+// conversation it was filed from (see ReportForm's contextConversationId),
+// so an admin can judge it against the real exchange instead of only the
+// reporter's own account. Fetched lazily on first expand, not eagerly for
+// every report card.
+function ReportChatToggle({ conversationId, reportedUserId }: { conversationId: string; reportedUserId?: string }) {
+  const [open, setOpen] = useState(false)
+  const [messages, setMessages] = useState<Message[] | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleToggle() {
+    const next = !open
+    setOpen(next)
+    if (next && messages === null) {
+      setLoading(true)
+      setError(null)
+      try {
+        setMessages(await fetchAdminConversationMessages(conversationId))
+      } catch (err) {
+        setError(err instanceof ApiError ? err.message : 'Chat konnte nicht geladen werden.')
+      } finally {
+        setLoading(false)
+      }
+    }
+  }
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={handleToggle}
+        className="flex cursor-pointer items-center gap-1.5 text-xs text-foreground-muted hover:text-accent-strong"
+      >
+        <ChatCircle size={14} aria-hidden />
+        {open ? 'Chat ausblenden' : 'Chat ansehen'}
+      </button>
+      {open && (
+        <div className="mt-2 flex max-h-64 flex-col gap-1.5 overflow-y-auto rounded-xl border border-border bg-surface-muted/40 p-3">
+          {loading && <p className="text-xs text-foreground-muted">Wird geladen…</p>}
+          {error && <p className="text-xs text-destructive">{error}</p>}
+          {messages?.length === 0 && <p className="text-xs text-foreground-muted">Keine Nachrichten.</p>}
+          {messages?.map((message) => (
+            <p key={message.id} className="text-xs">
+              <span className="font-medium text-foreground">
+                {message.senderId === reportedUserId ? 'Gemeldete Person' : 'Andere Person'}
+                {': '}
+              </span>
+              <span className="text-foreground-muted">{message.text}</span>
+            </p>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 // Same colored-squircle-initial pattern as the chat's Avatar (Messages.tsx)
 // — student accounts don't carry a profile photo, so this is the one
@@ -185,7 +243,7 @@ function ReportsTab() {
       {visibleReports.map((report) => (
         <div key={report.id} className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-4 text-sm shadow-sm">
           <div className="flex items-start gap-3">
-            {report.targetType === 'LISTING' && <Thumbnail src={report.listing?.images[0]} />}
+            {report.listing && <Thumbnail src={report.listing.images[0]} />}
             <div className="flex min-w-0 flex-1 flex-col gap-2">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 {report.targetType === 'LISTING' && report.listing ? (
@@ -209,12 +267,28 @@ function ReportsTab() {
               {report.targetType === 'USER' && report.reportedUser && (
                 <p className="text-xs text-foreground-muted">{report.reportedUser.email}</p>
               )}
+              {/* Context, not the target itself — only shown for a USER
+                  report filed from a listing/chat, so the admin can see
+                  what the reported behavior actually happened around. */}
+              {report.targetType === 'USER' && report.listing && (
+                <Link
+                  to={`/listing/${report.listing.id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-foreground-muted underline-offset-2 hover:text-accent-strong hover:underline"
+                >
+                  Im Zusammenhang mit „{report.listing.title}"
+                </Link>
+              )}
               <p className="text-foreground-muted">Grund: {report.reason}</p>
               {report.message && <p className="text-foreground-muted">„{report.message}"</p>}
               <p className="text-xs text-foreground-muted">
                 Gemeldet von {report.reporter ? `${report.reporter.name} (${report.reporter.email})` : 'unbekannt'} ·{' '}
                 {formatDate(report.createdAt)}
               </p>
+              {report.conversationId && (
+                <ReportChatToggle conversationId={report.conversationId} reportedUserId={report.reportedUser?.id} />
+              )}
             </div>
           </div>
           {report.status === 'OFFEN' && (

@@ -170,7 +170,12 @@ export function ListingDetail() {
         </div>
 
         {reporting === 'USER' && listing.sellerId && (
-          <ReportForm targetType="USER" targetId={listing.sellerId} onCancel={() => setReporting(null)} />
+          <ReportForm
+            targetType="USER"
+            targetId={listing.sellerId}
+            contextListingId={listing.id}
+            onCancel={() => setReporting(null)}
+          />
         )}
 
         {isAdmin ? (

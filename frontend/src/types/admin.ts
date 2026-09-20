@@ -14,6 +14,9 @@ export interface Report {
   reporter: { id: string; name: string; email: string; role: Role } | null
   listing: { id: string; title: string; status: 'AKTIV' | 'VERKAUFT'; images: string[] } | null
   reportedUser: { id: string; name: string; email: string; role: Role } | null
+  // Context for a USER report only — which conversation the reported
+  // behavior happened in, if it was filed from a chat. Null otherwise.
+  conversationId: string | null
   createdAt: string
   resolvedAt: string | null
 }

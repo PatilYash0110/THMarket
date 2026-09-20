@@ -148,6 +148,21 @@ export class ChatService {
     });
   }
 
+  // No participant check — only reachable via AdminController's own
+  // AdminGuard, for reviewing a conversation a report explicitly links
+  // (see AdminService.createReport's isConversationBetween check, which is
+  // what keeps an admin from being handed access to an unrelated chat).
+  async getMessagesForAdmin(conversationId: string) {
+    const conversation = await this.prisma.conversation.findUnique({ where: { id: conversationId } });
+    if (!conversation) {
+      throw new NotFoundException('Unterhaltung nicht gefunden.');
+    }
+    return this.prisma.message.findMany({
+      where: { conversationId },
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
   async createMessage(conversationId: string, senderId: string, text: string) {
     return this.prisma.message.create({
       data: { conversationId, senderId, text },

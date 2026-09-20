@@ -133,10 +133,19 @@ model Report {
   targetLabel    String
   reporterId     String?
   reporter       User?            @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: SetNull)
+  // For a LISTING report this is the target itself; for a USER report it's
+  // just context (which listing the reported behavior happened around, if
+  // any) — e.g. reporting a seller from their listing page, or reporting
+  // the other participant from a chat bound to one.
   listingId      String?
   listing        Listing?         @relation(fields: [listingId], references: [id], onDelete: SetNull)
   reportedUserId String?
   reportedUser   User?            @relation("ReportsReceived", fields: [reportedUserId], references: [id], onDelete: SetNull)
+  // Set only when a USER report was filed from within a chat — lets an
+  // admin open that exact conversation to judge the report instead of only
+  // seeing the reporter's own account of it.
+  conversationId String?
+  conversation   Conversation?    @relation(fields: [conversationId], references: [id], onDelete: SetNull)
   createdAt      DateTime         @default(now())
   resolvedAt     DateTime?
 
@@ -182,6 +191,7 @@ model Conversation {
   // table since a conversation only ever has exactly two participants.
   buyerLastReadAt  DateTime?
   sellerLastReadAt DateTime?
+  reports          Report[]
 
   // Makes "start a conversation" idempotent: messaging the same seller about
   // the same listing twice reopens the same thread instead of forking a new

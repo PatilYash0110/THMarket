@@ -241,9 +241,15 @@ export function Messages() {
               )}
             </header>
 
-            {reporting && activeOther && (
+            {reporting && activeOther && activeConversation && (
               <div className="border-b border-border p-4">
-                <ReportForm targetType="USER" targetId={activeOther.id} onCancel={() => setReporting(false)} />
+                <ReportForm
+                  targetType="USER"
+                  targetId={activeOther.id}
+                  contextListingId={activeConversation.listing?.id}
+                  contextConversationId={activeConversation.id}
+                  onCancel={() => setReporting(false)}
+                />
               </div>
             )}
 
