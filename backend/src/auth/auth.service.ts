@@ -26,10 +26,15 @@ const RESEND_VERIFICATION_COOLDOWN_MS = 60 * 1000;
 // is someone else marking your email verified — no password exposure).
 const PASSWORD_RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
 const BCRYPT_ROUNDS = 12;
-// Generic response for both resend-verification and forgot-password so
-// neither endpoint leaks whether a given @thm.de address has an account.
+// Generic response for resend-verification (always) and forgot-password
+// (when the account is verified or doesn't exist) so those cases don't leak
+// whether a given @thm.de address has an account.
 const GENERIC_RESET_MESSAGE =
   'Falls ein Konto mit dieser E-Mail existiert, wurde eine E-Mail gesendet.';
+// Shared with login() — an unverified account gets this same message from
+// both endpoints, so a password reset doesn't quietly succeed for an
+// account that still can't log in afterward regardless.
+const UNVERIFIED_MESSAGE = 'Bitte bestätige zuerst deine E-Mail-Adresse.';
 
 export interface PublicUser {
   id: string;
@@ -211,9 +216,7 @@ export class AuthService {
     // This still tells a legitimate user who forgot to verify what's
     // actually wrong, which a fully generic error can't.
     if (!user.verified) {
-      throw new ForbiddenException(
-        'Bitte bestätige zuerst deine E-Mail-Adresse.',
-      );
+      throw new ForbiddenException(UNVERIFIED_MESSAGE);
     }
 
     const passwordMatches = await bcrypt.compare(
@@ -250,6 +253,16 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
+
+    // An unverified account can't log in regardless of its password (see
+    // login() above), so silently emailing a reset link here would just
+    // lead to a dead end: new password, same "please verify" wall
+    // afterward. Surfacing this costs only the same "unverified" signal
+    // the login page already reveals — no password is involved here to
+    // guess, so there's no oracle risk from this branch.
+    if (user && !user.verified) {
+      throw new ForbiddenException(UNVERIFIED_MESSAGE);
+    }
 
     if (user) {
       const passwordResetToken = randomBytes(32).toString('hex');

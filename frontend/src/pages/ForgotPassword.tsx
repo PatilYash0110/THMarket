@@ -3,6 +3,12 @@ import { type FormEvent, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ApiError, forgotPassword } from '../api/auth'
 import { Button } from '../components/Button'
+import { ResendVerificationButton } from '../components/ResendVerificationButton'
+
+// Matches the backend's exact message for an unverified account (see
+// AuthService.forgotPassword) — a reset link would be a dead end for this
+// account anyway, so offer the actual fix instead.
+const UNVERIFIED_MESSAGE = 'Bitte bestätige zuerst deine E-Mail-Adresse.'
 
 export function ForgotPassword() {
   const [email, setEmail] = useState('')
@@ -62,9 +68,12 @@ export function ForgotPassword() {
           />
         </label>
         {error && (
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
+          <div className="flex flex-col gap-2">
+            <p role="alert" className="text-sm text-destructive">
+              {error}
+            </p>
+            {error === UNVERIFIED_MESSAGE && email && <ResendVerificationButton email={email} fullWidth />}
+          </div>
         )}
         <Button type="submit" size="lg" className="mt-1" disabled={submitting}>
           {submitting ? 'Wird gesendet…' : 'Link anfordern'}
