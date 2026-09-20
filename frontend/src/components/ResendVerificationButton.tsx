@@ -38,7 +38,7 @@ export function ResendVerificationButton({ email, fullWidth = false }: { email: 
         disabled={sending || secondsLeft > 0}
         className={fullWidth ? 'w-full' : undefined}
       >
-        {secondsLeft > 0 ? `Erneut senden (${secondsLeft}s)` : 'Link erneut senden'}
+        {secondsLeft > 0 ? `Erneut senden (${secondsLeft}s)` : 'Bestätigungslink erneut senden'}
       </Button>
       {message && <p className="text-xs text-foreground-muted">{message}</p>}
     </div>
