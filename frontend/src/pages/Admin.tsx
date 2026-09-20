@@ -18,6 +18,17 @@ import { useAuth } from '../context/AuthContext'
 import { formatDate, formatPrice } from '../lib/format'
 import type { AdminUser, AuditLogEntry, Listing, Report, ResolveReportAction } from '../types'
 
+// Same colored-squircle-initial pattern as the chat's Avatar (Messages.tsx)
+// — student accounts don't carry a profile photo, so this is the one
+// consistent "who is this" visual across the app.
+function Avatar({ name }: { name: string }) {
+  return (
+    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-xs font-semibold text-accent-strong">
+      {name.charAt(0).toUpperCase()}
+    </div>
+  )
+}
+
 // Small thumbnail for a reported listing — same broken-image fallback as
 // ListingCard, so a dead URL still reads as "no photo" rather than a
 // visibly broken <img>.
@@ -243,6 +254,13 @@ function UsersTab() {
   const [error, setError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const [pendingDelete, setPendingDelete] = useState<AdminUser | null>(null)
+  const [query, setQuery] = useState('')
+  const visibleUsers = query.trim()
+    ? users.filter((user) => {
+        const q = query.trim().toLowerCase()
+        return user.name.toLowerCase().includes(q) || user.email.toLowerCase().includes(q)
+      })
+    : users
 
   async function load() {
     setLoading(true)
@@ -283,6 +301,16 @@ function UsersTab() {
           {actionError}
         </p>
       )}
+      <input
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder="Name oder E-Mail durchsuchen…"
+        aria-label="Nutzer durchsuchen"
+        className="h-10 w-full max-w-xs rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      />
+      {visibleUsers.length === 0 && (
+        <p className="text-sm text-foreground-muted">Keine Nutzer gefunden.</p>
+      )}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
@@ -296,9 +324,14 @@ function UsersTab() {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
+            {visibleUsers.map((user) => (
               <tr key={user.id} className="border-b border-border transition-colors hover:bg-surface-muted/40">
-                <td className="py-3 pr-4 text-foreground">{user.name}</td>
+                <td className="py-3 pr-4 text-foreground">
+                  <div className="flex items-center gap-2.5">
+                    <Avatar name={user.name} />
+                    {user.name}
+                  </div>
+                </td>
                 <td className="py-3 pr-4 text-foreground-muted">{user.email}</td>
                 <td className="py-3 pr-4">
                   <Badge tone="neutral">{user.role}</Badge>
