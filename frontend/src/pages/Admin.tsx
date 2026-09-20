@@ -11,6 +11,7 @@ import { ApiError } from '../api/auth'
 import { fetchListings } from '../api/listings'
 import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
+import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useAuth } from '../context/AuthContext'
 import { formatDate, formatPrice } from '../lib/format'
 import type { AdminUser, AuditLogEntry, Listing, Report, ResolveReportAction } from '../types'
@@ -34,10 +35,50 @@ function promptForNote(message: string): string | null {
   return trimmed.length > 0 ? trimmed : null
 }
 
+// Per-action dialog copy — one config function instead of scattered
+// prompt()/confirm() strings, so ReportsTab's render logic only has to pick
+// an action and hand it to <ConfirmDialog>.
+function reportDialogConfig(action: ResolveReportAction) {
+  switch (action) {
+    case 'NO_ACTION':
+      return {
+        title: 'Ohne Maßnahme schließen?',
+        description: 'Die Meldung wird als geschlossen markiert, ohne dass etwas am Inserat oder Nutzer geändert wird.',
+        confirmLabel: 'Schließen',
+        destructive: false,
+      }
+    case 'USER_WARNED':
+      return {
+        title: 'Nutzer verwarnen',
+        noteLabel: 'Verwarnungstext (wird dem Nutzer angezeigt)',
+        confirmLabel: 'Verwarnen',
+        destructive: false,
+      }
+    case 'USER_DELETED':
+      return {
+        title: 'Nutzer endgültig löschen?',
+        description: 'Das kann nicht rückgängig gemacht werden.',
+        noteLabel: 'Begründung',
+        confirmLabel: 'Endgültig löschen',
+        destructive: true,
+      }
+    case 'LISTING_DELETED':
+      return {
+        title: 'Inserat endgültig löschen?',
+        description: 'Das kann nicht rückgängig gemacht werden.',
+        noteLabel: 'Begründung',
+        confirmLabel: 'Endgültig löschen',
+        destructive: true,
+      }
+  }
+}
+
 function ReportsTab() {
   const [reports, setReports] = useState<Report[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
+  const [pending, setPending] = useState<{ report: Report; action: ResolveReportAction } | null>(null)
 
   async function load() {
     setLoading(true)
@@ -55,27 +96,16 @@ function ReportsTab() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  async function handleResolve(report: Report, action: ResolveReportAction) {
-    let note: string | undefined
-    if (action !== 'NO_ACTION') {
-      const captured = promptForNote(
-        action === 'USER_WARNED'
-          ? 'Verwarnungstext (wird dem Nutzer angezeigt):'
-          : 'Kurze Begründung für diese Maßnahme:',
-      )
-      if (!captured) return
-      note = captured
-    } else if (!window.confirm('Diese Meldung ohne Maßnahme schließen?')) {
-      return
-    }
-    if (action === 'USER_DELETED' && !window.confirm('Diesen Nutzer wirklich endgültig löschen?')) return
-    if (action === 'LISTING_DELETED' && !window.confirm('Dieses Inserat wirklich endgültig löschen?')) return
-
+  async function handleConfirm(note?: string) {
+    if (!pending) return
+    const { report, action } = pending
+    setPending(null)
+    setActionError(null)
     try {
       await resolveReport(report.id, { action, note })
       await load()
     } catch (err) {
-      window.alert(err instanceof ApiError ? err.message : 'Aktion fehlgeschlagen. Bitte versuche es erneut.')
+      setActionError(err instanceof ApiError ? err.message : 'Aktion fehlgeschlagen. Bitte versuche es erneut.')
     }
   }
 
@@ -84,6 +114,11 @@ function ReportsTab() {
 
   return (
     <div className="flex flex-col gap-3">
+      {actionError && (
+        <p role="alert" className="text-sm text-destructive">
+          {actionError}
+        </p>
+      )}
       {reports.length === 0 && <p className="text-sm text-foreground-muted">Keine Meldungen vorhanden.</p>}
       {reports.map((report) => (
         <div key={report.id} className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-4 text-sm shadow-sm">
@@ -102,21 +137,21 @@ function ReportsTab() {
           </p>
           {report.status === 'OFFEN' && (
             <div className="mt-1 flex flex-wrap gap-2">
-              <Button size="sm" variant="ghost" onClick={() => handleResolve(report, 'NO_ACTION')}>
+              <Button size="sm" variant="ghost" onClick={() => setPending({ report, action: 'NO_ACTION' })}>
                 Ohne Maßnahme schließen
               </Button>
               {report.targetType === 'USER' && (
                 <>
-                  <Button size="sm" variant="secondary" onClick={() => handleResolve(report, 'USER_WARNED')}>
+                  <Button size="sm" variant="secondary" onClick={() => setPending({ report, action: 'USER_WARNED' })}>
                     Nutzer verwarnen
                   </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleResolve(report, 'USER_DELETED')}>
+                  <Button size="sm" variant="destructive" onClick={() => setPending({ report, action: 'USER_DELETED' })}>
                     Nutzer löschen
                   </Button>
                 </>
               )}
               {report.targetType === 'LISTING' && (
-                <Button size="sm" variant="destructive" onClick={() => handleResolve(report, 'LISTING_DELETED')}>
+                <Button size="sm" variant="destructive" onClick={() => setPending({ report, action: 'LISTING_DELETED' })}>
                   Inserat löschen
                 </Button>
               )}
@@ -124,6 +159,14 @@ function ReportsTab() {
           )}
         </div>
       ))}
+
+      {pending && (
+        <ConfirmDialog
+          {...reportDialogConfig(pending.action)}
+          onConfirm={handleConfirm}
+          onCancel={() => setPending(null)}
+        />
+      )}
     </div>
   )
 }
