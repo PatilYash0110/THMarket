@@ -13,6 +13,11 @@ export interface Message {
 export interface Conversation {
   id: string
   listing: { id: string; title: string; status: ListingStatus } | null
+  // One-time snapshot of the listing's title, taken when the conversation
+  // was created — the only way to still show what a thread was about once
+  // `listing` goes null (the listing was deleted). Null on threads created
+  // before this snapshot existed.
+  listingTitle: string | null
   buyer: { id: string; name: string } | null
   seller: { id: string; name: string } | null
   messages: Message[]

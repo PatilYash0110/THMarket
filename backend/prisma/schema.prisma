@@ -164,6 +164,12 @@ model Conversation {
   id        String    @id @default(cuid())
   listingId String?
   listing   Listing?  @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  // Raw snapshot of the listing's title at conversation-creation time, same
+  // idea as Report.targetLabel — once `listing` goes null (listing deleted),
+  // this is the only way the thread can still show what it was about
+  // instead of a bare "Inserat". Null on rows created before this column
+  // existed; the frontend falls back to the old generic label for those.
+  listingTitle String?
   buyerId   String?
   buyer     User?     @relation("ConversationsAsBuyer", fields: [buyerId], references: [id], onDelete: SetNull)
   sellerId  String?

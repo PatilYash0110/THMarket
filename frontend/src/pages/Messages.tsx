@@ -8,6 +8,19 @@ import { useAuth } from '../context/AuthContext'
 import { useMessages } from '../context/MessagesContext'
 import { formatDate } from '../lib/format'
 
+// Once `listing` goes null (deleted by its seller or by admin action), fall
+// back to the one-time title snapshot instead of the generic "Inserat" —
+// and flag it as removed so the UI can say so, rather than silently
+// presenting a stale title as if the listing still existed.
+function listingDisplay(conversation: { listing: { title: string } | null; listingTitle: string | null }): {
+  title: string
+  removed: boolean
+} {
+  if (conversation.listing) return { title: conversation.listing.title, removed: false }
+  if (conversation.listingTitle) return { title: conversation.listingTitle, removed: true }
+  return { title: 'Inserat', removed: true }
+}
+
 function sendErrorMessage(reason: string): string {
   switch (reason) {
     case 'too_long':
@@ -116,6 +129,7 @@ export function Messages() {
       : activeConversation.buyer
     : undefined
   const activeSold = activeConversation?.listing?.status === 'VERKAUFT'
+  const activeListing = activeConversation ? listingDisplay(activeConversation) : null
 
   return (
     <div className="grid h-[calc(100dvh-8rem)] grid-cols-1 overflow-hidden rounded-3xl border border-border bg-surface shadow-sm md:grid-cols-[300px_1fr]">
@@ -127,6 +141,7 @@ export function Messages() {
           const isActive = conversation.id === activeConversation?.id
           const unread = conversation.unreadCount > 0
           const sold = conversation.listing?.status === 'VERKAUFT'
+          const { title: listingTitle, removed: listingRemoved } = listingDisplay(conversation)
 
           return (
             <Link
@@ -134,11 +149,11 @@ export function Messages() {
               to={`/messages/${conversation.id}`}
               className={clsx(
                 'flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors',
-                sold && 'opacity-60',
+                (sold || listingRemoved) && 'opacity-60',
                 isActive ? 'bg-accent-soft' : 'hover:bg-surface-muted',
               )}
             >
-              <Avatar name={other?.name ?? '?'} className={clsx('h-11 w-11', sold && 'grayscale')} />
+              <Avatar name={other?.name ?? '?'} className={clsx('h-11 w-11', (sold || listingRemoved) && 'grayscale')} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <p
@@ -147,12 +162,18 @@ export function Messages() {
                       unread ? 'font-semibold' : 'font-medium',
                     )}
                   >
-                    {conversation.listing?.title ?? 'Inserat'}
+                    {listingTitle}
                   </p>
-                  {sold && (
+                  {listingRemoved ? (
                     <span className="shrink-0">
-                      <Badge tone="neutral">Verkauft</Badge>
+                      <Badge tone="neutral">Entfernt</Badge>
                     </span>
+                  ) : (
+                    sold && (
+                      <span className="shrink-0">
+                        <Badge tone="neutral">Verkauft</Badge>
+                      </span>
+                    )
                   )}
                 </div>
                 <p
@@ -184,16 +205,23 @@ export function Messages() {
           </div>
         ) : (
           <>
-            <header className={clsx('flex shrink-0 items-center gap-3 border-b border-border px-5 py-4', activeSold && 'opacity-60')}>
-              <Avatar name={activeOther?.name ?? '?'} className={clsx('h-10 w-10', activeSold && 'grayscale')} />
+            <header className={clsx('flex shrink-0 items-center gap-3 border-b border-border px-5 py-4', (activeSold || activeListing?.removed) && 'opacity-60')}>
+              <Avatar name={activeOther?.name ?? '?'} className={clsx('h-10 w-10', (activeSold || activeListing?.removed) && 'grayscale')} />
               <div>
                 <div className="flex items-center gap-1.5">
-                  <p className="font-display text-base font-semibold text-foreground">
-                    {activeConversation.listing?.title ?? 'Inserat'}
-                  </p>
-                  {activeSold && <Badge tone="neutral">Verkauft</Badge>}
+                  <p className="font-display text-base font-semibold text-foreground">{activeListing?.title}</p>
+                  {activeListing?.removed ? (
+                    <Badge tone="neutral">Entfernt</Badge>
+                  ) : (
+                    activeSold && <Badge tone="neutral">Verkauft</Badge>
+                  )}
                 </div>
-                <p className="text-xs text-foreground-muted">mit {activeOther?.name ?? 'Gelöschter Nutzer'}</p>
+                <p className="text-xs text-foreground-muted">
+                  {activeListing?.removed
+                    ? 'Dieses Inserat wurde entfernt — '
+                    : ''}
+                  mit {activeOther?.name ?? 'Gelöschter Nutzer'}
+                </p>
               </div>
             </header>
 

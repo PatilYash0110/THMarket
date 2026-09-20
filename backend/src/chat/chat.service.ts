@@ -28,7 +28,7 @@ export class ChatService {
   async startConversation(buyerId: string, listingId: string) {
     const listing = await this.prisma.listing.findUnique({
       where: { id: listingId },
-      select: { sellerId: true },
+      select: { sellerId: true, title: true },
     });
     if (!listing) {
       throw new NotFoundException('Inserat nicht gefunden.');
@@ -42,7 +42,10 @@ export class ChatService {
 
     const conversation = await this.prisma.conversation.upsert({
       where: { listingId_buyerId: { listingId, buyerId } },
-      create: { listingId, buyerId, sellerId: listing.sellerId },
+      // listingTitle is a one-time snapshot, not kept in sync with later
+      // title edits — `update: {}` deliberately never touches it on a
+      // reopened thread, same as every other field here.
+      create: { listingId, buyerId, sellerId: listing.sellerId, listingTitle: listing.title },
       update: {},
       include: CONVERSATION_INCLUDE,
     });
