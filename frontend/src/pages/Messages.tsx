@@ -8,6 +8,19 @@ import { useAuth } from '../context/AuthContext'
 import { useMessages } from '../context/MessagesContext'
 import { formatDate } from '../lib/format'
 
+function sendErrorMessage(reason: string): string {
+  switch (reason) {
+    case 'too_long':
+      return 'Nachricht ist zu lang (max. 2000 Zeichen).'
+    case 'rate_limited':
+      return 'Zu viele Nachrichten — bitte warte kurz und versuche es erneut.'
+    case 'timeout':
+      return 'Keine Antwort vom Server. Bitte versuche es erneut.'
+    default:
+      return 'Nachricht konnte nicht gesendet werden.'
+  }
+}
+
 // A small colored "squircle" standing in for a profile photo, since listings
 // carry photos but student accounts don't.
 function Avatar({ name, className }: { name: string; className?: string }) {
@@ -28,6 +41,7 @@ export function Messages() {
   const { conversationId } = useParams<{ conversationId?: string }>()
   const { conversations, getMessages, openConversation, clearActiveConversation, sendMessage } = useMessages()
   const [draft, setDraft] = useState('')
+  const [sendError, setSendError] = useState<string | null>(null)
 
   const activeConversation = conversationId
     ? conversations.find((conversation) => conversation.id === conversationId)
@@ -41,6 +55,7 @@ export function Messages() {
   // without it, a thread visited once would keep being treated as active
   // forever, and its unread badge would never increment again.
   useEffect(() => {
+    setSendError(null)
     if (activeConversation) {
       openConversation(activeConversation.id)
     }
@@ -69,11 +84,21 @@ export function Messages() {
 
   if (!currentUser) return null
 
-  function handleSend(event: FormEvent) {
+  // The draft is kept (not cleared) until the server actually acks the
+  // send — previously cleared immediately on emit, so a message rejected
+  // server-side (rate limit, over length, no longer a participant) just
+  // silently disappeared with no error and no way to retry (B-05).
+  async function handleSend(event: FormEvent) {
     event.preventDefault()
-    if (!activeConversation || !draft.trim()) return
-    sendMessage(activeConversation.id, draft.trim())
-    setDraft('')
+    const text = draft.trim()
+    if (!activeConversation || !text) return
+    setSendError(null)
+    const result = await sendMessage(activeConversation.id, text)
+    if (result.ok) {
+      setDraft('')
+    } else {
+      setSendError(sendErrorMessage(result.reason))
+    }
   }
 
   if (conversations.length === 0) {
@@ -201,6 +226,11 @@ export function Messages() {
               })}
             </div>
 
+            {sendError && (
+              <p role="alert" className="shrink-0 px-4 pt-2 text-xs text-destructive">
+                {sendError}
+              </p>
+            )}
             <form onSubmit={handleSend} className="flex shrink-0 items-center gap-2 border-t border-border p-4">
               <input
                 value={draft}

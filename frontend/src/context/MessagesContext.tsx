@@ -9,13 +9,15 @@ import { connectSocket, disconnectSocket, getSocket } from '../lib/socket'
 import type { Conversation, Message } from '../types'
 import { useAuth } from './AuthContext'
 
+export type SendMessageResult = { ok: true } | { ok: false; reason: string }
+
 interface MessagesContextValue {
   conversations: Conversation[]
   unreadTotal: number
   getMessages: (conversationId: string) => Message[]
   openConversation: (conversationId: string) => Promise<void>
   clearActiveConversation: () => void
-  sendMessage: (conversationId: string, text: string) => void
+  sendMessage: (conversationId: string, text: string) => Promise<SendMessageResult>
   startConversation: (listingId: string) => Promise<Conversation>
 }
 
@@ -154,8 +156,23 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
     activeConversationIdRef.current = null
   }
 
-  function sendMessage(conversationId: string, text: string): void {
-    getSocket().emit('sendMessage', { conversationId, text })
+  // Waits for the server's ack instead of firing and forgetting — a
+  // rejected send (rate-limited, too long, not a participant) previously
+  // vanished silently while the input had already been cleared, so the
+  // text was just gone with no error and no way to retry (B-05). A
+  // 5s timeout covers a dropped connection so this never hangs forever.
+  function sendMessage(conversationId: string, text: string): Promise<SendMessageResult> {
+    return new Promise((resolve) => {
+      getSocket()
+        .timeout(5000)
+        .emit('sendMessage', { conversationId, text }, (err: Error | null, response?: SendMessageResult) => {
+          if (err || !response) {
+            resolve({ ok: false, reason: 'timeout' })
+            return
+          }
+          resolve(response)
+        })
+    })
   }
 
   async function startConversation(listingId: string): Promise<Conversation> {

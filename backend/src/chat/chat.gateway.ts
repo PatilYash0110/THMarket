@@ -99,27 +99,38 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await client.join(`conversation:${conversationId}`);
   }
 
+  // Returns an ack result rather than firing and forgetting — a rejected
+  // send (rate-limited, too long, not a participant) previously vanished
+  // silently server-side while the client had already cleared its draft,
+  // so the text was just gone with no way to know or retry (B-05). The
+  // client passes an ack callback; when it does, NestJS's socket.io
+  // adapter sends this return value back as that callback's argument.
   @SubscribeMessage('sendMessage')
   async handleSend(
     @ConnectedSocket() client: Socket,
     @MessageBody() body: { conversationId: string; text: string },
-  ): Promise<void> {
+  ): Promise<{ ok: boolean; reason?: string }> {
     const userId = client.data.userId as string | undefined;
-    if (!userId || !this.withinRateLimit(client.id)) {
-      return;
+    if (!userId) {
+      return { ok: false, reason: 'unauthorized' };
+    }
+    if (!this.withinRateLimit(client.id)) {
+      return { ok: false, reason: 'rate_limited' };
     }
     const conversationId = body?.conversationId;
     const text = typeof body?.text === 'string' ? body.text.trim() : '';
-    if (
-      typeof conversationId !== 'string' ||
-      !text ||
-      text.length > MAX_MESSAGE_LENGTH ||
-      !(await this.chatService.isParticipant(userId, conversationId))
-    ) {
-      return;
+    if (typeof conversationId !== 'string' || !text) {
+      return { ok: false, reason: 'invalid' };
+    }
+    if (text.length > MAX_MESSAGE_LENGTH) {
+      return { ok: false, reason: 'too_long' };
+    }
+    if (!(await this.chatService.isParticipant(userId, conversationId))) {
+      return { ok: false, reason: 'forbidden' };
     }
     const message = await this.chatService.createMessage(conversationId, userId, text);
     this.server.to(`conversation:${conversationId}`).emit('message', message);
+    return { ok: true };
   }
 
   private withinRateLimit(socketId: string): boolean {
