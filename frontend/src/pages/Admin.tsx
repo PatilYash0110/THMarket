@@ -25,16 +25,6 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'audit', label: 'Audit-Log' },
 ]
 
-// A short justification is required for every action except dismissing a
-// report with no action taken — the backend enforces this too; the prompt
-// is what actually captures it, since a plain confirm() has no text input.
-function promptForNote(message: string): string | null {
-  const note = window.prompt(message)
-  if (note === null) return null
-  const trimmed = note.trim()
-  return trimmed.length > 0 ? trimmed : null
-}
-
 // Per-action dialog copy — one config function instead of scattered
 // prompt()/confirm() strings, so ReportsTab's render logic only has to pick
 // an action and hand it to <ConfirmDialog>.
@@ -176,6 +166,8 @@ function UsersTab() {
   const [users, setUsers] = useState<AdminUser[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<AdminUser | null>(null)
 
   async function load() {
     setLoading(true)
@@ -193,15 +185,16 @@ function UsersTab() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  async function handleDelete(user: AdminUser) {
-    const note = promptForNote(`Begründung für die Löschung von "${user.name}":`)
-    if (!note) return
-    if (!window.confirm(`"${user.name}" wirklich endgültig löschen?`)) return
+  async function handleDelete(note?: string) {
+    if (!pendingDelete || !note) return
+    const user = pendingDelete
+    setPendingDelete(null)
+    setActionError(null)
     try {
       await deleteAdminUser(user.id, note)
       await load()
     } catch (err) {
-      window.alert(err instanceof ApiError ? err.message : 'Löschen fehlgeschlagen. Bitte versuche es erneut.')
+      setActionError(err instanceof ApiError ? err.message : 'Löschen fehlgeschlagen. Bitte versuche es erneut.')
     }
   }
 
@@ -209,45 +202,64 @@ function UsersTab() {
   if (error) return <p className="text-sm text-destructive">{error}</p>
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse text-sm">
-        <thead>
-          <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-foreground-muted">
-            <th className="py-2 pr-4">Name</th>
-            <th className="py-2 pr-4">E-Mail</th>
-            <th className="py-2 pr-4">Rolle</th>
-            <th className="py-2 pr-4">Verifiziert</th>
-            <th className="py-2 pr-4">Meldungen</th>
-            <th className="py-2"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id} className="border-b border-border transition-colors hover:bg-surface-muted/40">
-              <td className="py-3 pr-4 text-foreground">{user.name}</td>
-              <td className="py-3 pr-4 text-foreground-muted">{user.email}</td>
-              <td className="py-3 pr-4">
-                <Badge tone="neutral">{user.role}</Badge>
-              </td>
-              <td className="py-3 pr-4 text-foreground-muted">{user.verified ? 'Ja' : 'Nein'}</td>
-              <td className="py-3 pr-4 text-foreground-muted">
-                {user.reportsReceivedCount > 0 ? (
-                  <Badge tone="destructive">{user.reportsReceivedCount}</Badge>
-                ) : (
-                  '–'
-                )}
-              </td>
-              <td className="py-3">
-                {user.role === 'STUDENT' && user.id !== currentUser?.id && (
-                  <Button size="sm" variant="destructive" onClick={() => handleDelete(user)}>
-                    Löschen
-                  </Button>
-                )}
-              </td>
+    <div className="flex flex-col gap-3">
+      {actionError && (
+        <p role="alert" className="text-sm text-destructive">
+          {actionError}
+        </p>
+      )}
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-sm">
+          <thead>
+            <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-foreground-muted">
+              <th className="py-2 pr-4">Name</th>
+              <th className="py-2 pr-4">E-Mail</th>
+              <th className="py-2 pr-4">Rolle</th>
+              <th className="py-2 pr-4">Verifiziert</th>
+              <th className="py-2 pr-4">Meldungen</th>
+              <th className="py-2"></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id} className="border-b border-border transition-colors hover:bg-surface-muted/40">
+                <td className="py-3 pr-4 text-foreground">{user.name}</td>
+                <td className="py-3 pr-4 text-foreground-muted">{user.email}</td>
+                <td className="py-3 pr-4">
+                  <Badge tone="neutral">{user.role}</Badge>
+                </td>
+                <td className="py-3 pr-4 text-foreground-muted">{user.verified ? 'Ja' : 'Nein'}</td>
+                <td className="py-3 pr-4 text-foreground-muted">
+                  {user.reportsReceivedCount > 0 ? (
+                    <Badge tone="destructive">{user.reportsReceivedCount}</Badge>
+                  ) : (
+                    '–'
+                  )}
+                </td>
+                <td className="py-3">
+                  {user.role === 'STUDENT' && user.id !== currentUser?.id && (
+                    <Button size="sm" variant="destructive" onClick={() => setPendingDelete(user)}>
+                      Löschen
+                    </Button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {pendingDelete && (
+        <ConfirmDialog
+          title={`"${pendingDelete.name}" endgültig löschen?`}
+          description="Das kann nicht rückgängig gemacht werden."
+          noteLabel="Begründung"
+          confirmLabel="Endgültig löschen"
+          destructive
+          onConfirm={handleDelete}
+          onCancel={() => setPendingDelete(null)}
+        />
+      )}
     </div>
   )
 }
@@ -256,6 +268,8 @@ function ListingsTab() {
   const [listings, setListings] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<Listing | null>(null)
 
   async function load() {
     setLoading(true)
@@ -273,14 +287,16 @@ function ListingsTab() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  async function handleDelete(listing: Listing) {
-    const note = promptForNote(`Begründung für die Löschung von "${listing.title}" (optional):`) ?? undefined
-    if (!window.confirm(`"${listing.title}" wirklich endgültig löschen?`)) return
+  async function handleDelete(note?: string) {
+    if (!pendingDelete || !note) return
+    const listing = pendingDelete
+    setPendingDelete(null)
+    setActionError(null)
     try {
       await deleteAdminListing(listing.id, note)
       await load()
     } catch (err) {
-      window.alert(err instanceof ApiError ? err.message : 'Löschen fehlgeschlagen. Bitte versuche es erneut.')
+      setActionError(err instanceof ApiError ? err.message : 'Löschen fehlgeschlagen. Bitte versuche es erneut.')
     }
   }
 
@@ -288,35 +304,54 @@ function ListingsTab() {
   if (error) return <p className="text-sm text-destructive">{error}</p>
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse text-sm">
-        <thead>
-          <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-foreground-muted">
-            <th className="py-2 pr-4">Titel</th>
-            <th className="py-2 pr-4">Verkäufer</th>
-            <th className="py-2 pr-4">Preis</th>
-            <th className="py-2 pr-4">Status</th>
-            <th className="py-2"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {listings.map((listing) => (
-            <tr key={listing.id} className="border-b border-border transition-colors hover:bg-surface-muted/40">
-              <td className="py-3 pr-4 text-foreground">{listing.title}</td>
-              <td className="py-3 pr-4 text-foreground-muted">{listing.seller?.name ?? 'Gelöschter Nutzer'}</td>
-              <td className="py-3 pr-4 text-foreground-muted">{formatPrice(listing.priceCents)}</td>
-              <td className="py-3 pr-4">
-                <Badge tone={listing.status === 'AKTIV' ? 'accent' : 'neutral'}>{listing.status}</Badge>
-              </td>
-              <td className="py-3">
-                <Button size="sm" variant="destructive" onClick={() => handleDelete(listing)}>
-                  Löschen
-                </Button>
-              </td>
+    <div className="flex flex-col gap-3">
+      {actionError && (
+        <p role="alert" className="text-sm text-destructive">
+          {actionError}
+        </p>
+      )}
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-sm">
+          <thead>
+            <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-foreground-muted">
+              <th className="py-2 pr-4">Titel</th>
+              <th className="py-2 pr-4">Verkäufer</th>
+              <th className="py-2 pr-4">Preis</th>
+              <th className="py-2 pr-4">Status</th>
+              <th className="py-2"></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {listings.map((listing) => (
+              <tr key={listing.id} className="border-b border-border transition-colors hover:bg-surface-muted/40">
+                <td className="py-3 pr-4 text-foreground">{listing.title}</td>
+                <td className="py-3 pr-4 text-foreground-muted">{listing.seller?.name ?? 'Gelöschter Nutzer'}</td>
+                <td className="py-3 pr-4 text-foreground-muted">{formatPrice(listing.priceCents)}</td>
+                <td className="py-3 pr-4">
+                  <Badge tone={listing.status === 'AKTIV' ? 'accent' : 'neutral'}>{listing.status}</Badge>
+                </td>
+                <td className="py-3">
+                  <Button size="sm" variant="destructive" onClick={() => setPendingDelete(listing)}>
+                    Löschen
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {pendingDelete && (
+        <ConfirmDialog
+          title={`"${pendingDelete.title}" endgültig löschen?`}
+          description="Das kann nicht rückgängig gemacht werden."
+          noteLabel="Begründung"
+          confirmLabel="Endgültig löschen"
+          destructive
+          onConfirm={handleDelete}
+          onCancel={() => setPendingDelete(null)}
+        />
+      )}
     </div>
   )
 }
