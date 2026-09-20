@@ -204,17 +204,23 @@ export class AuthService {
       );
     }
 
+    // Checked BEFORE the password, and independent of it — an unverified
+    // account always gets this same response no matter what password was
+    // given, so a guessed/stolen password's correctness is never revealed
+    // before the account is ever verified (the original S-12 finding).
+    // This still tells a legitimate user who forgot to verify what's
+    // actually wrong, which a fully generic error can't.
+    if (!user.verified) {
+      throw new ForbiddenException(
+        'Bitte bestätige zuerst deine E-Mail-Adresse.',
+      );
+    }
+
     const passwordMatches = await bcrypt.compare(
       dto.password,
       user.passwordHash,
     );
-    // Unverified accounts get the same generic error as a wrong password,
-    // regardless of whether the password itself was correct — a distinct
-    // "please verify" response here would let an attacker confirm a
-    // guessed/stolen password is correct before the account is ever
-    // verified. The resend-verification flow is the intended path for a
-    // legitimate unverified user, and doesn't require a correct password.
-    if (!passwordMatches || !user.verified) {
+    if (!passwordMatches) {
       throw new UnauthorizedException(
         'Ungültige E-Mail-Adresse oder Passwort.',
       );
