@@ -62,7 +62,10 @@ export function Checkout() {
     )
   }
 
-  if (!listing || listing.status === 'VERKAUFT' || !listing.sofortkaufMoeglich) {
+  // sellerId check: the backend already rejects buying your own listing
+  // (S-02) — this just stops the checkout form from rendering at all for
+  // it, instead of only failing once you submit.
+  if (!listing || listing.status === 'VERKAUFT' || !listing.sofortkaufMoeglich || listing.sellerId === currentUser.id) {
     return <Navigate to="/" replace />
   }
 
