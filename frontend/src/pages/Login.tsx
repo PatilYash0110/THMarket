@@ -5,6 +5,11 @@ import { Button } from '../components/Button'
 import { ResendVerificationButton } from '../components/ResendVerificationButton'
 import { useAuth } from '../context/AuthContext'
 
+// Matches the backend's exact message for an unverified account (see
+// AuthService.login) — the resend button only makes sense for that specific
+// case now that the backend distinguishes it from a wrong password again.
+const UNVERIFIED_MESSAGE = 'Bitte bestätige zuerst deine E-Mail-Adresse.'
+
 export function Login() {
   const { currentUser, loading, login } = useAuth()
   const navigate = useNavigate()
@@ -71,15 +76,11 @@ export function Login() {
           </Link>
         </label>
         {error && (
-          <div className="flex flex-col items-start gap-2">
+          <div className="flex flex-col gap-2">
             <p id="login-error" role="alert" className="text-sm text-destructive">
               {error}
             </p>
-            {/* Always offered on any login failure, not just an "unverified"
-                one — the backend no longer distinguishes wrong password from
-                unverified in its error (see S-12), so this can't leak which
-                case applies; it's just a safe next step either way. */}
-            {email && <ResendVerificationButton email={email} />}
+            {error === UNVERIFIED_MESSAGE && email && <ResendVerificationButton email={email} fullWidth />}
           </div>
         )}
         <Button type="submit" size="lg" className="mt-1" disabled={submitting}>
