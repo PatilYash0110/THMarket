@@ -57,7 +57,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // per-message headers, so this is verified once at connect time, same
   // secret as JwtStrategy's HTTP-side verification. Any failure just
   // disconnects; a rejected handshake is signal enough on its own.
-  async handleConnection(client: Socket): Promise<void> {
+  //
+  // Nest binds @SubscribeMessage handlers on this socket right after this
+  // method is *called*, without waiting for the promise it returns to
+  // settle — so a client that emits 'joinConversation' the instant it sees
+  // 'connect' can reach handleJoin() before the two awaits below have run,
+  // finding client.data.userId still unset and silently dropping the join.
+  // Stashing the in-flight promise on client.data (synchronously, before
+  // any await here) lets every other handler await it first and see the
+  // fully-authenticated socket either way.
+  handleConnection(client: Socket): Promise<void> {
+    const authenticated = this.authenticate(client);
+    client.data.authenticated = authenticated;
+    return authenticated;
+  }
+
+  private async authenticate(client: Socket): Promise<void> {
     try {
       const cookieToken = extractCookie(client.handshake.headers.cookie, AUTH_COOKIE_NAME);
       const token = cookieToken ?? (client.handshake.auth?.token as string | undefined);
@@ -92,6 +107,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('joinConversation')
   async handleJoin(@ConnectedSocket() client: Socket, @MessageBody() conversationId: string): Promise<void> {
+    await (client.data.authenticated as Promise<void> | undefined);
     const userId = client.data.userId as string | undefined;
     if (!userId || typeof conversationId !== 'string' || !(await this.chatService.isParticipant(userId, conversationId))) {
       return;
@@ -110,6 +126,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() body: { conversationId: string; text: string },
   ): Promise<{ ok: boolean; reason?: string }> {
+    await (client.data.authenticated as Promise<void> | undefined);
     const userId = client.data.userId as string | undefined;
     if (!userId) {
       return { ok: false, reason: 'unauthorized' };
