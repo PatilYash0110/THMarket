@@ -31,7 +31,9 @@ export class GeminiService {
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
   ) {
-    this.ai = new GoogleGenAI({ apiKey: this.config.getOrThrow<string>('GEMINI_API_KEY') });
+    this.ai = new GoogleGenAI({
+      apiKey: this.config.getOrThrow<string>('GEMINI_API_KEY'),
+    });
     this.model = this.config.get<string>('GEMINI_MODEL') ?? DEFAULT_MODEL;
   }
 
@@ -42,19 +44,29 @@ export class GeminiService {
   // manual") — here the fallback is "let the upload through, logged", not
   // "block everything". A human can still act on a reported photo afterward
   // via the existing admin/report flow.
-  async moderateImage(image: { buffer: Buffer; mimetype: string }): Promise<boolean> {
+  async moderateImage(image: {
+    buffer: Buffer;
+    mimetype: string;
+  }): Promise<boolean> {
     try {
       const response = await this.ai.models.generateContent({
         model: this.model,
         contents: [
-          { inlineData: { mimeType: image.mimetype, data: image.buffer.toString('base64') } },
+          {
+            inlineData: {
+              mimeType: image.mimetype,
+              data: image.buffer.toString('base64'),
+            },
+          },
           { text: MODERATION_INSTRUCTION },
         ],
       });
       const verdict = response.text?.trim().toUpperCase();
       return verdict !== 'UNSAFE';
     } catch (error) {
-      this.logger.warn(`Image moderation call failed, allowing upload through: ${error}`);
+      this.logger.warn(
+        `Image moderation call failed, allowing upload through: ${error}`,
+      );
       // Previously only a log line, invisible to anyone but whoever is
       // watching server logs at that moment — this puts the same fact
       // in front of admins in the app's own Audit Log, so an unmoderated
@@ -89,20 +101,33 @@ export class GeminiService {
     // is just more description material, not a prompt override.
     const promptText =
       contextLines.length > 0
-        ? [INSTRUCTION, '<nutzereingabe>', ...contextLines, '</nutzereingabe>'].join('\n')
+        ? [
+            INSTRUCTION,
+            '<nutzereingabe>',
+            ...contextLines,
+            '</nutzereingabe>',
+          ].join('\n')
         : INSTRUCTION;
 
     const contents = [
       ...images.map((image) => ({
-        inlineData: { mimeType: image.mimetype, data: image.buffer.toString('base64') },
+        inlineData: {
+          mimeType: image.mimetype,
+          data: image.buffer.toString('base64'),
+        },
       })),
       { text: promptText },
     ];
 
-    const response = await this.ai.models.generateContent({ model: this.model, contents });
+    const response = await this.ai.models.generateContent({
+      model: this.model,
+      contents,
+    });
     const text = response.text?.trim();
     if (!text) {
-      throw new BadRequestException('Gemini hat keinen Beschreibungstext geliefert.');
+      throw new BadRequestException(
+        'Gemini hat keinen Beschreibungstext geliefert.',
+      );
     }
     return text;
   }

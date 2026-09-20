@@ -37,7 +37,9 @@ export class AdminService {
           'Du kannst dein eigenes Inserat nicht melden.',
         );
       }
-      await this.assertNoOpenDuplicateReport(reporterId, { listingId: listing.id });
+      await this.assertNoOpenDuplicateReport(reporterId, {
+        listingId: listing.id,
+      });
       return this.prisma.report.create({
         data: {
           targetType: 'LISTING',
@@ -60,7 +62,9 @@ export class AdminService {
     if (user.id === reporterId) {
       throw new ForbiddenException('Du kannst dich nicht selbst melden.');
     }
-    await this.assertNoOpenDuplicateReport(reporterId, { reportedUserId: user.id });
+    await this.assertNoOpenDuplicateReport(reporterId, {
+      reportedUserId: user.id,
+    });
 
     // Both are just admin-review context, not the report's target, so a
     // bad/missing value here doesn't block filing the report — it's simply
@@ -69,8 +73,23 @@ export class AdminService {
     // a client could attach an arbitrary conversationId to a report and
     // hand an admin a reason to open a private chat neither of them is
     // actually part of.
-    const listingId = dto.listingId && (await this.prisma.listing.findUnique({ where: { id: dto.listingId }, select: { id: true } })) ? dto.listingId : undefined;
-    const conversationId = dto.conversationId && (await this.isConversationBetween(dto.conversationId, reporterId, user.id)) ? dto.conversationId : undefined;
+    const listingId =
+      dto.listingId &&
+      (await this.prisma.listing.findUnique({
+        where: { id: dto.listingId },
+        select: { id: true },
+      }))
+        ? dto.listingId
+        : undefined;
+    const conversationId =
+      dto.conversationId &&
+      (await this.isConversationBetween(
+        dto.conversationId,
+        reporterId,
+        user.id,
+      ))
+        ? dto.conversationId
+        : undefined;
 
     return this.prisma.report.create({
       data: {
@@ -86,7 +105,11 @@ export class AdminService {
     });
   }
 
-  private async isConversationBetween(conversationId: string, userAId: string, userBId: string): Promise<boolean> {
+  private async isConversationBetween(
+    conversationId: string,
+    userAId: string,
+    userBId: string,
+  ): Promise<boolean> {
     const conversation = await this.prisma.conversation.findUnique({
       where: { id: conversationId },
       select: { buyerId: true, sellerId: true },
@@ -122,7 +145,9 @@ export class AdminService {
       where: status ? { status } : undefined,
       include: {
         reporter: { select: USER_SELECT },
-        listing: { select: { id: true, title: true, status: true, images: true } },
+        listing: {
+          select: { id: true, title: true, status: true, images: true },
+        },
         reportedUser: { select: USER_SELECT },
       },
       orderBy: { createdAt: 'desc' },

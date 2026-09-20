@@ -17,6 +17,15 @@ import { assertSessionStillValid } from '../auth/session-validation';
 import { PrismaService } from '../prisma/prisma.service';
 import { ChatService } from './chat.service';
 
+// Socket.io types `Socket.data` as `any` by default — this pins it to the
+// two fields this gateway actually stores there, so every client.data.*
+// access below is checked instead of silently `any`.
+interface ChatSocketData {
+  userId?: string;
+  authenticated?: Promise<void>;
+}
+type ChatSocket = Socket<any, any, any, ChatSocketData>;
+
 const MAX_MESSAGE_LENGTH = 2000;
 // Simple in-memory sliding window per connected socket — sockets aren't
 // covered by the HTTP-only ThrottlerGuard used elsewhere in this app, and
@@ -25,7 +34,10 @@ const MAX_MESSAGE_LENGTH = 2000;
 const MESSAGE_RATE_LIMIT = 10;
 const MESSAGE_RATE_WINDOW_MS = 10_000;
 
-function extractCookie(header: string | undefined, name: string): string | undefined {
+function extractCookie(
+  header: string | undefined,
+  name: string,
+): string | undefined {
   if (!header) return undefined;
   const found = header
     .split(';')
@@ -36,7 +48,10 @@ function extractCookie(header: string | undefined, name: string): string | undef
 
 @WebSocketGateway({
   namespace: '/chat',
-  cors: { origin: process.env.CORS_ORIGIN?.split(',') ?? 'http://localhost:5173', credentials: true },
+  cors: {
+    origin: process.env.CORS_ORIGIN?.split(',') ?? 'http://localhost:5173',
+    credentials: true,
+  },
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
@@ -46,7 +61,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
-    @Inject(forwardRef(() => ChatService)) private readonly chatService: ChatService,
+    @Inject(forwardRef(() => ChatService))
+    private readonly chatService: ChatService,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -66,16 +82,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // Stashing the in-flight promise on client.data (synchronously, before
   // any await here) lets every other handler await it first and see the
   // fully-authenticated socket either way.
-  handleConnection(client: Socket): Promise<void> {
+  handleConnection(client: ChatSocket): Promise<void> {
     const authenticated = this.authenticate(client);
     client.data.authenticated = authenticated;
     return authenticated;
   }
 
-  private async authenticate(client: Socket): Promise<void> {
+  private async authenticate(client: ChatSocket): Promise<void> {
     try {
-      const cookieToken = extractCookie(client.handshake.headers.cookie, AUTH_COOKIE_NAME);
-      const token = cookieToken ?? (client.handshake.auth?.token as string | undefined);
+      const cookieToken = extractCookie(
+        client.handshake.headers.cookie,
+        AUTH_COOKIE_NAME,
+      );
+      const token =
+        cookieToken ?? (client.handshake.auth?.token as string | undefined);
       if (!token) throw new Error('missing token');
       const payload = await this.jwt.verifyAsync<JwtPayload>(token, {
         secret: this.config.getOrThrow<string>('JWT_SECRET'),
@@ -92,7 +112,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  handleDisconnect(client: Socket): void {
+  handleDisconnect(client: ChatSocket): void {
     this.messageTimestamps.delete(client.id);
   }
 
@@ -102,14 +122,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // no reason to have ever joined 'conversation:<id>' for a thread that
   // didn't exist yet when they connected.
   notifyConversationStarted(sellerId: string, conversation: unknown): void {
-    this.server.to(`user:${sellerId}`).emit('conversationStarted', conversation);
+    this.server
+      .to(`user:${sellerId}`)
+      .emit('conversationStarted', conversation);
   }
 
   @SubscribeMessage('joinConversation')
-  async handleJoin(@ConnectedSocket() client: Socket, @MessageBody() conversationId: string): Promise<void> {
-    await (client.data.authenticated as Promise<void> | undefined);
-    const userId = client.data.userId as string | undefined;
-    if (!userId || typeof conversationId !== 'string' || !(await this.chatService.isParticipant(userId, conversationId))) {
+  async handleJoin(
+    @ConnectedSocket() client: ChatSocket,
+    @MessageBody() conversationId: string,
+  ): Promise<void> {
+    await client.data.authenticated;
+    const userId = client.data.userId;
+    if (
+      !userId ||
+      typeof conversationId !== 'string' ||
+      !(await this.chatService.isParticipant(userId, conversationId))
+    ) {
       return;
     }
     await client.join(`conversation:${conversationId}`);
@@ -123,11 +152,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // adapter sends this return value back as that callback's argument.
   @SubscribeMessage('sendMessage')
   async handleSend(
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: ChatSocket,
     @MessageBody() body: { conversationId: string; text: string },
   ): Promise<{ ok: boolean; reason?: string }> {
-    await (client.data.authenticated as Promise<void> | undefined);
-    const userId = client.data.userId as string | undefined;
+    await client.data.authenticated;
+    const userId = client.data.userId;
     if (!userId) {
       return { ok: false, reason: 'unauthorized' };
     }
@@ -145,7 +174,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!(await this.chatService.isParticipant(userId, conversationId))) {
       return { ok: false, reason: 'forbidden' };
     }
-    const message = await this.chatService.createMessage(conversationId, userId, text);
+    const message = await this.chatService.createMessage(
+      conversationId,
+      userId,
+      text,
+    );
     this.server.to(`conversation:${conversationId}`).emit('message', message);
     return { ok: true };
   }

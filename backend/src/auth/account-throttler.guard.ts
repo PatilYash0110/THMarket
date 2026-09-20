@@ -7,8 +7,12 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 // lockout would throttle everyone else's login attempts too.
 @Injectable()
 export class AccountThrottlerGuard extends ThrottlerGuard {
-  protected async getTracker(req: Record<string, any>): Promise<string> {
-    const email = typeof req.body?.email === 'string' ? req.body.email.toLowerCase() : 'unknown';
-    return `${email}:${req.ip}`;
+  protected getTracker(req: Record<string, any>): Promise<string> {
+    const request = req as { body?: { email?: unknown }; ip?: string };
+    const email =
+      typeof request.body?.email === 'string'
+        ? request.body.email.toLowerCase()
+        : 'unknown';
+    return Promise.resolve(`${email}:${request.ip}`);
   }
 }

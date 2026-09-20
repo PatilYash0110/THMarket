@@ -11,7 +11,10 @@ export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @Post()
-  startConversation(@CurrentUser() user: JwtPayload, @Body() dto: StartConversationDto) {
+  startConversation(
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: StartConversationDto,
+  ) {
     return this.chatService.startConversation(user.sub, dto.listingId);
   }
 

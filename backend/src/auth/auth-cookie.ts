@@ -11,7 +11,12 @@ function parseDurationMs(value: string): number {
     return 7 * 24 * 60 * 60 * 1000;
   }
   const amount = Number(match[1]);
-  const unitMs: Record<string, number> = { s: 1000, m: 60_000, h: 3_600_000, d: 86_400_000 };
+  const unitMs: Record<string, number> = {
+    s: 1000,
+    m: 60_000,
+    h: 3_600_000,
+    d: 86_400_000,
+  };
   return amount * unitMs[match[2].toLowerCase()];
 }
 

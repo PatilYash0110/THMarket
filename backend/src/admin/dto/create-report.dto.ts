@@ -17,7 +17,10 @@ export class CreateReportDto {
   // USER report as context: which listing the reported behavior happened
   // around (e.g. reporting a seller from their listing page, or the other
   // participant from a chat bound to one) — lets an admin open it later.
-  @ValidateIf((dto: CreateReportDto) => dto.targetType === 'LISTING' || dto.listingId !== undefined)
+  @ValidateIf(
+    (dto: CreateReportDto) =>
+      dto.targetType === 'LISTING' || dto.listingId !== undefined,
+  )
   @IsString()
   listingId?: string;
 

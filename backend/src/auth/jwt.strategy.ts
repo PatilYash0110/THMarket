@@ -20,7 +20,12 @@ export interface JwtPayload {
 // localStorage the way the previous token storage allowed), falling back to
 // a Bearer header so non-browser clients (curl, Postman, tests) still work.
 function cookieExtractor(req: Request): string | null {
-  return req?.cookies?.[AUTH_COOKIE_NAME] ?? null;
+  // req.cookies is typed `any` by Express (cookie-parser augments it at
+  // runtime, not in the type declarations) — narrow it explicitly rather
+  // than returning that `any` straight through.
+  const cookies = (req as { cookies?: Record<string, unknown> })?.cookies;
+  const token = cookies?.[AUTH_COOKIE_NAME];
+  return typeof token === 'string' ? token : null;
 }
 
 @Injectable()
@@ -30,7 +35,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly prisma: PrismaService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor, ExtractJwt.fromAuthHeaderAsBearerToken()]),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        cookieExtractor,
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
       ignoreExpiration: false,
       secretOrKey: config.getOrThrow<string>('JWT_SECRET'),
     });

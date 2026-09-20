@@ -5,7 +5,10 @@
 // bytes are available, checking each format's actual magic number rather
 // than trusting what the browser claimed the file was.
 const SIGNATURES: { check: (buffer: Buffer) => boolean }[] = [
-  { check: (b) => b.length >= 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff }, // JPEG
+  {
+    check: (b) =>
+      b.length >= 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff,
+  }, // JPEG
   {
     check: (b) =>
       b.length >= 8 &&
@@ -18,10 +21,15 @@ const SIGNATURES: { check: (buffer: Buffer) => boolean }[] = [
       b[6] === 0x1a &&
       b[7] === 0x0a, // PNG
   },
-  { check: (b) => b.length >= 6 && ['GIF87a', 'GIF89a'].includes(b.toString('ascii', 0, 6)) }, // GIF87a/89a
   {
     check: (b) =>
-      b.length >= 12 && b.toString('ascii', 0, 4) === 'RIFF' && b.toString('ascii', 8, 12) === 'WEBP',
+      b.length >= 6 && ['GIF87a', 'GIF89a'].includes(b.toString('ascii', 0, 6)),
+  }, // GIF87a/89a
+  {
+    check: (b) =>
+      b.length >= 12 &&
+      b.toString('ascii', 0, 4) === 'RIFF' &&
+      b.toString('ascii', 8, 12) === 'WEBP',
   }, // WEBP
 ];
 

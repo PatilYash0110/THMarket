@@ -13,18 +13,19 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
+import { trimIfString } from '../../common/trim-transform';
 import { LISTING_CATEGORIES } from './create-listing.dto';
 
 export class UpdateListingDto {
   @IsOptional()
-  @Transform(({ value }) => value?.trim())
+  @Transform(trimIfString)
   @IsString()
   @MinLength(1)
   @MaxLength(200)
   title?: string;
 
   @IsOptional()
-  @Transform(({ value }) => value?.trim())
+  @Transform(trimIfString)
   @IsString()
   @MinLength(1)
   @MaxLength(5000)

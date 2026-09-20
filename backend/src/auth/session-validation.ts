@@ -17,10 +17,18 @@ export async function assertSessionStillValid(
   });
 
   if (!user) {
-    throw new UnauthorizedException('Sitzung abgelaufen. Bitte melde dich erneut an.');
+    throw new UnauthorizedException(
+      'Sitzung abgelaufen. Bitte melde dich erneut an.',
+    );
   }
 
-  if (user.passwordChangedAt && issuedAt && issuedAt < Math.floor(user.passwordChangedAt.getTime() / 1000)) {
-    throw new UnauthorizedException('Sitzung abgelaufen. Bitte melde dich erneut an.');
+  if (
+    user.passwordChangedAt &&
+    issuedAt &&
+    issuedAt < Math.floor(user.passwordChangedAt.getTime() / 1000)
+  ) {
+    throw new UnauthorizedException(
+      'Sitzung abgelaufen. Bitte melde dich erneut an.',
+    );
   }
 }

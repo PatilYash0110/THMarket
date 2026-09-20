@@ -1,4 +1,10 @@
-import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ChatGateway } from './chat.gateway';
 
@@ -18,7 +24,8 @@ const CONVERSATION_INCLUDE = {
 export class ChatService {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(forwardRef(() => ChatGateway)) private readonly chatGateway: ChatGateway,
+    @Inject(forwardRef(() => ChatGateway))
+    private readonly chatGateway: ChatGateway,
   ) {}
 
   // Idempotent via a single atomic upsert on the (listingId, buyerId) unique
@@ -34,7 +41,9 @@ export class ChatService {
       throw new NotFoundException('Inserat nicht gefunden.');
     }
     if (!listing.sellerId) {
-      throw new ForbiddenException('Der Verkäufer dieses Inserats existiert nicht mehr.');
+      throw new ForbiddenException(
+        'Der Verkäufer dieses Inserats existiert nicht mehr.',
+      );
     }
     if (listing.sellerId === buyerId) {
       throw new ForbiddenException('Du kannst dir nicht selbst schreiben.');
@@ -45,11 +54,19 @@ export class ChatService {
       // listingTitle is a one-time snapshot, not kept in sync with later
       // title edits — `update: {}` deliberately never touches it on a
       // reopened thread, same as every other field here.
-      create: { listingId, buyerId, sellerId: listing.sellerId, listingTitle: listing.title },
+      create: {
+        listingId,
+        buyerId,
+        sellerId: listing.sellerId,
+        listingTitle: listing.title,
+      },
       update: {},
       include: CONVERSATION_INCLUDE,
     });
-    const result = { ...conversation, unreadCount: await this.countUnread(conversation, buyerId) };
+    const result = {
+      ...conversation,
+      unreadCount: await this.countUnread(conversation, buyerId),
+    };
     // Reaches the seller even if this is a brand-new thread they've never
     // joined the room for — see ChatGateway.notifyConversationStarted().
     // Harmless to call on a reopened existing thread too: their socket
@@ -94,7 +111,10 @@ export class ChatService {
     },
     userId: string,
   ): Promise<number> {
-    const lastReadAt = conversation.buyerId === userId ? conversation.buyerLastReadAt : conversation.sellerLastReadAt;
+    const lastReadAt =
+      conversation.buyerId === userId
+        ? conversation.buyerLastReadAt
+        : conversation.sellerLastReadAt;
     return this.prisma.message.count({
       where: {
         conversationId: conversation.id,
@@ -119,23 +139,32 @@ export class ChatService {
     if (conversation.buyerId !== userId && conversation.sellerId !== userId) {
       throw new ForbiddenException('Du bist kein Teil dieser Unterhaltung.');
     }
-    const field = conversation.buyerId === userId ? 'buyerLastReadAt' : 'sellerLastReadAt';
+    const field =
+      conversation.buyerId === userId ? 'buyerLastReadAt' : 'sellerLastReadAt';
     await this.prisma.conversation.update({
       where: { id: conversationId },
       data: { [field]: new Date() },
     });
   }
 
-  async isParticipant(userId: string, conversationId: string): Promise<boolean> {
+  async isParticipant(
+    userId: string,
+    conversationId: string,
+  ): Promise<boolean> {
     const conversation = await this.prisma.conversation.findUnique({
       where: { id: conversationId },
       select: { buyerId: true, sellerId: true },
     });
-    return conversation !== null && (conversation.buyerId === userId || conversation.sellerId === userId);
+    return (
+      conversation !== null &&
+      (conversation.buyerId === userId || conversation.sellerId === userId)
+    );
   }
 
   async getMessages(userId: string, conversationId: string) {
-    const conversation = await this.prisma.conversation.findUnique({ where: { id: conversationId } });
+    const conversation = await this.prisma.conversation.findUnique({
+      where: { id: conversationId },
+    });
     if (!conversation) {
       throw new NotFoundException('Unterhaltung nicht gefunden.');
     }
@@ -153,7 +182,9 @@ export class ChatService {
   // (see AdminService.createReport's isConversationBetween check, which is
   // what keeps an admin from being handed access to an unrelated chat).
   async getMessagesForAdmin(conversationId: string) {
-    const conversation = await this.prisma.conversation.findUnique({ where: { id: conversationId } });
+    const conversation = await this.prisma.conversation.findUnique({
+      where: { id: conversationId },
+    });
     if (!conversation) {
       throw new NotFoundException('Unterhaltung nicht gefunden.');
     }

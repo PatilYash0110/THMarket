@@ -12,6 +12,7 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
+import { trimIfString } from '../../common/trim-transform';
 
 // Kept manually in sync with frontend/src/types/listing.ts's ListingCategory
 // union — no shared package in this monorepo to dedupe it.
@@ -25,13 +26,13 @@ export const LISTING_CATEGORIES = [
 ] as const;
 
 export class CreateListingDto {
-  @Transform(({ value }) => value?.trim())
+  @Transform(trimIfString)
   @IsString()
   @MinLength(1)
   @MaxLength(200)
   title: string;
 
-  @Transform(({ value }) => value?.trim())
+  @Transform(trimIfString)
   @IsString()
   @MinLength(1)
   @MaxLength(5000)

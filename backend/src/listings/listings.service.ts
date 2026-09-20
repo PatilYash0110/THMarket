@@ -37,7 +37,9 @@ export class ListingsService {
 
   async create(sellerId: string, role: string, dto: CreateListingDto) {
     if (role !== 'STUDENT') {
-      throw new ForbiddenException('Admin-Konten können keine Inserate erstellen.');
+      throw new ForbiddenException(
+        'Admin-Konten können keine Inserate erstellen.',
+      );
     }
 
     return this.prisma.listing.create({
@@ -55,7 +57,9 @@ export class ListingsService {
       throw new ForbiddenException('Du kannst nur eigene Inserate bearbeiten.');
     }
     if (listing.status === 'VERKAUFT') {
-      throw new ConflictException('Verkaufte Inserate können nicht mehr bearbeitet werden.');
+      throw new ConflictException(
+        'Verkaufte Inserate können nicht mehr bearbeitet werden.',
+      );
     }
 
     return this.prisma.listing.update({
@@ -72,12 +76,17 @@ export class ListingsService {
   // vector on a marketplace (silently kill a competitor's active listing).
   // Now requires the caller to be that listing's seller, or an admin.
   async markSold(id: string, userId: string, role: string) {
-    const listing = await this.prisma.listing.findUnique({ where: { id }, select: { sellerId: true } });
+    const listing = await this.prisma.listing.findUnique({
+      where: { id },
+      select: { sellerId: true },
+    });
     if (!listing) {
       throw new NotFoundException('Inserat nicht gefunden.');
     }
     if (role !== 'ADMIN' && listing.sellerId !== userId) {
-      throw new ForbiddenException('Du kannst nur eigene Inserate als verkauft markieren.');
+      throw new ForbiddenException(
+        'Du kannst nur eigene Inserate als verkauft markieren.',
+      );
     }
     return this.markSoldInternal(id);
   }
@@ -99,7 +108,10 @@ export class ListingsService {
       data: { status: 'VERKAUFT', ...(buyerId ? { buyerId } : {}) },
     });
     if (result.count === 0) {
-      const exists = await this.prisma.listing.findUnique({ where: { id }, select: { id: true } });
+      const exists = await this.prisma.listing.findUnique({
+        where: { id },
+        select: { id: true },
+      });
       if (!exists) {
         throw new NotFoundException('Inserat nicht gefunden.');
       }
@@ -121,7 +133,12 @@ export class ListingsService {
   // writes in `$transaction` alone would NOT prevent two concurrent
   // purchases from both passing their checks before either writes, which
   // would double-sell the listing and double-charge/credit both sides.
-  async purchase(id: string, buyerId: string, role: string, dto: PurchaseListingDto) {
+  async purchase(
+    id: string,
+    buyerId: string,
+    role: string,
+    dto: PurchaseListingDto,
+  ) {
     if (dto.paymentMethod === 'simulation') {
       // No balance change here on purpose — Simulation stays a no-money
       // demo of the card-checkout UI. It still needs the same eligibility
@@ -140,10 +157,14 @@ export class ListingsService {
         throw new NotFoundException('Inserat nicht gefunden.');
       }
       if (!listing.sofortkaufMoeglich) {
-        throw new ForbiddenException('Für dieses Inserat ist kein Sofortkauf möglich.');
+        throw new ForbiddenException(
+          'Für dieses Inserat ist kein Sofortkauf möglich.',
+        );
       }
       if (listing.sellerId === buyerId) {
-        throw new ForbiddenException('Du kannst dein eigenes Inserat nicht kaufen.');
+        throw new ForbiddenException(
+          'Du kannst dein eigenes Inserat nicht kaufen.',
+        );
       }
       validateMockCard(dto.card!);
       return this.markSoldInternal(id, buyerId);
@@ -161,10 +182,14 @@ export class ListingsService {
       throw new NotFoundException('Inserat nicht gefunden.');
     }
     if (!listing.sofortkaufMoeglich) {
-      throw new ForbiddenException('Für dieses Inserat ist kein Sofortkauf möglich.');
+      throw new ForbiddenException(
+        'Für dieses Inserat ist kein Sofortkauf möglich.',
+      );
     }
     if (listing.sellerId === buyerId) {
-      throw new ForbiddenException('Du kannst dein eigenes Inserat nicht kaufen.');
+      throw new ForbiddenException(
+        'Du kannst dein eigenes Inserat nicht kaufen.',
+      );
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -181,7 +206,9 @@ export class ListingsService {
         data: { balanceCents: { decrement: listing.priceCents } },
       });
       if (debited.count === 0) {
-        throw new BadRequestException('Nicht genügend Guthaben für diesen Kauf.');
+        throw new BadRequestException(
+          'Nicht genügend Guthaben für diesen Kauf.',
+        );
       }
 
       // sellerId is nullable at the schema level (a seller's account can be
@@ -190,7 +217,9 @@ export class ListingsService {
       // a user still has any AKTIV listings, precisely to prevent this from
       // happening mid-purchase.
       if (!listing.sellerId) {
-        throw new ConflictException('Der Verkäufer dieses Inserats existiert nicht mehr.');
+        throw new ConflictException(
+          'Der Verkäufer dieses Inserats existiert nicht mehr.',
+        );
       }
 
       await tx.user.update({
@@ -198,7 +227,10 @@ export class ListingsService {
         data: { balanceCents: { increment: listing.priceCents } },
       });
 
-      const buyer = await tx.user.findUniqueOrThrow({ where: { id: buyerId }, select: { balanceCents: true } });
+      const buyer = await tx.user.findUniqueOrThrow({
+        where: { id: buyerId },
+        select: { balanceCents: true },
+      });
       const updated = await tx.listing.findUniqueOrThrow({
         where: { id },
         include: { seller: { select: SELLER_SELECT } },
@@ -220,14 +252,19 @@ export class ListingsService {
     });
 
     if (result.count === 0) {
-      const listing = await this.prisma.listing.findUnique({ where: { id }, select: { sellerId: true, status: true } });
+      const listing = await this.prisma.listing.findUnique({
+        where: { id },
+        select: { sellerId: true, status: true },
+      });
       if (!listing) {
         throw new NotFoundException('Inserat nicht gefunden.');
       }
       if (listing.sellerId !== userId) {
         throw new ForbiddenException('Du kannst nur eigene Inserate löschen.');
       }
-      throw new ConflictException('Verkaufte Inserate können nicht gelöscht werden.');
+      throw new ConflictException(
+        'Verkaufte Inserate können nicht gelöscht werden.',
+      );
     }
   }
 

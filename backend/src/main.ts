@@ -2,6 +2,7 @@ import { setDefaultResultOrder } from 'dns';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
+import type { Express, NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { MulterExceptionFilter } from './common/multer-exception.filter';
@@ -20,7 +21,7 @@ async function bootstrap() {
   // that hop's X-Forwarded-For and makes req.ip the real client IP.
   // Without this, the login/forgot-password throttler keys on Cloudflare's
   // edge IP for every request, not the actual caller.
-  app.getHttpAdapter().getInstance().set('trust proxy', 1);
+  (app.getHttpAdapter().getInstance() as Express).set('trust proxy', 1);
 
   app.use(helmet());
   app.use(cookieParser());
@@ -36,7 +37,7 @@ async function bootstrap() {
   // rejected — that covers non-browser clients (curl, Postman, the mobile
   // app this API doesn't have yet), none of which carry the victim's
   // cookie in the first place, so they aren't a CSRF vector.
-  app.use((req, res, next) => {
+  app.use((req: Request, res: Response, next: NextFunction) => {
     if (SAFE_METHODS.has(req.method.toUpperCase())) {
       next();
       return;
