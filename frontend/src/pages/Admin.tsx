@@ -87,12 +87,19 @@ function reportDialogConfig(action: ResolveReportAction) {
   }
 }
 
+type ReportFilter = 'OFFEN' | 'ALLE'
+
 function ReportsTab() {
   const [reports, setReports] = useState<Report[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const [pending, setPending] = useState<{ report: Report; action: ResolveReportAction } | null>(null)
+  // Defaults to only open reports — closed ones otherwise pile up and bury
+  // the ones that actually need attention.
+  const [filter, setFilter] = useState<ReportFilter>('OFFEN')
+  const openCount = reports.filter((report) => report.status === 'OFFEN').length
+  const visibleReports = filter === 'OFFEN' ? reports.filter((report) => report.status === 'OFFEN') : reports
 
   async function load() {
     setLoading(true)
@@ -133,8 +140,32 @@ function ReportsTab() {
           {actionError}
         </p>
       )}
-      {reports.length === 0 && <p className="text-sm text-foreground-muted">Keine Meldungen vorhanden.</p>}
-      {reports.map((report) => (
+      <div className="flex gap-1.5">
+        <button
+          type="button"
+          onClick={() => setFilter('OFFEN')}
+          className={`cursor-pointer rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
+            filter === 'OFFEN' ? 'bg-accent-soft text-accent-strong' : 'text-foreground-muted hover:bg-surface-muted'
+          }`}
+        >
+          Offen{reports.length > 0 && ` (${openCount})`}
+        </button>
+        <button
+          type="button"
+          onClick={() => setFilter('ALLE')}
+          className={`cursor-pointer rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
+            filter === 'ALLE' ? 'bg-accent-soft text-accent-strong' : 'text-foreground-muted hover:bg-surface-muted'
+          }`}
+        >
+          Alle{reports.length > 0 && ` (${reports.length})`}
+        </button>
+      </div>
+      {visibleReports.length === 0 && (
+        <p className="text-sm text-foreground-muted">
+          {filter === 'OFFEN' ? 'Keine offenen Meldungen.' : 'Keine Meldungen vorhanden.'}
+        </p>
+      )}
+      {visibleReports.map((report) => (
         <div key={report.id} className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-4 text-sm shadow-sm">
           <div className="flex items-start gap-3">
             {report.targetType === 'LISTING' && <ReportThumbnail src={report.listing?.images[0]} />}
