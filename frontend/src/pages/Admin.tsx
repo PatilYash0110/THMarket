@@ -1,4 +1,5 @@
-import { ImageBroken } from '@phosphor-icons/react'
+import { ClockCounterClockwise, Flag, ImageBroken, Tag, Users } from '@phosphor-icons/react'
+import type { Icon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -58,11 +59,11 @@ function Thumbnail({ src, size = 56 }: { src?: string; size?: number }) {
 
 type Tab = 'reports' | 'users' | 'listings' | 'audit'
 
-const TABS: { id: Tab; label: string }[] = [
-  { id: 'reports', label: 'Meldungen' },
-  { id: 'users', label: 'Nutzer' },
-  { id: 'listings', label: 'Inserate' },
-  { id: 'audit', label: 'Audit-Log' },
+const TABS: { id: Tab; label: string; icon: Icon }[] = [
+  { id: 'reports', label: 'Meldungen', icon: Flag },
+  { id: 'users', label: 'Nutzer', icon: Users },
+  { id: 'listings', label: 'Inserate', icon: Tag },
+  { id: 'audit', label: 'Audit-Log', icon: ClockCounterClockwise },
 ]
 
 // Per-action dialog copy — one config function instead of scattered
@@ -591,27 +592,36 @@ export function Admin() {
 
       <DashboardOverview />
 
-      <div className="flex gap-1 border-b border-border">
-        {TABS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => setTab(item.id)}
-            className={`cursor-pointer border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
-              tab === item.id
-                ? 'border-accent text-accent-strong'
-                : 'border-transparent text-foreground-muted hover:text-foreground'
-            }`}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-[200px_1fr] md:items-start">
+        <nav className="flex gap-1.5 overflow-x-auto md:flex-col md:gap-1 md:overflow-visible">
+          {TABS.map((item) => {
+            const ItemIcon = item.icon
+            const active = tab === item.id
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setTab(item.id)}
+                className={`flex shrink-0 cursor-pointer items-center gap-2.5 rounded-full px-3.5 py-2 text-sm font-medium transition-colors md:rounded-xl md:px-3 ${
+                  active
+                    ? 'bg-accent-soft text-accent-strong'
+                    : 'text-foreground-muted hover:bg-surface-muted hover:text-foreground'
+                }`}
+              >
+                <ItemIcon size={17} weight={active ? 'fill' : 'regular'} aria-hidden />
+                {item.label}
+              </button>
+            )
+          })}
+        </nav>
 
-      {tab === 'reports' && <ReportsTab />}
-      {tab === 'users' && <UsersTab />}
-      {tab === 'listings' && <ListingsTab />}
-      {tab === 'audit' && <AuditLogTab />}
+        <div>
+          {tab === 'reports' && <ReportsTab />}
+          {tab === 'users' && <UsersTab />}
+          {tab === 'listings' && <ListingsTab />}
+          {tab === 'audit' && <AuditLogTab />}
+        </div>
+      </div>
     </div>
   )
 }
