@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
+import { MulterExceptionFilter } from './common/multer-exception.filter';
 
 const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
   .split(',')
@@ -14,6 +15,12 @@ setDefaultResultOrder('ipv4first');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Render sits directly behind Cloudflare — one hop — so `1` trusts only
+  // that hop's X-Forwarded-For and makes req.ip the real client IP.
+  // Without this, the login/forgot-password throttler keys on Cloudflare's
+  // edge IP for every request, not the actual caller.
+  app.getHttpAdapter().getInstance().set('trust proxy', 1);
 
   app.use(helmet());
   app.use(cookieParser());
@@ -39,6 +46,13 @@ async function bootstrap() {
       res.status(403).json({ message: 'Ungültiger Origin.' });
       return;
     }
+    // A request with no Origin header but a cross-site Sec-Fetch-Site is
+    // still cross-site — some browsers omit Origin in cases (POST via
+    // navigation, older Safari) that Sec-Fetch-Site still flags correctly.
+    if (!origin && req.headers['sec-fetch-site'] === 'cross-site') {
+      res.status(403).json({ message: 'Ungültiger Origin.' });
+      return;
+    }
     next();
   });
 
@@ -50,9 +64,12 @@ async function bootstrap() {
     }),
   );
 
+  app.useGlobalFilters(new MulterExceptionFilter());
+
   app.enableCors({
     origin: ALLOWED_ORIGINS,
     credentials: true,
+    exposedHeaders: ['Retry-After'],
   });
 
   await app.listen(process.env.PORT ?? 3000);

@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -27,10 +26,15 @@ const RESEND_VERIFICATION_COOLDOWN_MS = 60 * 1000;
 // is someone else marking your email verified — no password exposure).
 const PASSWORD_RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
 const BCRYPT_ROUNDS = 12;
-// Generic response for both resend-verification and forgot-password so
-// neither endpoint leaks whether a given @thm.de address has an account.
+// Generic response for resend-verification (always) and forgot-password
+// (when the account is verified or doesn't exist) so those cases don't leak
+// whether a given @thm.de address has an account.
 const GENERIC_RESET_MESSAGE =
   'Falls ein Konto mit dieser E-Mail existiert, wurde eine E-Mail gesendet.';
+// Shared with login() — an unverified account gets this same message from
+// both endpoints, so a password reset doesn't quietly succeed for an
+// account that still can't log in afterward regardless.
+const UNVERIFIED_MESSAGE = 'Bitte bestätige zuerst deine E-Mail-Adresse.';
 
 export interface PublicUser {
   id: string;
@@ -83,9 +87,13 @@ export class AuthService {
       where: { email: dto.email },
     });
     if (existing) {
-      throw new ConflictException(
-        'Diese E-Mail-Adresse ist bereits registriert.',
-      );
+      // Same success shape as a real registration, not a 409 — a distinct
+      // "already registered" response would let an attacker enumerate
+      // which @thm.de addresses have accounts. The account's actual owner
+      // still gets a useful signal via email; the API response leaks
+      // nothing either way.
+      await this.mail.sendAccountExistsEmail(existing.email, existing.name);
+      return { email: dto.email };
     }
 
     const passwordHash = await bcrypt.hash(dto.password, BCRYPT_ROUNDS);
@@ -114,8 +122,23 @@ export class AuthService {
       where: { emailVerificationToken: token },
     });
 
+    if (!user) {
+      throw new NotFoundException(
+        'Der Bestätigungslink ist ungültig oder abgelaufen.',
+      );
+    }
+
+    // Idempotent: a mail scanner (Outlook SafeLinks, Gmail prefetch) that
+    // fetches the link before the student clicks it, or the student
+    // clicking twice, must not turn an already-successful verification
+    // into an "invalid link" error. The token is intentionally left in
+    // place (not nulled) so it keeps resolving to this user on a repeat
+    // hit — a fresh resend overwrites it anyway.
+    if (user.verified) {
+      return { email: user.email };
+    }
+
     if (
-      !user ||
       !user.emailVerificationExpires ||
       user.emailVerificationExpires < new Date()
     ) {
@@ -126,11 +149,7 @@ export class AuthService {
 
     await this.prisma.user.update({
       where: { id: user.id },
-      data: {
-        verified: true,
-        emailVerificationToken: null,
-        emailVerificationExpires: null,
-      },
+      data: { verified: true },
     });
 
     return { email: user.email };
@@ -190,6 +209,16 @@ export class AuthService {
       );
     }
 
+    // Checked BEFORE the password, and independent of it — an unverified
+    // account always gets this same response no matter what password was
+    // given, so a guessed/stolen password's correctness is never revealed
+    // before the account is ever verified (the original S-12 finding).
+    // This still tells a legitimate user who forgot to verify what's
+    // actually wrong, which a fully generic error can't.
+    if (!user.verified) {
+      throw new ForbiddenException(UNVERIFIED_MESSAGE);
+    }
+
     const passwordMatches = await bcrypt.compare(
       dto.password,
       user.passwordHash,
@@ -197,12 +226,6 @@ export class AuthService {
     if (!passwordMatches) {
       throw new UnauthorizedException(
         'Ungültige E-Mail-Adresse oder Passwort.',
-      );
-    }
-
-    if (!user.verified) {
-      throw new ForbiddenException(
-        'Bitte bestätige zuerst deine E-Mail-Adresse.',
       );
     }
 
@@ -230,6 +253,16 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
+
+    // An unverified account can't log in regardless of its password (see
+    // login() above), so silently emailing a reset link here would just
+    // lead to a dead end: new password, same "please verify" wall
+    // afterward. Surfacing this costs only the same "unverified" signal
+    // the login page already reveals — no password is involved here to
+    // guess, so there's no oracle risk from this branch.
+    if (user && !user.verified) {
+      throw new ForbiddenException(UNVERIFIED_MESSAGE);
+    }
 
     if (user) {
       const passwordResetToken = randomBytes(32).toString('hex');

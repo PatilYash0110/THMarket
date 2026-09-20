@@ -11,7 +11,7 @@ import { CreateListingDto } from './dto/create-listing.dto';
 import { PurchaseListingDto } from './dto/purchase-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 
-const SELLER_SELECT = { name: true, email: true, verified: true } as const;
+const SELLER_SELECT = { name: true, verified: true } as const;
 
 @Injectable()
 export class ListingsService {
@@ -53,6 +53,9 @@ export class ListingsService {
     }
     if (listing.sellerId !== userId) {
       throw new ForbiddenException('Du kannst nur eigene Inserate bearbeiten.');
+    }
+    if (listing.status === 'VERKAUFT') {
+      throw new ConflictException('Verkaufte Inserate können nicht mehr bearbeitet werden.');
     }
 
     return this.prisma.listing.update({
@@ -118,15 +121,47 @@ export class ListingsService {
   // writes in `$transaction` alone would NOT prevent two concurrent
   // purchases from both passing their checks before either writes, which
   // would double-sell the listing and double-charge/credit both sides.
-  async purchase(id: string, buyerId: string, dto: PurchaseListingDto) {
+  async purchase(id: string, buyerId: string, role: string, dto: PurchaseListingDto) {
     if (dto.paymentMethod === 'simulation') {
+      // No balance change here on purpose — Simulation stays a no-money
+      // demo of the card-checkout UI. It still needs the same eligibility
+      // guards as a real purchase, though: without these, any student
+      // could mark ANY listing sold for free, including one with
+      // Sofortkauf disabled, their own, or (since there was no role check)
+      // even an admin account could "buy" something.
+      if (role !== 'STUDENT') {
+        throw new ForbiddenException('Nur Studierende können Inserate kaufen.');
+      }
+      const listing = await this.prisma.listing.findUnique({
+        where: { id },
+        select: { sellerId: true, sofortkaufMoeglich: true },
+      });
+      if (!listing) {
+        throw new NotFoundException('Inserat nicht gefunden.');
+      }
+      if (!listing.sofortkaufMoeglich) {
+        throw new ForbiddenException('Für dieses Inserat ist kein Sofortkauf möglich.');
+      }
+      if (listing.sellerId === buyerId) {
+        throw new ForbiddenException('Du kannst dein eigenes Inserat nicht kaufen.');
+      }
       validateMockCard(dto.card!);
       return this.markSoldInternal(id, buyerId);
     }
 
+    // Same eligibility guards as the simulation branch above — without them
+    // a Guthaben purchase could buy a Sofortkauf-disabled listing, or (since
+    // balanceCents exists on every User row regardless of role) let an admin
+    // account buy one too.
+    if (role !== 'STUDENT') {
+      throw new ForbiddenException('Nur Studierende können Inserate kaufen.');
+    }
     const listing = await this.prisma.listing.findUnique({ where: { id } });
     if (!listing) {
       throw new NotFoundException('Inserat nicht gefunden.');
+    }
+    if (!listing.sofortkaufMoeglich) {
+      throw new ForbiddenException('Für dieses Inserat ist kein Sofortkauf möglich.');
     }
     if (listing.sellerId === buyerId) {
       throw new ForbiddenException('Du kannst dein eigenes Inserat nicht kaufen.');
@@ -201,6 +236,11 @@ export class ListingsService {
     if (listing.sellerId === userId) {
       throw new ForbiddenException(
         'Du kannst eigene Inserate nicht zu deinen Favoriten hinzufügen.',
+      );
+    }
+    if (listing.status !== 'AKTIV') {
+      throw new ForbiddenException(
+        'Verkaufte Inserate können nicht favorisiert werden.',
       );
     }
     await this.prisma.favorite.upsert({

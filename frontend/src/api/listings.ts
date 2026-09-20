@@ -4,13 +4,16 @@ import type { Listing } from '../types'
 const API_URL = import.meta.env.VITE_API_URL as string
 
 export async function fetchListings(): Promise<Listing[]> {
-  const response = await fetch(`${API_URL}/listings`)
+  // Both routes require auth now (see backend S-01) — without
+  // `credentials: 'include'` the httpOnly auth cookie never gets sent and
+  // every call here 401s, even for a logged-in user.
+  const response = await fetch(`${API_URL}/listings`, { credentials: 'include' })
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
   return response.json()
 }
 
 export async function fetchListingById(id: string): Promise<Listing | undefined> {
-  const response = await fetch(`${API_URL}/listings/${id}`)
+  const response = await fetch(`${API_URL}/listings/${id}`, { credentials: 'include' })
   if (response.status === 404) return undefined
   if (!response.ok) throw new ApiError(await parseErrorMessage(response))
   return response.json()

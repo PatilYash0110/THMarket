@@ -1,5 +1,5 @@
 import { CheckCircle } from '@phosphor-icons/react'
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { ApiError } from '../api/auth'
 import { Button } from '../components/Button'
@@ -12,7 +12,7 @@ type PaymentMode = 'simulation' | 'guthaben'
 export function Checkout() {
   const { listingId } = useParams<{ listingId: string }>()
   const { currentUser, setBalance } = useAuth()
-  const { getListing, purchaseListing, loading } = useListings()
+  const { getListing, refreshListing, purchaseListing, loading } = useListings()
   const [mode, setMode] = useState<PaymentMode>('simulation')
   const [cardNumber, setCardNumber] = useState('')
   const [cardExpiry, setCardExpiry] = useState('')
@@ -22,6 +22,15 @@ export function Checkout() {
   const [submitting, setSubmitting] = useState(false)
 
   const listing = listingId ? getListing(listingId) : undefined
+
+  // Same staleness problem as the detail page: without this, a listing
+  // someone else bought (or the seller took off Sofortkauf) in the
+  // meantime still renders this checkout form, which then just 409s on
+  // submit instead of the "not purchasable anymore" redirect below.
+  useEffect(() => {
+    if (listingId) refreshListing(listingId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listingId])
 
   if (!currentUser) {
     return <Navigate to="/login" replace />
@@ -53,7 +62,10 @@ export function Checkout() {
     )
   }
 
-  if (!listing || listing.status === 'VERKAUFT' || !listing.sofortkaufMoeglich) {
+  // sellerId check: the backend already rejects buying your own listing
+  // (S-02) — this just stops the checkout form from rendering at all for
+  // it, instead of only failing once you submit.
+  if (!listing || listing.status === 'VERKAUFT' || !listing.sofortkaufMoeglich || listing.sellerId === currentUser.id) {
     return <Navigate to="/" replace />
   }
 

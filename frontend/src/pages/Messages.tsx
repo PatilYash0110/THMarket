@@ -1,12 +1,39 @@
-import { PaperPlaneRight } from '@phosphor-icons/react'
+import { Flag, PaperPlaneRight } from '@phosphor-icons/react'
 import clsx from 'clsx'
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Badge } from '../components/Badge'
 import { EmptyState } from '../components/EmptyState'
+import { ReportForm } from '../components/ReportForm'
 import { useAuth } from '../context/AuthContext'
 import { useMessages } from '../context/MessagesContext'
 import { formatDate } from '../lib/format'
+
+// Once `listing` goes null (deleted by its seller or by admin action), fall
+// back to the one-time title snapshot instead of the generic "Inserat" —
+// and flag it as removed so the UI can say so, rather than silently
+// presenting a stale title as if the listing still existed.
+function listingDisplay(conversation: { listing: { title: string } | null; listingTitle: string | null }): {
+  title: string
+  removed: boolean
+} {
+  if (conversation.listing) return { title: conversation.listing.title, removed: false }
+  if (conversation.listingTitle) return { title: conversation.listingTitle, removed: true }
+  return { title: 'Inserat', removed: true }
+}
+
+function sendErrorMessage(reason: string): string {
+  switch (reason) {
+    case 'too_long':
+      return 'Nachricht ist zu lang (max. 2000 Zeichen).'
+    case 'rate_limited':
+      return 'Zu viele Nachrichten — bitte warte kurz und versuche es erneut.'
+    case 'timeout':
+      return 'Keine Antwort vom Server. Bitte versuche es erneut.'
+    default:
+      return 'Nachricht konnte nicht gesendet werden.'
+  }
+}
 
 // A small colored "squircle" standing in for a profile photo, since listings
 // carry photos but student accounts don't.
@@ -26,29 +53,68 @@ function Avatar({ name, className }: { name: string; className?: string }) {
 export function Messages() {
   const { currentUser } = useAuth()
   const { conversationId } = useParams<{ conversationId?: string }>()
-  const { conversations, getMessages, openConversation, sendMessage } = useMessages()
+  const { conversations, getMessages, openConversation, clearActiveConversation, sendMessage } = useMessages()
   const [draft, setDraft] = useState('')
+  const [sendError, setSendError] = useState<string | null>(null)
+  const [reporting, setReporting] = useState(false)
 
   const activeConversation = conversationId
     ? conversations.find((conversation) => conversation.id === conversationId)
     : undefined
+  const activeMessages = activeConversation ? getMessages(activeConversation.id) : []
+  const messageListRef = useRef<HTMLDivElement>(null)
 
   // Lazily fetches the full history and joins the socket room only once a
   // thread is actually opened — the list view only ever carries a preview.
+  // Cleanup clears the "currently open" marker on unmount/thread switch —
+  // without it, a thread visited once would keep being treated as active
+  // forever, and its unread badge would never increment again.
   useEffect(() => {
+    setSendError(null)
+    setReporting(false)
     if (activeConversation) {
       openConversation(activeConversation.id)
+    }
+    return () => {
+      clearActiveConversation()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConversation?.id])
 
+  // A thread previously always opened scrolled to the top — the newest
+  // messages (what anyone opening a chat actually wants to see) were below
+  // the fold. Re-runs whenever the message count changes too, so a live
+  // incoming message while the thread is open also stays pinned to the
+  // bottom.
+  //
+  // Sets scrollTop directly on the message list itself rather than calling
+  // scrollIntoView() on a bottom anchor — scrollIntoView() walks up EVERY
+  // scrollable ancestor to bring the target into view, so on a page whose
+  // outer layout is even a few pixels taller than the viewport it scrolls
+  // the whole page instead of (or as well as) this inner panel. Setting
+  // scrollTop touches only this one element.
+  useEffect(() => {
+    const list = messageListRef.current
+    if (list) list.scrollTop = list.scrollHeight
+  }, [activeConversation?.id, activeMessages.length])
+
   if (!currentUser) return null
 
-  function handleSend(event: FormEvent) {
+  // The draft is kept (not cleared) until the server actually acks the
+  // send — previously cleared immediately on emit, so a message rejected
+  // server-side (rate limit, over length, no longer a participant) just
+  // silently disappeared with no error and no way to retry (B-05).
+  async function handleSend(event: FormEvent) {
     event.preventDefault()
-    if (!activeConversation || !draft.trim()) return
-    sendMessage(activeConversation.id, draft.trim())
-    setDraft('')
+    const text = draft.trim()
+    if (!activeConversation || !text) return
+    setSendError(null)
+    const result = await sendMessage(activeConversation.id, text)
+    if (result.ok) {
+      setDraft('')
+    } else {
+      setSendError(sendErrorMessage(result.reason))
+    }
   }
 
   if (conversations.length === 0) {
@@ -66,6 +132,7 @@ export function Messages() {
       : activeConversation.buyer
     : undefined
   const activeSold = activeConversation?.listing?.status === 'VERKAUFT'
+  const activeListing = activeConversation ? listingDisplay(activeConversation) : null
 
   return (
     <div className="grid h-[calc(100dvh-8rem)] grid-cols-1 overflow-hidden rounded-3xl border border-border bg-surface shadow-sm md:grid-cols-[300px_1fr]">
@@ -77,6 +144,7 @@ export function Messages() {
           const isActive = conversation.id === activeConversation?.id
           const unread = conversation.unreadCount > 0
           const sold = conversation.listing?.status === 'VERKAUFT'
+          const { title: listingTitle, removed: listingRemoved } = listingDisplay(conversation)
 
           return (
             <Link
@@ -84,11 +152,11 @@ export function Messages() {
               to={`/messages/${conversation.id}`}
               className={clsx(
                 'flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors',
-                sold && 'opacity-60',
+                (sold || listingRemoved) && 'opacity-60',
                 isActive ? 'bg-accent-soft' : 'hover:bg-surface-muted',
               )}
             >
-              <Avatar name={other?.name ?? '?'} className={clsx('h-11 w-11', sold && 'grayscale')} />
+              <Avatar name={other?.name ?? '?'} className={clsx('h-11 w-11', (sold || listingRemoved) && 'grayscale')} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <p
@@ -97,12 +165,18 @@ export function Messages() {
                       unread ? 'font-semibold' : 'font-medium',
                     )}
                   >
-                    {conversation.listing?.title ?? 'Inserat'}
+                    {listingTitle}
                   </p>
-                  {sold && (
+                  {listingRemoved ? (
                     <span className="shrink-0">
-                      <Badge tone="neutral">Verkauft</Badge>
+                      <Badge tone="neutral">Entfernt</Badge>
                     </span>
+                  ) : (
+                    sold && (
+                      <span className="shrink-0">
+                        <Badge tone="neutral">Verkauft</Badge>
+                      </span>
+                    )
                   )}
                 </div>
                 <p
@@ -134,21 +208,53 @@ export function Messages() {
           </div>
         ) : (
           <>
-            <header className={clsx('flex shrink-0 items-center gap-3 border-b border-border px-5 py-4', activeSold && 'opacity-60')}>
-              <Avatar name={activeOther?.name ?? '?'} className={clsx('h-10 w-10', activeSold && 'grayscale')} />
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <p className="font-display text-base font-semibold text-foreground">
-                    {activeConversation.listing?.title ?? 'Inserat'}
+            <header className={clsx('flex shrink-0 items-center justify-between gap-3 border-b border-border px-5 py-4', (activeSold || activeListing?.removed) && 'opacity-60')}>
+              <div className="flex items-center gap-3">
+                <Avatar name={activeOther?.name ?? '?'} className={clsx('h-10 w-10', (activeSold || activeListing?.removed) && 'grayscale')} />
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <p className="font-display text-base font-semibold text-foreground">{activeListing?.title}</p>
+                    {activeListing?.removed ? (
+                      <Badge tone="neutral">Entfernt</Badge>
+                    ) : (
+                      activeSold && <Badge tone="neutral">Verkauft</Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-foreground-muted">
+                    {activeListing?.removed
+                      ? 'Dieses Inserat wurde entfernt — '
+                      : ''}
+                    mit {activeOther?.name ?? 'Gelöschter Nutzer'}
                   </p>
-                  {activeSold && <Badge tone="neutral">Verkauft</Badge>}
                 </div>
-                <p className="text-xs text-foreground-muted">mit {activeOther?.name ?? 'Gelöschter Nutzer'}</p>
               </div>
+              {activeOther && (
+                <button
+                  type="button"
+                  onClick={() => setReporting((prev) => !prev)}
+                  aria-label="Nutzer melden"
+                  className="flex shrink-0 cursor-pointer items-center gap-1.5 px-2 text-xs text-foreground-muted hover:text-destructive"
+                >
+                  <Flag size={14} aria-hidden />
+                  Melden
+                </button>
+              )}
             </header>
 
-            <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-5">
-              {getMessages(activeConversation.id).map((message) => {
+            {reporting && activeOther && activeConversation && (
+              <div className="border-b border-border p-4">
+                <ReportForm
+                  targetType="USER"
+                  targetId={activeOther.id}
+                  contextListingId={activeConversation.listing?.id}
+                  contextConversationId={activeConversation.id}
+                  onCancel={() => setReporting(false)}
+                />
+              </div>
+            )}
+
+            <div ref={messageListRef} className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-5">
+              {activeMessages.map((message) => {
                 const isMine = message.senderId === currentUser.id
                 return (
                   <div
@@ -176,6 +282,11 @@ export function Messages() {
               })}
             </div>
 
+            {sendError && (
+              <p role="alert" className="shrink-0 px-4 pt-2 text-xs text-destructive">
+                {sendError}
+              </p>
+            )}
             <form onSubmit={handleSend} className="flex shrink-0 items-center gap-2 border-t border-border p-4">
               <input
                 value={draft}

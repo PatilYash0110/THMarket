@@ -4,6 +4,7 @@ import {
   createListing,
   deleteListing as deleteListingRequest,
   fetchFavoriteListingIds,
+  fetchListingById,
   fetchListings,
   markListingSold,
   purchaseListing as purchaseListingRequest,
@@ -31,7 +32,10 @@ interface ListingsContextValue {
   listings: Listing[]
   favoriteIds: string[]
   loading: boolean
+  error: string | null
+  retry: () => void
   getListing: (id: string) => Listing | undefined
+  refreshListing: (id: string) => Promise<void>
   addListing: (input: CreateListingInput) => Promise<Listing>
   updateListing: (id: string, updates: Partial<Listing>) => Promise<Listing>
   markAsSold: (id: string) => Promise<Listing>
@@ -48,23 +52,68 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
   const [listings, setListings] = useState<Listing[]>([])
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [retryToken, setRetryToken] = useState(0)
 
+  // Previously had no .catch at all — an API outage left `listings` at its
+  // initial [], which the Home page can't distinguish from "genuinely no
+  // results", plus an unhandled promise rejection in the console.
+  //
+  // Also re-runs when a guest logs in (currentUser?.id going from
+  // undefined to set): GET /listings now requires auth (S-01), so a guest
+  // redirected to a listing by RequireStudent, who then logs in, would
+  // otherwise be stuck with the failed/empty fetch from before they were
+  // authenticated — the exact listing they were sent to view would show
+  // as "not found". Keyed on the id, not the whole `currentUser` object,
+  // so an unrelated update (balance, profile) doesn't also refetch.
   useEffect(() => {
+    setLoading(true)
+    setError(null)
     fetchListings()
       .then(setListings)
+      .catch(() => setError('Inserate konnten nicht geladen werden.'))
       .finally(() => setLoading(false))
-  }, [])
+  }, [retryToken, currentUser?.id])
 
   useEffect(() => {
     if (!currentUser) {
       setFavoriteIds([])
       return
     }
-    fetchFavoriteListingIds().then(setFavoriteIds)
+    // Favorites are a secondary affordance shown as filled hearts on cards
+    // that already loaded some other way — silently keeping the existing
+    // (possibly empty) list on failure is enough here, no dedicated error UI.
+    fetchFavoriteListingIds()
+      .then(setFavoriteIds)
+      .catch(() => {})
   }, [currentUser])
+
+  function retry() {
+    setRetryToken((prev) => prev + 1)
+  }
 
   function getListing(id: string) {
     return listings.find((listing) => listing.id === id)
+  }
+
+  // The main `listings` fetch only happens once per session/login — a
+  // listing sold by someone else in the meantime still shows "Kaufen" and
+  // 409s at checkout until a full reload. Detail/checkout pages call this
+  // on mount to get that one listing's current state without refetching
+  // the whole list. Silently keeps the existing (possibly stale) entry on
+  // failure rather than erroring the whole page over one listing.
+  async function refreshListing(id: string): Promise<void> {
+    try {
+      const fresh = await fetchListingById(id)
+      setListings((prev) => {
+        if (!fresh) return prev.filter((listing) => listing.id !== id)
+        return prev.some((listing) => listing.id === id)
+          ? prev.map((listing) => (listing.id === id ? fresh : listing))
+          : [...prev, fresh]
+      })
+    } catch {
+      // keep whatever was already loaded
+    }
   }
 
   async function addListing(input: CreateListingInput) {
@@ -117,7 +166,10 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
         listings,
         favoriteIds,
         loading,
+        error,
+        retry,
         getListing,
+        refreshListing,
         addListing,
         updateListing,
         markAsSold,

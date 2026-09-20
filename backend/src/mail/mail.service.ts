@@ -64,6 +64,35 @@ export class MailService {
     this.logger.log(`Verification email sent to ${to}`);
   }
 
+  // Sent instead of a 409 when someone tries to register an @thm.de
+  // address that already has an account — see AuthService.register(). The
+  // API response itself stays identical to a real registration, so this
+  // email is the only place the account's actual owner learns anything.
+  async sendAccountExistsEmail(to: string, name: string): Promise<void> {
+    if (!this.transporter) {
+      this.logger.warn(
+        `GMAIL_USER/GMAIL_APP_PASSWORD not set — logging account-exists notice instead of sending email.`,
+      );
+      this.logger.log(`Account-exists notice for ${to}`);
+      return;
+    }
+
+    await this.transporter.sendMail({
+      from: `"THMarket" <${this.config.get<string>('GMAIL_USER')}>`,
+      to,
+      subject: 'Du hast bereits ein Konto — THMarket',
+      text: `Hallo ${name},\n\njemand hat versucht, mit dieser E-Mail-Adresse ein neues THMarket-Konto zu erstellen — du hast aber schon eines. Falls das du warst, kannst du dich ganz normal anmelden oder dein Passwort zurücksetzen. Falls nicht, kannst du diese E-Mail ignorieren.`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+          <p>Hallo ${escapeHtml(name)},</p>
+          <p>jemand hat versucht, mit dieser E-Mail-Adresse ein neues THMarket-Konto zu erstellen — du hast aber schon eines.</p>
+          <p>Falls das du warst, kannst du dich ganz normal anmelden oder dein Passwort zurücksetzen. Falls nicht, kannst du diese E-Mail ignorieren.</p>
+        </div>
+      `,
+    });
+    this.logger.log(`Account-exists notice sent to ${to}`);
+  }
+
   async sendPasswordResetEmail(to: string, name: string, resetUrl: string): Promise<void> {
     if (!this.transporter) {
       this.logger.warn(

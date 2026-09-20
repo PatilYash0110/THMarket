@@ -1,3 +1,4 @@
+import { forwardRef, Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import {
@@ -12,6 +13,8 @@ import {
 import type { Server, Socket } from 'socket.io';
 import { AUTH_COOKIE_NAME } from '../auth/auth-cookie';
 import type { JwtPayload } from '../auth/jwt.strategy';
+import { assertSessionStillValid } from '../auth/session-validation';
+import { PrismaService } from '../prisma/prisma.service';
 import { ChatService } from './chat.service';
 
 const MAX_MESSAGE_LENGTH = 2000;
@@ -43,7 +46,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
-    private readonly chatService: ChatService,
+    @Inject(forwardRef(() => ChatService)) private readonly chatService: ChatService,
+    private readonly prisma: PrismaService,
   ) {}
 
   // The JWT arrives either via the httpOnly auth cookie (same one the HTTP
@@ -53,7 +57,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // per-message headers, so this is verified once at connect time, same
   // secret as JwtStrategy's HTTP-side verification. Any failure just
   // disconnects; a rejected handshake is signal enough on its own.
-  async handleConnection(client: Socket): Promise<void> {
+  //
+  // Nest binds @SubscribeMessage handlers on this socket right after this
+  // method is *called*, without waiting for the promise it returns to
+  // settle — so a client that emits 'joinConversation' the instant it sees
+  // 'connect' can reach handleJoin() before the two awaits below have run,
+  // finding client.data.userId still unset and silently dropping the join.
+  // Stashing the in-flight promise on client.data (synchronously, before
+  // any await here) lets every other handler await it first and see the
+  // fully-authenticated socket either way.
+  handleConnection(client: Socket): Promise<void> {
+    const authenticated = this.authenticate(client);
+    client.data.authenticated = authenticated;
+    return authenticated;
+  }
+
+  private async authenticate(client: Socket): Promise<void> {
     try {
       const cookieToken = extractCookie(client.handshake.headers.cookie, AUTH_COOKIE_NAME);
       const token = cookieToken ?? (client.handshake.auth?.token as string | undefined);
@@ -61,7 +80,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const payload = await this.jwt.verifyAsync<JwtPayload>(token, {
         secret: this.config.getOrThrow<string>('JWT_SECRET'),
       });
+      await assertSessionStillValid(this.prisma, payload.sub, payload.iat);
       client.data.userId = payload.sub;
+      // A per-user room, joined regardless of which conversation rooms get
+      // joined afterward — lets notifyConversationStarted() below reach a
+      // seller for a conversation that didn't exist yet at connect time,
+      // which 'conversation:<id>' rooms alone can never cover.
+      await client.join(`user:${payload.sub}`);
     } catch {
       client.disconnect();
     }
@@ -71,8 +96,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.messageTimestamps.delete(client.id);
   }
 
+  // Called by ChatService right after a brand-new conversation is created,
+  // so the seller's first message from a buyer arrives live instead of
+  // only showing up on their next full page load — the seller's socket has
+  // no reason to have ever joined 'conversation:<id>' for a thread that
+  // didn't exist yet when they connected.
+  notifyConversationStarted(sellerId: string, conversation: unknown): void {
+    this.server.to(`user:${sellerId}`).emit('conversationStarted', conversation);
+  }
+
   @SubscribeMessage('joinConversation')
   async handleJoin(@ConnectedSocket() client: Socket, @MessageBody() conversationId: string): Promise<void> {
+    await (client.data.authenticated as Promise<void> | undefined);
     const userId = client.data.userId as string | undefined;
     if (!userId || typeof conversationId !== 'string' || !(await this.chatService.isParticipant(userId, conversationId))) {
       return;
@@ -80,27 +115,39 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await client.join(`conversation:${conversationId}`);
   }
 
+  // Returns an ack result rather than firing and forgetting — a rejected
+  // send (rate-limited, too long, not a participant) previously vanished
+  // silently server-side while the client had already cleared its draft,
+  // so the text was just gone with no way to know or retry (B-05). The
+  // client passes an ack callback; when it does, NestJS's socket.io
+  // adapter sends this return value back as that callback's argument.
   @SubscribeMessage('sendMessage')
   async handleSend(
     @ConnectedSocket() client: Socket,
     @MessageBody() body: { conversationId: string; text: string },
-  ): Promise<void> {
+  ): Promise<{ ok: boolean; reason?: string }> {
+    await (client.data.authenticated as Promise<void> | undefined);
     const userId = client.data.userId as string | undefined;
-    if (!userId || !this.withinRateLimit(client.id)) {
-      return;
+    if (!userId) {
+      return { ok: false, reason: 'unauthorized' };
+    }
+    if (!this.withinRateLimit(client.id)) {
+      return { ok: false, reason: 'rate_limited' };
     }
     const conversationId = body?.conversationId;
     const text = typeof body?.text === 'string' ? body.text.trim() : '';
-    if (
-      typeof conversationId !== 'string' ||
-      !text ||
-      text.length > MAX_MESSAGE_LENGTH ||
-      !(await this.chatService.isParticipant(userId, conversationId))
-    ) {
-      return;
+    if (typeof conversationId !== 'string' || !text) {
+      return { ok: false, reason: 'invalid' };
+    }
+    if (text.length > MAX_MESSAGE_LENGTH) {
+      return { ok: false, reason: 'too_long' };
+    }
+    if (!(await this.chatService.isParticipant(userId, conversationId))) {
+      return { ok: false, reason: 'forbidden' };
     }
     const message = await this.chatService.createMessage(conversationId, userId, text);
     this.server.to(`conversation:${conversationId}`).emit('message', message);
+    return { ok: true };
   }
 
   private withinRateLimit(socketId: string): boolean {

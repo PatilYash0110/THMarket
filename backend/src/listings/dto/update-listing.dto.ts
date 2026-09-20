@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   ArrayMaxSize,
   ArrayMinSize,
@@ -6,6 +7,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  Matches,
   Max,
   MaxLength,
   Min,
@@ -15,12 +17,14 @@ import { LISTING_CATEGORIES } from './create-listing.dto';
 
 export class UpdateListingDto {
   @IsOptional()
+  @Transform(({ value }) => value?.trim())
   @IsString()
   @MinLength(1)
   @MaxLength(200)
   title?: string;
 
   @IsOptional()
+  @Transform(({ value }) => value?.trim())
   @IsString()
   @MinLength(1)
   @MaxLength(5000)
@@ -42,6 +46,7 @@ export class UpdateListingDto {
   // empty array to strip every photo from a listing.
   @IsOptional()
   @IsString({ each: true })
+  @Matches(/^https:\/\/res\.cloudinary\.com\//, { each: true })
   @ArrayMinSize(1, { message: 'Mindestens ein Foto ist erforderlich.' })
   @ArrayMaxSize(6)
   images?: string[];

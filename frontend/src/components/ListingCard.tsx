@@ -1,5 +1,6 @@
-import { Heart } from '@phosphor-icons/react'
+import { Heart, ImageBroken } from '@phosphor-icons/react'
 import clsx from 'clsx'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useListings } from '../context/ListingsContext'
@@ -13,20 +14,28 @@ export function ListingCard({ listing }: { listing: Listing }) {
   const favorite = isFavorite(listing.id)
   const isOwner = currentUser?.id === listing.sellerId
   const sold = listing.status === 'VERKAUFT'
+  const [imageBroken, setImageBroken] = useState(false)
 
   return (
     <div className="group relative flex flex-col">
       <Link to={`/listing/${listing.id}`} className="block">
         <div className="relative aspect-square overflow-hidden rounded-2xl bg-surface-muted shadow-sm transition-shadow duration-300 ease-out group-hover:shadow-lg">
-          <img
-            src={listing.images[0]}
-            alt={listing.title}
-            loading="lazy"
-            className={clsx(
-              'h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105',
-              sold && 'opacity-50 grayscale',
-            )}
-          />
+          {imageBroken ? (
+            <div className="flex h-full w-full items-center justify-center text-foreground-muted">
+              <ImageBroken size={28} aria-hidden />
+            </div>
+          ) : (
+            <img
+              src={listing.images[0]}
+              alt={listing.title}
+              loading="lazy"
+              onError={() => setImageBroken(true)}
+              className={clsx(
+                'h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105',
+                sold && 'opacity-50 grayscale',
+              )}
+            />
+          )}
           {sold && (
             <span className="absolute left-3 top-3">
               <Badge tone="neutral">Verkauft</Badge>

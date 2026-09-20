@@ -4,7 +4,7 @@ import { Button } from './Button'
 
 const COOLDOWN_SECONDS = 60
 
-export function ResendVerificationButton({ email }: { email: string }) {
+export function ResendVerificationButton({ email, fullWidth = false }: { email: string; fullWidth?: boolean }) {
   const [secondsLeft, setSecondsLeft] = useState(0)
   const [sending, setSending] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
@@ -30,9 +30,15 @@ export function ResendVerificationButton({ email }: { email: string }) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <Button variant="secondary" size="sm" onClick={handleClick} disabled={sending || secondsLeft > 0}>
-        {secondsLeft > 0 ? `Erneut senden (${secondsLeft}s)` : 'Link erneut senden'}
+    <div className={fullWidth ? 'flex w-full flex-col gap-2' : 'flex flex-col items-center gap-2'}>
+      <Button
+        variant="secondary"
+        size={fullWidth ? 'lg' : 'sm'}
+        onClick={handleClick}
+        disabled={sending || secondsLeft > 0}
+        className={fullWidth ? 'w-full' : undefined}
+      >
+        {secondsLeft > 0 ? `Erneut senden (${secondsLeft}s)` : 'Bestätigungslink erneut senden'}
       </Button>
       {message && <p className="text-xs text-foreground-muted">{message}</p>}
     </div>

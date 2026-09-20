@@ -6,7 +6,7 @@ interface AuthContextValue {
   currentUser: User | null
   loading: boolean
   login: (email: string, password: string) => Promise<void>
-  logout: () => void
+  logout: () => Promise<void>
   setBalance: (balanceCents: number) => void
   updateUser: (user: User) => void
 }
@@ -33,11 +33,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCurrentUser(user)
   }
 
-  function logout() {
+  async function logout() {
+    // Await the cookie-clearing request before updating local state —
+    // fire-and-forget let a fast reload right after clicking "Abmelden"
+    // (e.g. on a shared campus PC) race ahead of the request and log the
+    // same session back in via the still-valid cookie.
+    await logoutUser().catch(() => {})
     setCurrentUser(null)
-    // Fire-and-forget: the cookie-clearing round trip doesn't need to block
-    // the UI from reflecting "logged out" immediately.
-    void logoutUser()
   }
 
   function setBalance(balanceCents: number) {

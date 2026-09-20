@@ -18,9 +18,19 @@ interface ReportFormProps {
   targetType: 'LISTING' | 'USER'
   targetId: string
   onCancel: () => void
+  // Admin-review context for a USER report only — which listing/chat the
+  // reported behavior happened around, so it's not lost after submitting.
+  contextListingId?: string
+  contextConversationId?: string
 }
 
-export function ReportForm({ targetType, targetId, onCancel }: ReportFormProps) {
+export function ReportForm({
+  targetType,
+  targetId,
+  onCancel,
+  contextListingId,
+  contextConversationId,
+}: ReportFormProps) {
   const [reason, setReason] = useState<string>(REPORT_REASONS[0])
   const [message, setMessage] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -34,8 +44,9 @@ export function ReportForm({ targetType, targetId, onCancel }: ReportFormProps) 
     try {
       await createReport({
         targetType,
-        listingId: targetType === 'LISTING' ? targetId : undefined,
+        listingId: targetType === 'LISTING' ? targetId : contextListingId,
         reportedUserId: targetType === 'USER' ? targetId : undefined,
+        conversationId: targetType === 'USER' ? contextConversationId : undefined,
         reason,
         message: message.trim() || undefined,
       })

@@ -1,5 +1,6 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { ChatGateway } from './chat.gateway';
 
 const USER_SELECT = { id: true, name: true } as const;
 // Shared by startConversation() and listConversations() so both always
@@ -15,7 +16,10 @@ const CONVERSATION_INCLUDE = {
 
 @Injectable()
 export class ChatService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => ChatGateway)) private readonly chatGateway: ChatGateway,
+  ) {}
 
   // Idempotent via a single atomic upsert on the (listingId, buyerId) unique
   // key, not a separate find-then-create — messaging the same seller about
@@ -24,7 +28,7 @@ export class ChatService {
   async startConversation(buyerId: string, listingId: string) {
     const listing = await this.prisma.listing.findUnique({
       where: { id: listingId },
-      select: { sellerId: true },
+      select: { sellerId: true, title: true },
     });
     if (!listing) {
       throw new NotFoundException('Inserat nicht gefunden.');
@@ -38,11 +42,20 @@ export class ChatService {
 
     const conversation = await this.prisma.conversation.upsert({
       where: { listingId_buyerId: { listingId, buyerId } },
-      create: { listingId, buyerId, sellerId: listing.sellerId },
+      // listingTitle is a one-time snapshot, not kept in sync with later
+      // title edits — `update: {}` deliberately never touches it on a
+      // reopened thread, same as every other field here.
+      create: { listingId, buyerId, sellerId: listing.sellerId, listingTitle: listing.title },
       update: {},
       include: CONVERSATION_INCLUDE,
     });
-    return { ...conversation, unreadCount: await this.countUnread(conversation, buyerId) };
+    const result = { ...conversation, unreadCount: await this.countUnread(conversation, buyerId) };
+    // Reaches the seller even if this is a brand-new thread they've never
+    // joined the room for — see ChatGateway.notifyConversationStarted().
+    // Harmless to call on a reopened existing thread too: their socket
+    // already has this conversation, so a repeat event just gets merged.
+    this.chatGateway.notifyConversationStarted(listing.sellerId, result);
+    return result;
   }
 
   // Newest-activity-first; only the single latest message per conversation
@@ -128,6 +141,21 @@ export class ChatService {
     }
     if (conversation.buyerId !== userId && conversation.sellerId !== userId) {
       throw new ForbiddenException('Du bist kein Teil dieser Unterhaltung.');
+    }
+    return this.prisma.message.findMany({
+      where: { conversationId },
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
+  // No participant check — only reachable via AdminController's own
+  // AdminGuard, for reviewing a conversation a report explicitly links
+  // (see AdminService.createReport's isConversationBetween check, which is
+  // what keeps an admin from being handed access to an unrelated chat).
+  async getMessagesForAdmin(conversationId: string) {
+    const conversation = await this.prisma.conversation.findUnique({ where: { id: conversationId } });
+    if (!conversation) {
+      throw new NotFoundException('Unterhaltung nicht gefunden.');
     }
     return this.prisma.message.findMany({
       where: { conversationId },

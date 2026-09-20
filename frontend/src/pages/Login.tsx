@@ -2,7 +2,13 @@ import { type FormEvent, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api/auth'
 import { Button } from '../components/Button'
+import { ResendVerificationButton } from '../components/ResendVerificationButton'
 import { useAuth } from '../context/AuthContext'
+
+// Matches the backend's exact message for an unverified account (see
+// AuthService.login) — the resend button only makes sense for that specific
+// case now that the backend distinguishes it from a wrong password again.
+const UNVERIFIED_MESSAGE = 'Bitte bestätige zuerst deine E-Mail-Adresse.'
 
 export function Login() {
   const { currentUser, loading, login } = useAuth()
@@ -70,9 +76,12 @@ export function Login() {
           </Link>
         </label>
         {error && (
-          <p id="login-error" role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
+          <div className="flex flex-col gap-2">
+            <p id="login-error" role="alert" className="text-sm text-destructive">
+              {error}
+            </p>
+            {error === UNVERIFIED_MESSAGE && email && <ResendVerificationButton email={email} fullWidth />}
+          </div>
         )}
         <Button type="submit" size="lg" className="mt-1" disabled={submitting}>
           {submitting ? 'Anmelden…' : 'Anmelden'}
