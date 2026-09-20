@@ -99,7 +99,7 @@ export class AdminService {
       where: status ? { status } : undefined,
       include: {
         reporter: { select: USER_SELECT },
-        listing: { select: { id: true, title: true, status: true } },
+        listing: { select: { id: true, title: true, status: true, images: true } },
         reportedUser: { select: USER_SELECT },
       },
       orderBy: { createdAt: 'desc' },

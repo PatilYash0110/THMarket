@@ -1,4 +1,6 @@
+import { ImageBroken } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   deleteAdminListing,
   deleteAdminUser,
@@ -15,6 +17,28 @@ import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useAuth } from '../context/AuthContext'
 import { formatDate, formatPrice } from '../lib/format'
 import type { AdminUser, AuditLogEntry, Listing, Report, ResolveReportAction } from '../types'
+
+// Small thumbnail for a reported listing — same broken-image fallback as
+// ListingCard, so a dead URL still reads as "no photo" rather than a
+// visibly broken <img>.
+function ReportThumbnail({ src }: { src?: string }) {
+  const [broken, setBroken] = useState(false)
+  if (!src || broken) {
+    return (
+      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-surface-muted text-foreground-muted">
+        <ImageBroken size={20} aria-hidden />
+      </div>
+    )
+  }
+  return (
+    <img
+      src={src}
+      alt=""
+      onError={() => setBroken(true)}
+      className="h-14 w-14 shrink-0 rounded-xl object-cover"
+    />
+  )
+}
 
 type Tab = 'reports' | 'users' | 'listings' | 'audit'
 
@@ -112,19 +136,39 @@ function ReportsTab() {
       {reports.length === 0 && <p className="text-sm text-foreground-muted">Keine Meldungen vorhanden.</p>}
       {reports.map((report) => (
         <div key={report.id} className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-4 text-sm shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="font-medium text-foreground">
-              {report.targetType === 'LISTING' ? 'Inserat: ' : 'Nutzer: '}
-              {report.listing?.title ?? report.reportedUser?.name ?? report.targetLabel}
-            </p>
-            <Badge tone={report.status === 'OFFEN' ? 'destructive' : 'accent'}>{report.status}</Badge>
+          <div className="flex items-start gap-3">
+            {report.targetType === 'LISTING' && <ReportThumbnail src={report.listing?.images[0]} />}
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                {report.targetType === 'LISTING' && report.listing ? (
+                  <Link
+                    to={`/listing/${report.listing.id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-medium text-foreground underline-offset-2 hover:text-accent-strong hover:underline"
+                  >
+                    {report.listing.title}
+                  </Link>
+                ) : (
+                  <p className="font-medium text-foreground">
+                    {report.targetType === 'LISTING' ? 'Inserat: ' : 'Nutzer: '}
+                    {report.reportedUser?.name ?? report.targetLabel}
+                    {report.targetType === 'LISTING' && ' (entfernt)'}
+                  </p>
+                )}
+                <Badge tone={report.status === 'OFFEN' ? 'destructive' : 'accent'}>{report.status}</Badge>
+              </div>
+              {report.targetType === 'USER' && report.reportedUser && (
+                <p className="text-xs text-foreground-muted">{report.reportedUser.email}</p>
+              )}
+              <p className="text-foreground-muted">Grund: {report.reason}</p>
+              {report.message && <p className="text-foreground-muted">„{report.message}"</p>}
+              <p className="text-xs text-foreground-muted">
+                Gemeldet von {report.reporter ? `${report.reporter.name} (${report.reporter.email})` : 'unbekannt'} ·{' '}
+                {formatDate(report.createdAt)}
+              </p>
+            </div>
           </div>
-          <p className="text-foreground-muted">Grund: {report.reason}</p>
-          {report.message && <p className="text-foreground-muted">„{report.message}"</p>}
-          <p className="text-xs text-foreground-muted">
-            Gemeldet von {report.reporter ? `${report.reporter.name} (${report.reporter.email})` : 'unbekannt'} ·{' '}
-            {formatDate(report.createdAt)}
-          </p>
           {report.status === 'OFFEN' && (
             <div className="mt-1 flex flex-wrap gap-2">
               <Button size="sm" variant="ghost" onClick={() => setPending({ report, action: 'NO_ACTION' })}>

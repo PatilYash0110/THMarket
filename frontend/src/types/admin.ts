@@ -12,7 +12,7 @@ export interface Report {
   status: ReportStatus
   targetLabel: string
   reporter: { id: string; name: string; email: string; role: Role } | null
-  listing: { id: string; title: string; status: 'AKTIV' | 'VERKAUFT' } | null
+  listing: { id: string; title: string; status: 'AKTIV' | 'VERKAUFT'; images: string[] } | null
   reportedUser: { id: string; name: string; email: string; role: Role } | null
   createdAt: string
   resolvedAt: string | null
