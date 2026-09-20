@@ -149,9 +149,19 @@ export class ListingsService {
       return this.markSoldInternal(id, buyerId);
     }
 
+    // Same eligibility guards as the simulation branch above — without them
+    // a Guthaben purchase could buy a Sofortkauf-disabled listing, or (since
+    // balanceCents exists on every User row regardless of role) let an admin
+    // account buy one too.
+    if (role !== 'STUDENT') {
+      throw new ForbiddenException('Nur Studierende können Inserate kaufen.');
+    }
     const listing = await this.prisma.listing.findUnique({ where: { id } });
     if (!listing) {
       throw new NotFoundException('Inserat nicht gefunden.');
+    }
+    if (!listing.sofortkaufMoeglich) {
+      throw new ForbiddenException('Für dieses Inserat ist kein Sofortkauf möglich.');
     }
     if (listing.sellerId === buyerId) {
       throw new ForbiddenException('Du kannst dein eigenes Inserat nicht kaufen.');
