@@ -1,9 +1,10 @@
-import { PaperPlaneRight } from '@phosphor-icons/react'
+import { Flag, PaperPlaneRight } from '@phosphor-icons/react'
 import clsx from 'clsx'
 import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Badge } from '../components/Badge'
 import { EmptyState } from '../components/EmptyState'
+import { ReportForm } from '../components/ReportForm'
 import { useAuth } from '../context/AuthContext'
 import { useMessages } from '../context/MessagesContext'
 import { formatDate } from '../lib/format'
@@ -55,6 +56,7 @@ export function Messages() {
   const { conversations, getMessages, openConversation, clearActiveConversation, sendMessage } = useMessages()
   const [draft, setDraft] = useState('')
   const [sendError, setSendError] = useState<string | null>(null)
+  const [reporting, setReporting] = useState(false)
 
   const activeConversation = conversationId
     ? conversations.find((conversation) => conversation.id === conversationId)
@@ -69,6 +71,7 @@ export function Messages() {
   // forever, and its unread badge would never increment again.
   useEffect(() => {
     setSendError(null)
+    setReporting(false)
     if (activeConversation) {
       openConversation(activeConversation.id)
     }
@@ -205,25 +208,44 @@ export function Messages() {
           </div>
         ) : (
           <>
-            <header className={clsx('flex shrink-0 items-center gap-3 border-b border-border px-5 py-4', (activeSold || activeListing?.removed) && 'opacity-60')}>
-              <Avatar name={activeOther?.name ?? '?'} className={clsx('h-10 w-10', (activeSold || activeListing?.removed) && 'grayscale')} />
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <p className="font-display text-base font-semibold text-foreground">{activeListing?.title}</p>
-                  {activeListing?.removed ? (
-                    <Badge tone="neutral">Entfernt</Badge>
-                  ) : (
-                    activeSold && <Badge tone="neutral">Verkauft</Badge>
-                  )}
+            <header className={clsx('flex shrink-0 items-center justify-between gap-3 border-b border-border px-5 py-4', (activeSold || activeListing?.removed) && 'opacity-60')}>
+              <div className="flex items-center gap-3">
+                <Avatar name={activeOther?.name ?? '?'} className={clsx('h-10 w-10', (activeSold || activeListing?.removed) && 'grayscale')} />
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <p className="font-display text-base font-semibold text-foreground">{activeListing?.title}</p>
+                    {activeListing?.removed ? (
+                      <Badge tone="neutral">Entfernt</Badge>
+                    ) : (
+                      activeSold && <Badge tone="neutral">Verkauft</Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-foreground-muted">
+                    {activeListing?.removed
+                      ? 'Dieses Inserat wurde entfernt — '
+                      : ''}
+                    mit {activeOther?.name ?? 'Gelöschter Nutzer'}
+                  </p>
                 </div>
-                <p className="text-xs text-foreground-muted">
-                  {activeListing?.removed
-                    ? 'Dieses Inserat wurde entfernt — '
-                    : ''}
-                  mit {activeOther?.name ?? 'Gelöschter Nutzer'}
-                </p>
               </div>
+              {activeOther && (
+                <button
+                  type="button"
+                  onClick={() => setReporting((prev) => !prev)}
+                  aria-label="Nutzer melden"
+                  className="flex shrink-0 cursor-pointer items-center gap-1.5 px-2 text-xs text-foreground-muted hover:text-destructive"
+                >
+                  <Flag size={14} aria-hidden />
+                  Melden
+                </button>
+              )}
             </header>
+
+            {reporting && activeOther && (
+              <div className="border-b border-border p-4">
+                <ReportForm targetType="USER" targetId={activeOther.id} onCancel={() => setReporting(false)} />
+              </div>
+            )}
 
             <div ref={messageListRef} className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-5">
               {activeMessages.map((message) => {
