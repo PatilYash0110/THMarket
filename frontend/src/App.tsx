@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
-import { RequireAdmin, RequireStudent } from './components/RequireAuth'
+import { RequireAdmin, RequireStudent, RequireUser } from './components/RequireAuth'
 import { AccountSettings } from './pages/AccountSettings'
 import { Admin } from './pages/Admin'
 import { Checkout } from './pages/Checkout'
@@ -29,9 +29,9 @@ export default function App() {
         <Route
           path="listing/:id"
           element={
-            <RequireStudent>
+            <RequireUser>
               <ListingDetail />
-            </RequireStudent>
+            </RequireUser>
           }
         />
         <Route path="listing/:id/edit" element={<ListingForm />} />

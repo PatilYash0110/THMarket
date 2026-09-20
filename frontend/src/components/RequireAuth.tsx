@@ -23,6 +23,24 @@ export function RequireStudent({ children }: { children: ReactNode }) {
   return <>{children}</>
 }
 
+/**
+ * For pages any signed-in account may view, student or admin alike — e.g.
+ * a listing's detail page, which admins need to open from a report's
+ * context link. Unlike RequireStudent, this never redirects an admin away.
+ */
+export function RequireUser({ children }: { children: ReactNode }) {
+  const { currentUser, loading } = useAuth()
+  const location = useLocation()
+
+  if (loading) return null
+
+  if (!currentUser) {
+    return <Navigate to="/login" state={{ from: location }} replace />
+  }
+
+  return <>{children}</>
+}
+
 export function RequireAdmin({ children }: { children: ReactNode }) {
   const { currentUser, loading } = useAuth()
 
