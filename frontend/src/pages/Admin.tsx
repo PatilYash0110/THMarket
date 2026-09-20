@@ -29,15 +29,19 @@ function Avatar({ name }: { name: string }) {
   )
 }
 
-// Small thumbnail for a reported listing — same broken-image fallback as
-// ListingCard, so a dead URL still reads as "no photo" rather than a
-// visibly broken <img>.
-function ReportThumbnail({ src }: { src?: string }) {
+// Small listing thumbnail — same broken-image fallback as ListingCard, so a
+// dead URL still reads as "no photo" rather than a visibly broken <img>.
+// Used on report cards (larger) and the listings table (smaller).
+function Thumbnail({ src, size = 56 }: { src?: string; size?: number }) {
   const [broken, setBroken] = useState(false)
+  const style = { width: size, height: size }
   if (!src || broken) {
     return (
-      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-surface-muted text-foreground-muted">
-        <ImageBroken size={20} aria-hidden />
+      <div
+        style={style}
+        className="flex shrink-0 items-center justify-center rounded-xl bg-surface-muted text-foreground-muted"
+      >
+        <ImageBroken size={size * 0.36} aria-hidden />
       </div>
     )
   }
@@ -46,7 +50,8 @@ function ReportThumbnail({ src }: { src?: string }) {
       src={src}
       alt=""
       onError={() => setBroken(true)}
-      className="h-14 w-14 shrink-0 rounded-xl object-cover"
+      style={style}
+      className="shrink-0 rounded-xl object-cover"
     />
   )
 }
@@ -179,7 +184,7 @@ function ReportsTab() {
       {visibleReports.map((report) => (
         <div key={report.id} className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-4 text-sm shadow-sm">
           <div className="flex items-start gap-3">
-            {report.targetType === 'LISTING' && <ReportThumbnail src={report.listing?.images[0]} />}
+            {report.targetType === 'LISTING' && <Thumbnail src={report.listing?.images[0]} />}
             <div className="flex min-w-0 flex-1 flex-col gap-2">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 {report.targetType === 'LISTING' && report.listing ? (
@@ -378,6 +383,13 @@ function ListingsTab() {
   const [error, setError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const [pendingDelete, setPendingDelete] = useState<Listing | null>(null)
+  const [query, setQuery] = useState('')
+  const visibleListings = query.trim()
+    ? listings.filter((listing) => {
+        const q = query.trim().toLowerCase()
+        return listing.title.toLowerCase().includes(q) || (listing.seller?.name.toLowerCase().includes(q) ?? false)
+      })
+    : listings
 
   async function load() {
     setLoading(true)
@@ -418,11 +430,21 @@ function ListingsTab() {
           {actionError}
         </p>
       )}
+      <input
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder="Titel oder Verkäufer durchsuchen…"
+        aria-label="Inserate durchsuchen"
+        className="h-10 w-full max-w-xs rounded-lg border border-border bg-surface px-3 text-sm text-foreground placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      />
+      {visibleListings.length === 0 && (
+        <p className="text-sm text-foreground-muted">Keine Inserate gefunden.</p>
+      )}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-foreground-muted">
-              <th className="py-2 pr-4">Titel</th>
+              <th className="py-2 pr-4">Inserat</th>
               <th className="py-2 pr-4">Verkäufer</th>
               <th className="py-2 pr-4">Preis</th>
               <th className="py-2 pr-4">Status</th>
@@ -430,9 +452,21 @@ function ListingsTab() {
             </tr>
           </thead>
           <tbody>
-            {listings.map((listing) => (
+            {visibleListings.map((listing) => (
               <tr key={listing.id} className="border-b border-border transition-colors hover:bg-surface-muted/40">
-                <td className="py-3 pr-4 text-foreground">{listing.title}</td>
+                <td className="py-3 pr-4 text-foreground">
+                  <div className="flex items-center gap-2.5">
+                    <Thumbnail src={listing.images[0]} size={40} />
+                    <Link
+                      to={`/listing/${listing.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline-offset-2 hover:text-accent-strong hover:underline"
+                    >
+                      {listing.title}
+                    </Link>
+                  </div>
+                </td>
                 <td className="py-3 pr-4 text-foreground-muted">{listing.seller?.name ?? 'Gelöschter Nutzer'}</td>
                 <td className="py-3 pr-4 text-foreground-muted">{formatPrice(listing.priceCents)}</td>
                 <td className="py-3 pr-4">
