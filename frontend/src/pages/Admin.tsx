@@ -461,12 +461,68 @@ function AuditLogTab() {
   )
 }
 
+interface Summary {
+  openReports: number
+  users: number
+  listings: number
+  lastActivity: AuditLogEntry | null
+}
+
+function StatTile({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-1 rounded-2xl border border-border bg-surface p-4 shadow-sm">
+      <span className="font-display text-2xl font-semibold tabular-nums text-foreground">{value}</span>
+      <span className="text-xs uppercase tracking-wide text-foreground-muted">{label}</span>
+    </div>
+  )
+}
+
+// A quick-glance summary above the tabs — previously there was nothing
+// here at all, just straight into whichever tab was selected, with no
+// sense of overall state without clicking through each one.
+function DashboardOverview() {
+  const [summary, setSummary] = useState<Summary | null>(null)
+
+  useEffect(() => {
+    Promise.all([fetchReports('OFFEN'), fetchAdminUsers(), fetchListings(), fetchAuditLog()])
+      .then(([openReports, users, listings, auditLog]) => {
+        setSummary({
+          openReports: openReports.length,
+          users: users.length,
+          listings: listings.length,
+          lastActivity: auditLog[0] ?? null,
+        })
+      })
+      .catch(() => setSummary(null))
+  }, [])
+
+  if (!summary) return null
+
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <StatTile label="Offene Meldungen" value={String(summary.openReports)} />
+      <StatTile label="Nutzer" value={String(summary.users)} />
+      <StatTile label="Inserate" value={String(summary.listings)} />
+      <div className="flex flex-col gap-1 rounded-2xl border border-border bg-surface p-4 shadow-sm">
+        <span className="truncate text-sm font-medium text-foreground">
+          {summary.lastActivity?.action ?? 'Noch keine Aktivität'}
+        </span>
+        <span className="text-xs uppercase tracking-wide text-foreground-muted">
+          {summary.lastActivity ? `Letzte Aktion · ${formatDate(summary.lastActivity.createdAt)}` : 'Audit-Log'}
+        </span>
+      </div>
+    </div>
+  )
+}
+
 export function Admin() {
   const [tab, setTab] = useState<Tab>('reports')
 
   return (
     <div className="flex flex-col gap-8">
       <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Admin-Bereich</h1>
+
+      <DashboardOverview />
 
       <div className="flex gap-1 border-b border-border">
         {TABS.map((item) => (
