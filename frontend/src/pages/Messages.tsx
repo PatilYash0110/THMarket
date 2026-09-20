@@ -33,7 +33,7 @@ export function Messages() {
     ? conversations.find((conversation) => conversation.id === conversationId)
     : undefined
   const activeMessages = activeConversation ? getMessages(activeConversation.id) : []
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messageListRef = useRef<HTMLDivElement>(null)
 
   // Lazily fetches the full history and joins the socket room only once a
   // thread is actually opened — the list view only ever carries a preview.
@@ -55,8 +55,16 @@ export function Messages() {
   // the fold. Re-runs whenever the message count changes too, so a live
   // incoming message while the thread is open also stays pinned to the
   // bottom.
+  //
+  // Sets scrollTop directly on the message list itself rather than calling
+  // scrollIntoView() on a bottom anchor — scrollIntoView() walks up EVERY
+  // scrollable ancestor to bring the target into view, so on a page whose
+  // outer layout is even a few pixels taller than the viewport it scrolls
+  // the whole page instead of (or as well as) this inner panel. Setting
+  // scrollTop touches only this one element.
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView()
+    const list = messageListRef.current
+    if (list) list.scrollTop = list.scrollHeight
   }, [activeConversation?.id, activeMessages.length])
 
   if (!currentUser) return null
@@ -164,7 +172,7 @@ export function Messages() {
               </div>
             </header>
 
-            <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-5">
+            <div ref={messageListRef} className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-5">
               {activeMessages.map((message) => {
                 const isMine = message.senderId === currentUser.id
                 return (
@@ -191,7 +199,6 @@ export function Messages() {
                   </div>
                 )
               })}
-              <div ref={messagesEndRef} />
             </div>
 
             <form onSubmit={handleSend} className="flex shrink-0 items-center gap-2 border-t border-border p-4">
