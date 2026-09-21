@@ -26,13 +26,38 @@ function parseDurationMs(value: string): number {
 // simply never send the cookie. That only works over HTTPS, hence pairing
 // it with `secure`, which is also why dev (plain http://localhost) needs
 // the Lax/non-secure combination instead.
-export function buildAuthCookieOptions(jwtExpiresIn: string): CookieOptions {
+//
+// `partitioned` (CHIPS) is the piece that actually makes this cookie
+// survive in Safari and Chrome-Incognito: both now block SameSite=None
+// third-party cookies by default with no exception, so without this flag
+// the browser accepts the Set-Cookie from login but never stores it —
+// every request afterward looks logged-out. Partitioned scopes storage to
+// "this cookie, as seen while browsing thmarket.vercel.app" specifically,
+// which both engines still allow. Requires secure + SameSite=None (already
+// true here), so this stays production-only alongside them.
+function baseAuthCookieOptions(): CookieOptions {
   const isProd = process.env.NODE_ENV === 'production';
   return {
     httpOnly: true,
     secure: isProd,
     sameSite: isProd ? 'none' : 'lax',
+    partitioned: isProd,
     path: '/',
+  };
+}
+
+export function buildAuthCookieOptions(jwtExpiresIn: string): CookieOptions {
+  return {
+    ...baseAuthCookieOptions(),
     maxAge: parseDurationMs(jwtExpiresIn),
   };
+}
+
+// clearCookie() only actually clears the cookie the browser is holding if
+// every attribute that identifies it (secure/sameSite/partitioned/path)
+// matches what it was set with — a bare `{ path: '/' }` clears a plain
+// cookie fine, but leaves a Partitioned one behind, so logout wouldn't
+// really log the browser out on the affected browsers.
+export function buildClearAuthCookieOptions(): CookieOptions {
+  return baseAuthCookieOptions();
 }

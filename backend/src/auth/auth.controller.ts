@@ -13,7 +13,11 @@ import { ConfigService } from '@nestjs/config';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { AccountThrottlerGuard } from './account-throttler.guard';
-import { AUTH_COOKIE_NAME, buildAuthCookieOptions } from './auth-cookie';
+import {
+  AUTH_COOKIE_NAME,
+  buildAuthCookieOptions,
+  buildClearAuthCookieOptions,
+} from './auth-cookie';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './current-user.decorator';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
@@ -94,7 +98,7 @@ export class AuthController {
 
   @Post('logout')
   logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie(AUTH_COOKIE_NAME, { path: '/' });
+    res.clearCookie(AUTH_COOKIE_NAME, buildClearAuthCookieOptions());
     return { loggedOut: true };
   }
 
