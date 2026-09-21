@@ -7,6 +7,7 @@ import { generateListingDescription, uploadListingImages } from '../api/listings
 import { Button } from '../components/Button'
 import { useAuth } from '../context/AuthContext'
 import { useListings } from '../context/ListingsContext'
+import { compressImage } from '../lib/image-compress'
 import type { Listing, ListingCategory } from '../types'
 
 const CATEGORIES: ListingCategory[] = [
@@ -129,7 +130,11 @@ function ListingFormFields({
     }
   }, [])
 
-  function handleFilesSelected(fileList: FileList | null) {
+  // Compresses each photo right at selection time — before it's ever stored
+  // as this item's `file` — so both the final Cloudinary upload and the AI
+  // description call downstream work off the same already-reasonably-sized
+  // file instead of a multi-megabyte phone-camera original.
+  async function handleFilesSelected(fileList: FileList | null) {
     if (!fileList) return
     const available = MAX_IMAGES - images.length
     const files = Array.from(fileList)
@@ -142,7 +147,8 @@ function ListingFormFields({
       setImageError(null)
     }
 
-    const newItems: ImageItem[] = files.slice(0, available).map((file) => {
+    const compressed = await Promise.all(files.slice(0, available).map(compressImage))
+    const newItems: ImageItem[] = compressed.map((file) => {
       const previewUrl = URL.createObjectURL(file)
       objectUrlsRef.current.add(previewUrl)
       return { kind: 'new', file, previewUrl }
@@ -386,7 +392,7 @@ function ListingFormFields({
             accept="image/*"
             multiple
             onChange={(event) => {
-              handleFilesSelected(event.target.files)
+              void handleFilesSelected(event.target.files)
               event.target.value = ''
             }}
             className="hidden"
