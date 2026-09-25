@@ -55,4 +55,3 @@ Die KI unterstützt ausschließlich die Generierung eines Beschreibungsvorschlag
 
 ---
 
-[← zurück zur Architekturübersicht](README.md) · Nächstes Kapitel: [2. Randb
