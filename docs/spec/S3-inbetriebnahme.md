@@ -1,4 +1,4 @@
-# S3 – Inbetriebnahme
+# S3 Inbetriebnahme
 
 Die Inbetriebnahme beschreibt den Übergang von THMarket aus der Entwicklungs- in die produktive Nutzung durch THM-Studierende. Da reale Nutzerkonten, Inserate und Guthabenstände entstehen, sobald das System freigegeben wird, folgt die Einführung einem gestuften Vorgehen. Als Einzelprojekt ohne separate Staging-Infrastruktur (es existiert nur die eine produktive Umgebung aus Vercel-Frontend, Render-Backend und einer Neon-Datenbank) fallen die Stufen „Testen" und „Vorschau" bewusst schlanker aus:
 
