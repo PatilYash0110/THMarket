@@ -36,7 +36,7 @@ graph TD
 
 </details>
 
-*(Mermaid-Quelldatei: [`diagrams-code/p2-systemkontext.mermaid`](docs/spec/diagrams-code/p2-systemkontext.mermaid))*
+*(Mermaid-Quelldatei: [`diagrams-code/p2-systemkontext.mermaid`](diagrams-code/p2-systemkontext.mermaid))*
 
 # 1.5 Technischer Rahmen
 
