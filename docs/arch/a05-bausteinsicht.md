@@ -25,7 +25,7 @@ Auf Ebene 1 besteht THMarket aus fünf fachlichen Kernmodulen (Auth, Listings, W
 <details>
 <summary>📊 Diagramm anzeigen</summary>
 
-![Whitebox „System THMarket"](diagram_images/04-whitebox-system-thmarket.png)
+![Whitebox „System THMarket"](diagram_images/04-ebene1-whitebox-system.png)
 
 </details>
 
