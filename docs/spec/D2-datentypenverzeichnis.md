@@ -1,4 +1,4 @@
-# 3.2 Datentypenverzeichnis
+# D2 Datentypenverzeichnis
 
 ### USER
 
