@@ -1,0 +1,41 @@
+flowchart TB
+  subgraph SYS["Whitebox System THMarket · Verfeinerungsebene 1"]
+    direction TB
+    subgraph CORE["Fachliche Kernmodule"]
+      direction LR
+      AUTH["Auth ·<br/>Benutzerverwaltung"]:::core
+      LST["Listings"]:::core
+      WAL["Wallet"]:::core
+      CHT["Chat"]:::core
+      ADM["Admin"]:::core
+    end
+    subgraph INT["Integrationsmodule"]
+      direction LR
+      MAIL["Mail"]:::int
+      CLD["Cloudinary-Anbindung"]:::int
+      GEM["Gemini-Anbindung"]:::int
+    end
+    DB[("Datenbank · Prisma")]:::db
+  end
+  NEON[("Neon PostgreSQL")]:::ext
+  SVC_CLD["Cloudinary"]:::ext
+  SVC_GEM["Google Gemini API"]:::ext
+  SVC_SMTP["Gmail SMTP"]:::ext
+  ADM -->|liest gemeldeten Chat-Verlauf| CHT
+  CHT -->|prüft JWT über| AUTH
+  LST -->|lädt Bilder hoch über| CLD
+  LST -->|KI-Beschreibung/Moderation über| GEM
+  AUTH -->|versendet E-Mails über| MAIL
+  AUTH -->|liest/schreibt| DB
+  LST -->|liest/schreibt| DB
+  WAL -->|liest/schreibt| DB
+  CHT -->|liest/schreibt| DB
+  ADM -->|liest/schreibt| DB
+  DB --> NEON
+  MAIL -->|sendet E-Mail via| SVC_SMTP
+  CLD -->|lädt Bild hoch via| SVC_CLD
+  GEM -->|sendet Bild/Text via| SVC_GEM
+  classDef core fill:#d0ebff,stroke:#1971c2,color:#0b3a66
+  classDef int fill:#e5dbff,stroke:#7048e8,color:#3b2764
+  classDef db fill:#1d2b53,stroke:#101a3a,color:#ffffff
+  classDef ext fill:#e9ecef,stroke:#868e96,color:#343a40
