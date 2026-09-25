@@ -165,7 +165,7 @@ sequenceDiagram
 
 *Abbildung 15: Laufzeitsicht — Mock-Kauf*
 
-![Mock-Kauf](diagram_images/a06-laufzeitdiagramm_mock_kauf.png)
+![Mock-Kauf](diagram_images/14-mock-kauf.png)
 *(Quelltext: `diagrams-code/a06-laufzeitdiagramm_mock_kauf.mmd`)*
 
 ## 6.6 Meldung
