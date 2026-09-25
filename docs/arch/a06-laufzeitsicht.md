@@ -103,7 +103,7 @@ sequenceDiagram
 
 *Abbildung 13: Laufzeitsicht — Inserat mit KI-Beschreibung*
 
-![Inserat mit KI-Beschreibung](diagram_images/a06-laufzeitdiagramm_Inserat_KI_Beschreibung.png)
+![Inserat mit KI-Beschreibung](diagram_images/12-inserat-ki-beschreibung.png)
 *(Quelltext: `diagrams-code/a06-laufzeitdiagramm_Inserat_KI_Beschreibung.mmd`)*
 
 ## 6.4 Echtzeit-Chat
