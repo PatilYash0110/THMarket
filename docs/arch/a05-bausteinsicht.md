@@ -123,6 +123,6 @@ Besteht aus drei Teilen: **Meldungsverwaltung**, **Maßnahmen** und **Audit Log*
 Jede Maßnahme, die der Admin ergreift, wird vom Audit-Log-Teil protokolliert — die Maßnahmen-Komponente schreibt also nicht nur die eigentliche Aktion, sondern stößt zusätzlich den Log-Eintrag an.
 Meldungsverwaltung, Maßnahmen und Audit Log greifen alle jeweils eigenständig auf die Datenbank zu.
  
-![Whitebox Admin Management](diagram_images/a05-bausteinsicht_whitebox_admin_management.png)
+![Whitebox Admin Management](diagram_images/06-ebene2-whitebox-admin.png)
  
 *(Quelltext: `diagrams-code/a05-bausteinsicht_whitebox_admin_management.plantuml`)*
