@@ -1,4 +1,4 @@
-# 7. Verteilungssicht
+# A07. Verteilungssicht
 
 
 Die Softwarebausteine werden auf verschiedene Infrastruktur-Komponenten verteilt.
@@ -12,7 +12,7 @@ Die Softwarebausteine werden auf verschiedene Infrastruktur-Komponenten verteilt
 
 </details>
 
-## 7.1 Infrastruktur Ebene 1
+## A07.1 Infrastruktur Ebene 1
 
 Ebene 1 benennt die beteiligten Infrastruktur-Knoten und beschreibt, welche Bausteine auf ihnen laufen und wofür der jeweilige Knoten zuständig ist.
 
@@ -26,7 +26,7 @@ Ebene 1 benennt die beteiligten Infrastruktur-Knoten und beschreibt, welche Baus
 
 *Infrastrukturknoten der Verteilungssicht*
 
-## 7.2 Infrastruktur Ebene 2
+## A07.2 Infrastruktur Ebene 2
 
 Ebene 2 beschreibt die Kommunikationsbeziehungen zwischen den Knoten samt der eingesetzten Protokolle. Alle Verbindungen sind in der Produktion transportverschlüsselt.
 
