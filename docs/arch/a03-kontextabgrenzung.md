@@ -42,7 +42,7 @@ Nicht Teil von THMarket sind: Cloudinary, Google Gemini, Gmail SMTP, reale Zahlu
 <details>
 <summary>📊 Diagramm anzeigen</summary>
 
-![Technischer Kontext der THMarket-Anwendung](diagrams-png/02-technischer-kontext.png)
+![Technischer Kontext der THMarket-Anwendung](diagram_images/02-technischer-kontext.png)
 
 </details>
 
