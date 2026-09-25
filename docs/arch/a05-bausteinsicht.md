@@ -77,7 +77,7 @@ Die E-Mail Verifizierung spricht zusätzlich mit Gmail SMTP, um den Bestätigung
 Der JWT Guard / Rollen-Teil prüft Anfragen anhand des Tokens, hat dafür aber keine eigene, direkte Datenbankverbindung eingezeichnet — er arbeitet mit den Daten, die Login bzw.
 Registrierung bereits abgelegt haben.
  
-![Whitebox User Management](diagram_images/a05-bausteinsicht_whitebox_user_management.png)
+![Whitebox User Management](diagram_images/07-ebene2-whitebox-auth.png)
  
 *(Quelltext: `diagrams-code/a05-bausteinsicht_whitebox_user_management.plantuml`)*
  
