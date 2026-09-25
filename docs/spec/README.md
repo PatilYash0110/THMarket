@@ -63,3 +63,15 @@
 | E2 | Glossar | 🛠 | `` |
 
 ## Nicht anwendbare Bausteine
+
+---
+
+## Eingesetzte KI-Werkzeuge
+
+| Werkzeug | Eingesetzt für |
+|----------|----------------|
+| Claude (Claude Code) | Entwürfe und Umformulierungen von Bausteintexten, Repository- und Commit-Verwaltung |
+| Google Gemini | Recherche, Formulierungsvorschläge |
+| ChatGPT | Formulierungsvorschläge, Gegenlesen einzelner Abschnitte |
+
+Die fachlichen Festlegungen — Projektidee, Nutzerkreis, Anwendungsfälle, Datenmodell — sind Entscheidungen der Gruppe und nicht KI-generiert. Jeder mit KI-Unterstützung entstandene Abschnitt wurde von mindestens einem Gruppenmitglied gegen die eigene Projektidee gelesen und überarbeitet; Diagramme wurden im Mermaid- bzw. PlantUML-Quelltext von Hand nachgearbeitet.

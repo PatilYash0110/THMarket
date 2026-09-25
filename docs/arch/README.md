@@ -28,3 +28,17 @@ Referenz-Template: https://arc42.org/.
 | 10 | Qualitätsanforderungen | ✅ | [`a10-qualitaetsanforderungen.md`](a10-qualitaetsanforderungen.md) |
 | 11 | Risiken und technische Schulden | ✅ | [`a11-risiken-und-technische-schulden.md`](a11-risiken-und-technische-schulden.md) |
 | 12 | Glossar | ✅ | [`a12-glossar.md`](a12-glossar.md)  |
+
+---
+
+## Eingesetzte KI-Werkzeuge
+
+| Werkzeug | Eingesetzt für |
+|----------|----------------|
+| Claude (Claude Code) | Entwürfe für Kapiteltexte und ADRs, Code-Vervollständigung im Backend, Repository- und Commit-Verwaltung |
+| Google Gemini | Code-Vervollständigung, Recherche zu Technologiealternativen |
+| ChatGPT | Formulierungsvorschläge, Gegenlesen einzelner Kapitel |
+
+Die Architekturentscheidungen wurden in der Gruppe getroffen; KI-Werkzeuge dienten der Recherche der Alternativen und der Ausformulierung. Bausteinsicht und Laufzeitsicht wurden gegen den tatsächlichen Modulschnitt in `backend/src/` abgeglichen, Diagramme im Quelltext von Hand nachgearbeitet.
+
+Google Gemini ist außerdem Bestandteil der Anwendung selbst — siehe ADR-005 in [`a09-entwurfsentscheidungen.md`](a09-entwurfsentscheidungen.md).
