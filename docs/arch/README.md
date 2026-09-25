@@ -48,7 +48,6 @@ Alle 15 Diagramme sind als Bild eingebettet (standardmäßig eingeklappt, `📊 
 | 14 — Laufzeitsicht: Meldung | [`diagrams-png/14-laufzeitsicht-meldung.png`](diagram_images/14-mock-kauf.png) |
 | 15 — Verteilungssicht | [`diagrams-png/15-verteilungssicht.png`](diagram_images/15-registrierung-verifizierung.png) |
 
-Das Datenmodell (ER-Diagramm) ist nicht Teil dieses Dokuments — es wird mit der [Spezifikation](../spec/README.md) geteilt, siehe [`docs/spec/diagrams-code/datenmodell.mmd`](../spec/diagrams-code/datenmodell.mmd).
 
 
 ---
