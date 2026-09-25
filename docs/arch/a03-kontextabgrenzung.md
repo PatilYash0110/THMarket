@@ -10,7 +10,7 @@ THMarket wird in diesem Kapitel als Blackbox betrachtet. Die Kontextabgrenzung z
 *Abbildung 1: Fachlicher Kontext der THMarket-Anwendung*
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary>Diagramm anzeigen</summary>
 
 ![Fachlicher Kontext der THMarket-Anwendung](diagram_images/01-fachlicher-kontext.png)
 
@@ -39,7 +39,7 @@ Nicht Teil von THMarket sind: Cloudinary, Google Gemini, Gmail SMTP, reale Zahlu
 *Abbildung 2: Technischer Kontext der THMarket-Anwendung*
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary>Diagramm anzeigen</summary>
 
 ![Technischer Kontext der THMarket-Anwendung](diagram_images/02-technischer-kontext.png)
 
