@@ -29,7 +29,7 @@ sequenceDiagram
 
 *Abbildung 11: Laufzeitsicht — Allgemeiner Ablauf*
 
-![Allgemeiner Ablauf](diagram_images/a06-laufzeitdiagramm_allgemeiner_ablauf.png)
+![Allgemeiner Ablauf](diagram_images/10-allgemeiner-ablauf.png)
 *(Quelltext: `diagrams-code/a06-laufzeitdiagramm_allgemeiner_ablauf.mmd`)*
 
 ## 6.2 Registrierung & Verifizierung
