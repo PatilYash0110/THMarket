@@ -2,6 +2,10 @@
 
 Geschlossener Marktplatz für Studierende und Angehörige der THM.
 
+**Live-Demo:** <https://thmarket.vercel.app>
+
+> Das Backend läuft auf einem Render-Free-Tier und schläft nach etwa 15 Minuten Inaktivität ein. Die erste Anfrage nach einer Ruhephase kann daher 30–50 Sekunden dauern, danach reagiert die Anwendung normal.
+
 Inserate für Studienmaterialien, Möbel und Elektronik, handelbar ausschließlich innerhalb der Hochschule — abgesichert über E-Mail-Verifizierung mit THM-Adresse, mit Echtzeit-Chat zwischen Käufer und Verkäufer und simulierter Zahlung über ein internes Guthabenkonto.
 
 ## Projektkontext
@@ -75,7 +79,7 @@ OFFEN  -->  GESCHLOSSEN
 | Tests | Jest + Supertest | |
 | Laufzeit | Node.js | 20.19.0 |
 
-Deployment-Ziel laut ADR-010: Frontend auf Vercel, Backend auf Render, Datenbank auf Neon.
+Deployment laut ADR-010: Frontend auf Vercel (<https://thmarket.vercel.app>), Backend auf Render, Datenbank auf Neon.
 
 ## Voraussetzungen
 
