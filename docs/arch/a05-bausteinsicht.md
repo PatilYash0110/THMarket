@@ -22,7 +22,7 @@ Zwischen den fünf Modulen gibt es außerdem fachliche Abhängigkeiten, die in d
 - **Transaktion Management** braucht User Management und Inserat Management — um zu wissen, wer kauft, wer verkauft und welches Inserat gekauft wird.
 - **Kommunikation** braucht ebenfalls User Management und Inserat Management — der Chat findet zwischen zwei Nutzern über ein bestimmtes Inserat statt.
 - **Inserat Management** braucht seinerseits User Management, um den Anbieter eines Inserats zu kennen.
-![Whitebox THMarket Ebene 1](diagram_images/a05-bausteinsicht_whitebox_level_1.png)
+![Whitebox THMarket Ebene 1](diagram_images/04-ebene1-whitebox-system.png)
  
 *(Quelltext: `diagrams-code/a05-bausteinsicht_whitebox_level_1.plantuml`)*
  
