@@ -1,4 +1,4 @@
-# S1 – Nachbarsysteme
+# S1 Nachbarsysteme
 
 S1 beschreibt die Schnittstellen zwischen THMarket und externen Nachbarsystemen. THMarket greift auf drei externe Dienste zurück, um Kernfunktionen wie E-Mail-Versand, Bildspeicherung und KI-gestützte Beschreibungsvorschläge/Bildmoderation umzusetzen. Diese Dienste sind aus Sicht von THMarket Nachbarsysteme. Das System kommuniziert lose gekoppelt mit ihnen, hat aber keinen Einfluss auf deren Verfügbarkeit oder Weiterentwicklung.
 
