@@ -45,6 +45,6 @@ Der Administrator ist ein spezieller Akteur mit Rolle `ADMIN`, angelegt über ei
 - Inserate verwalten, insbesondere löschen (UC14)
 - Audit-Log einsehen (UC14)
 
-### Typischer Geschäftsprozess
+## 2.2 Typischer Geschäftsprozess
 
 Der typische Lebenszyklus eines Nutzers durchläuft folgende Stationen, die in den Use Cases UC01–UC14 im Detail beschrieben sind:
