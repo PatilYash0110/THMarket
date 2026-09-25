@@ -5,7 +5,7 @@ Auf der obersten Ebene (Ebene 0, Systemkontext) sieht man nur, wie sich THMarket
 Eine Ebene tiefer (Ebene 1) wird THMarket in seine fünf fachlichen Module zerlegt: User Management, Inserat Management, Kommunikation, Transaktion Management und Admin Management, die alle auf eine gemeinsame Datenbank zugreifen.
 Noch eine Ebene tiefer (Ebene 2) wird jedes der fünf Module im Detail betrachtet.
  
-![Bausteinsicht – Zerlegungsübersicht](diagram_images/a05_Bausteinsicht.png)
+![Bausteinsicht – Zerlegungsübersicht](diagram_images/03-ebene0-1-2-uebersicht.png)
  
 *Abbildung 4: Bausteinsicht — Zerlegungsübersicht (Ebenen 0–2)*
 *(Quelltext: `diagrams-code/a05-bausteinsicht.plantuml`)*
