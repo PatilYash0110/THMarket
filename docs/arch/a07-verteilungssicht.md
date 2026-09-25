@@ -2,7 +2,7 @@
 
 Die Softwarebausteine werden auf verschiedene Infrastruktur-Komponenten verteilt.
 
-![Verteilungssicht](diagram_images/a07-verteilungssicht.png)
+![Verteilungssicht](diagram_images/16-verteilungssicht.png)
 
 *Abbildung 17: Verteilungssicht*
 
