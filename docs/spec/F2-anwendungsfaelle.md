@@ -823,7 +823,6 @@ sequenceDiagram
 
 *Tabelle: Use Case UC13 – Meldungen bearbeiten (Admin)*
 
-> **Hinweis:** Welche Maßnahme zulässig ist, hängt vom Meldungstyp ab — bei einer Inserat-Meldung ist nur „löschen" oder „ohne Maßnahme schließen" möglich, bei einer Nutzer-Meldung nur „verwarnen", „löschen" oder „ohne Maßnahme schließen".
 
 #### Sequenzdiagramm UC13 – Meldungen bearbeiten
 
