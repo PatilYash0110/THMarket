@@ -9,44 +9,44 @@ Campus-Marktplatz für THM-Studierende
 | **Dokumenttyp** | Architekturdokumentation nach arc42 |
 | **Quelle** | `THMarket_Architektur_format check (korrigiert).pdf` |
 
-Dieses Dokument beschreibt die Softwarearchitektur von THMarket nach dem arc42-Template, aufbereitet als eine eigene, GitHub-lesbare README pro Kapitel. Die Kapitelnummerierung (A01–A12) folgt dem arc42-Standardschema; **A10 (Qualitätsanforderungen)** und **A11 (Risiken und technische Schulden)** sind im Quelldokument nicht als eigene Kapitel enthalten und daher hier ausgelassen — verwandte Inhalte finden sich in [Kapitel 1.2 (Qualitätsziele)](A01-introduction-and-goals.md#12-qualitätsziele) und [Kapitel 8 (Querschnittliche Konzepte)](A08-cross-cutting-concepts.md).
+Dieses Dokument beschreibt die Softwarearchitektur von THMarket nach dem arc42-Template, aufbereitet als eine eigene, GitHub-lesbare README pro Kapitel. Die Kapitelnummerierung (A01–A12) folgt dem arc42-Standardschema; **A10 (Qualitätsanforderungen)** und **A11 (Risiken und technische Schulden)** sind im Quelldokument nicht als eigene Kapitel enthalten und daher hier ausgelassen — verwandte Inhalte finden sich in [Kapitel 1.2 (Qualitätsziele)](a01-einfuehrung-und-ziele.md) und [Kapitel 8 (Querschnittliche Konzepte)](a08-querschnittliche-konzepte.md).
 
-Alle 15 Diagramme sind als Bild eingebettet (standardmäßig eingeklappt, `📊 Diagramm anzeigen`) und liegen zusätzlich einzeln unter [`diagrams-png/`](diagrams-png/) — direkt aus dem Original-PDF extrahiert, da für dieses Dokument kein Mermaid-Quelltext vorliegt (im Unterschied zur [Spezifikation](../spec/README.md), deren Diagramme als Mermaid-Code vorliegen).
+Alle 15 Diagramme sind als Bild eingebettet (standardmäßig eingeklappt, `📊 Diagramm anzeigen`) und liegen zusätzlich einzeln unter [`diagrams-png/`](diagram_images/) — direkt aus dem Original-PDF extrahiert, da für dieses Dokument kein Mermaid-Quelltext vorliegt (im Unterschied zur [Spezifikation](../spec/README.md), deren Diagramme als Mermaid-Code vorliegen).
 
 ## Inhaltsverzeichnis
 
-1. [Einführung und Ziele](A01-introduction-and-goals.md) — Anforderungsübersicht, Qualitätsziele, Stakeholder
-2. [Randbedingungen](A02-architecture-constraints.md) — Technologie-Stack, technische und organisatorische Randbedingungen
-3. [Kontextabgrenzung](A03-context-and-scope.md) — Fachlicher und technischer Kontext
-4. [Lösungsstrategie](A04-solution-strategy.md) — Grundlegende Architekturentscheidungen
-5. [Bausteinsicht](A05-building-block-view.md) — Module auf Ebene 0–2 (Auth, Listings, Wallet, Chat, Admin)
-6. [Laufzeitsicht](A06-runtime-view.md) — Sechs zentrale Abläufe als Sequenzdiagramm
-7. [Verteilungssicht](A07-deployment-view.md) — Infrastruktur-Knoten und Kommunikationsprotokolle
-8. [Querschnittliche Konzepte](A08-cross-cutting-concepts.md) — Persistenz, Sicherheit & Datenschutz, API
-9. [Architekturentscheidungen](A09-architecture-decisions.md) — ADR-001 bis ADR-010
+1. [Einführung und Ziele](a01-einfuehrung-und-ziele.md) — Anforderungsübersicht, Qualitätsziele, Stakeholder
+2. [Randbedingungen](a02-randbedingungen.md) — Technologie-Stack, technische und organisatorische Randbedingungen
+3. [Kontextabgrenzung](a03-kontextabgrenzung.md) — Fachlicher und technischer Kontext
+4. [Lösungsstrategie](a04-loesungsstrategie.md) — Grundlegende Architekturentscheidungen
+5. [Bausteinsicht](a05-bausteinsicht.md) — Module auf Ebene 0–2 (Auth, Listings, Wallet, Chat, Admin)
+6. [Laufzeitsicht](a06-laufzeitsicht.md) — Sechs zentrale Abläufe als Sequenzdiagramm
+7. [Verteilungssicht](a07-verteilungssicht.md) — Infrastruktur-Knoten und Kommunikationsprotokolle
+8. [Querschnittliche Konzepte](a08-querschnittliche-konzepte.md) — Persistenz, Sicherheit & Datenschutz, API
+9. [Architekturentscheidungen](a09-entwurfsentscheidungen.md) — ADR-001 bis ADR-010
 10. ~~Qualitätsanforderungen~~ — nicht im Quelldokument enthalten
 11. ~~Risiken und technische Schulden~~ — nicht im Quelldokument enthalten
-12. [Glossar](A12-glossary.md) — Fachbegriffe, Quellen und verwandte Dokumente (letztes Kapitel)
+12. [Glossar](a12-glossar.md) — Fachbegriffe, Quellen und verwandte Dokumente (letztes Kapitel)
 
 ## Diagrammquellen
 
 | Abbildung | Datei |
 |---|---|
-| 1 — Fachlicher Kontext | [`diagrams-png/01-fachlicher-kontext.png`](diagrams-png/01-fachlicher-kontext.png) |
-| 2 — Technischer Kontext | [`diagrams-png/02-technischer-kontext.png`](diagrams-png/02-technischer-kontext.png) |
-| 3 — Bausteinsicht Zerlegungsübersicht | [`diagrams-png/03-bausteinsicht-zerlegungsuebersicht.png`](diagrams-png/03-bausteinsicht-zerlegungsuebersicht.png) |
-| 4 — Whitebox „System THMarket" | [`diagrams-png/04-whitebox-system-thmarket.png`](diagrams-png/04-whitebox-system-thmarket.png) |
-| 5 — Whitebox „Auth" | [`diagrams-png/05-whitebox-auth.png`](diagrams-png/05-whitebox-auth.png) |
-| 6 — Whitebox „Listings" | [`diagrams-png/06-whitebox-listings.png`](diagrams-png/06-whitebox-listings.png) |
-| 7 — Whitebox „Chat" | [`diagrams-png/07-whitebox-chat.png`](diagrams-png/07-whitebox-chat.png) |
-| 8 — Whitebox „Admin" | [`diagrams-png/08-whitebox-admin.png`](diagrams-png/08-whitebox-admin.png) |
-| 9 — Laufzeitsicht: Allgemeiner Ablauf | [`diagrams-png/09-laufzeitsicht-allgemeiner-ablauf.png`](diagrams-png/09-laufzeitsicht-allgemeiner-ablauf.png) |
-| 10 — Laufzeitsicht: Registrierung & Verifizierung | [`diagrams-png/10-laufzeitsicht-registrierung-verifizierung.png`](diagrams-png/10-laufzeitsicht-registrierung-verifizierung.png) |
-| 11 — Laufzeitsicht: Inserat mit KI-Beschreibung | [`diagrams-png/11-laufzeitsicht-inserat-ki-beschreibung.png`](diagrams-png/11-laufzeitsicht-inserat-ki-beschreibung.png) |
-| 12 — Laufzeitsicht: Echtzeit-Chat | [`diagrams-png/12-laufzeitsicht-echtzeit-chat.png`](diagrams-png/12-laufzeitsicht-echtzeit-chat.png) |
-| 13 — Laufzeitsicht: Mock-Kauf | [`diagrams-png/13-laufzeitsicht-mock-kauf.png`](diagrams-png/13-laufzeitsicht-mock-kauf.png) |
-| 14 — Laufzeitsicht: Meldung | [`diagrams-png/14-laufzeitsicht-meldung.png`](diagrams-png/14-laufzeitsicht-meldung.png) |
-| 15 — Verteilungssicht | [`diagrams-png/15-verteilungssicht.png`](diagrams-png/15-verteilungssicht.png) |
+| 1 — Fachlicher Kontext | [`diagrams-png/01-fachlicher-kontext.png`](diagram_images/01-fachlicher-kontext.png) |
+| 2 — Technischer Kontext | [`diagrams-png/02-technischer-kontext.png`](diagrams_images/02-technischer-kontext.png) |
+| 3 — Bausteinsicht Zerlegungsübersicht | [`diagrams-png/03-bausteinsicht-zerlegungsuebersicht.png`](diagram_images/003-ebene0-1-2-uebersicht.png) |
+| 4 — Whitebox „System THMarket" | [`diagrams-png/04-whitebox-system-thmarket.png`](diagram_images/04-ebene1-whitebox-system.png) |
+| 5 — Whitebox „Auth" | [`diagrams-png/05-whitebox-auth.png`](diagram_images/05-ebene2-kernmodule-band.png) |
+| 6 — Whitebox „Listings" | [`diagrams-png/06-whitebox-listings.png`](diagram_images/06-ebene2-whitebox-admin.png) |
+| 7 — Whitebox „Chat" | [`diagrams-png/07-whitebox-chat.png`](diagram_images/07-ebene2-whitebox-auth.png) |
+| 8 — Whitebox „Admin" | [`diagrams-png/08-whitebox-admin.png`](diagram_images/08-ebene2-whitebox-chat.png) |
+| 9 — Laufzeitsicht: Allgemeiner Ablauf | [`diagrams-png/09-laufzeitsicht-allgemeiner-ablauf.png`](diagrams_images/09-ebene2-whitebox-listings.png) |
+| 10 — Laufzeitsicht: Registrierung & Verifizierung | [`diagrams-png/10-laufzeitsicht-registrierung-verifizierung.png`](diagram_images/10-allgemeiner-ablauf.png) |
+| 11 — Laufzeitsicht: Inserat mit KI-Beschreibung | [`diagrams-png/11-laufzeitsicht-inserat-ki-beschreibung.png`](diagram_images/11-echtzeit-chat.png) |
+| 12 — Laufzeitsicht: Echtzeit-Chat | [`diagrams-png/12-laufzeitsicht-echtzeit-chat.png`](diagram_images/12-inserat-ki-beschreibung.png) |
+| 13 — Laufzeitsicht: Mock-Kauf | [`diagrams-png/13-laufzeitsicht-mock-kauf.png`](diagram_images/13-meldung.png) |
+| 14 — Laufzeitsicht: Meldung | [`diagrams-png/14-laufzeitsicht-meldung.png`](diagram_images/14-mock-kauf.png) |
+| 15 — Verteilungssicht | [`diagrams-png/15-verteilungssicht.png`](diagram_images/15-registrierung-verifizierung.png) |
 
 Das Datenmodell (ER-Diagramm) ist nicht Teil dieses Dokuments — es wird mit der [Spezifikation](../spec/README.md) geteilt, siehe [`docs/spec/diagrams-code/datenmodell.mmd`](../spec/diagrams-code/datenmodell.mmd).
 
