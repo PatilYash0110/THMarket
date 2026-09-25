@@ -14,7 +14,7 @@
 | KI-Beschreibung | Von Google Gemini generierter Beschreibungsentwurf aus Fotos, Titel, Kategorie und optionalem Hinweis. |
 | Mock | Nachbildung einer Funktion ohne echte externe Anbindung. |
 | Prisma | ORM für den typsicheren Datenbankzugriff. |
-| Rate-Limiting | Drosselung der Anfragehäufigkeit; im Projekt gezielt auf sensible Endpunkte angewendet (siehe [Kapitel 8.2](Aa08-querschnittliche-konzepte.md#69-sicherheit--datenschutz)). |
+| Rate-Limiting | Drosselung der Anfragehäufigkeit; im Projekt gezielt auf sensible Endpunkte angewendet (siehe [Kapitel 8.2](a08-querschnittliche-konzepte.md#69-sicherheit--datenschutz)). |
 | Simulation (Zahlungsmodus) | Kauf per Test-Kreditkarte ohne jeglichen Geldfluss. |
 | Sofortkauf | Vom Verkäufer aktivierbare Option; steuert, ob „Kaufen" oder nur „Anbieter kontaktieren" angezeigt wird. |
 | Socket.io | Bibliothek für Echtzeit-Kommunikation über WebSockets. |
