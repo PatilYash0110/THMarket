@@ -40,7 +40,7 @@ Alle 15 Diagramme sind als Bild eingebettet (standardmäßig eingeklappt, `📊 
 | 6 — Whitebox „Listings" | [`diagrams-png/06-whitebox-listings.png`](diagram_images/06-ebene2-whitebox-admin.png) |
 | 7 — Whitebox „Chat" | [`diagrams-png/07-whitebox-chat.png`](diagram_images/07-ebene2-whitebox-auth.png) |
 | 8 — Whitebox „Admin" | [`diagrams-png/08-whitebox-admin.png`](diagram_images/08-ebene2-whitebox-chat.png) |
-| 9 — Laufzeitsicht: Allgemeiner Ablauf | [`diagrams-png/09-laufzeitsicht-allgemeiner-ablauf.png`](diagrams_images/09-ebene2-whitebox-listings.png) |
+| 9 — Laufzeitsicht: Allgemeiner Ablauf | [`diagrams-png/09-laufzeitsicht-allgemeiner-ablauf.png`](diagram_images/09-ebene2-whitebox-listings.png) |
 | 10 — Laufzeitsicht: Registrierung & Verifizierung | [`diagrams-png/10-laufzeitsicht-registrierung-verifizierung.png`](diagram_images/10-allgemeiner-ablauf.png) |
 | 11 — Laufzeitsicht: Inserat mit KI-Beschreibung | [`diagrams-png/11-laufzeitsicht-inserat-ki-beschreibung.png`](diagram_images/11-echtzeit-chat.png) |
 | 12 — Laufzeitsicht: Echtzeit-Chat | [`diagrams-png/12-laufzeitsicht-echtzeit-chat.png`](diagram_images/12-inserat-ki-beschreibung.png) |
