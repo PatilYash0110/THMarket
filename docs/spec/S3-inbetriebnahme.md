@@ -1,146 +1,29 @@
 # S3 – Inbetriebnahme
 
-Die Inbetriebnahme beschreibt den Übergang der Anwendung von der Entwicklung in die Nutzung durch Studierende. Da THMarket eine Neuentwicklung ist, ist keine Ablösung eines Vorgängersystems und kein Parallelbetrieb mit einem Altsystem erforderlich.
+Die Inbetriebnahme beschreibt den Übergang von THMarket aus der Entwicklungs- in die produktive Nutzung durch THM-Studierende. Da reale Nutzerkonten, Inserate und Guthabenstände entstehen, sobald das System freigegeben wird, folgt die Einführung einem gestuften Vorgehen. Als Einzelprojekt ohne separate Staging-Infrastruktur (es existiert nur die eine produktive Umgebung aus Vercel-Frontend, Render-Backend und einer Neon-Datenbank) fallen die Stufen „Testen" und „Vorschau" bewusst schlanker aus:
 
-Nach aktuellem Stand ist ein gestuftes Vorgehen vorgesehen:
+### Stufen
 
-1. interner Funktionstest durch das Projektteam,
-2. Beta-Phase mit ausgewählten THM-Studierenden,
-3. Auswertung des Feedbacks und Behebung wesentlicher Fehler,
-4. abschließender Systemtest,
-5. Freischaltung der Anwendung für den vorgesehenen Nutzerkreis.
+1. Implementierung nötiger Zahlungsfunktionen
+2. **Interner Funktionstest:** Alle 14 Use Cases werden lokal gegen eine mit Seed-Skript befüllte Datenbank durchgespielt, inklusive des per Seed-Skript angelegten Admin-Kontos.
+3. **Vorschau-Deployment:** Vercel erzeugt für jeden Push automatisch eine Preview-Umgebung des Frontends, sie läuft gegen dasselbe Backend/dieselbe Datenbank wie die Produktivumgebung, da kein separater Render- oder Neon-Staging-Dienst eingerichtet ist. Diese Stufe prüft daher UI-Änderungen, nicht das Zusammenspiel mit den externen Diensten unter isolierten Bedingungen.
+4. **Beta-Phase:** Eine kleine Gruppe verifizierter THM-Studierender erhält Zugang zur Produktivumgebung, um Usability-Feedback zu sammeln und bislang unentdeckte Fehler zu erfassen, bevor die Plattform breiter beworben wird.
+5. **Produktivfreigabe:** Öffnung für alle Studierenden mit gültiger `@thm.de`-Adresse.
 
-## S3.1 Voraussetzungen für die Inbetriebnahme
+### Vor dem Produktivstart geprüfte Fehlerszenarien
 
-Vor der Inbetriebnahme sollen mindestens folgende Voraussetzungen erfüllt sein:
+- Nicht erreichbare oder fehlerhafte Antworten von Cloudinary, Gemini oder Gmail SMTP.
+- Ungültige oder abgelaufene Verifizierungs- bzw. Passwort-Reset-Links (siehe UC01, UC03).
+- Gleichzeitiger Zugriff auf dasselbe Inserat, etwa wenn zwei Nutzer nahezu zeitgleich einen Kauf abschließen wollen (siehe die zweite serverseitige Guthabenprüfung in UC08 bzw. UC10).
+- Darstellung auf unterschiedlichen Endgeräten (Desktop/Mobil), da THMarket ausschließlich browserbasiert und nicht als native App verfügbar ist.
 
-- Das React-Frontend und das Backend sind lauffähig.
-- Eine PostgreSQL-Datenbank ist eingerichtet und erreichbar.
-- Die Verbindung zwischen Frontend, Backend und Datenbank funktioniert.
-- Der E-Mail-/SMTP-Dienst ist für den Versand von Verifizierungs-E-Mails konfiguriert.
-- Der Bildspeicherdienst ist für den Bild-Upload konfiguriert.
-- Der KI-Beschreibungsdienst ist für den Beschreibungsvorschlag konfiguriert.
-- Socket.io ist für die Chat-Kommunikation eingerichtet.
-- Die wesentlichen Funktionen der Anwendung wurden getestet.
-- Vertrauliche Zugangsdaten sind nicht öffentlich im Repository gespeichert.
+### Absichernde Maßnahmen
 
-Die konkrete Hosting- und Deployment-Umgebung wird im weiteren Projektverlauf festgelegt.
+- Fail-open-Verhalten bei der Bildmoderation, damit ein Ausfall von Gemini das Erstellen von Inseraten nicht komplett blockiert (NFA-06).
+- Klare, feldspezifische Fehlermeldungen mit Nutzerführung statt generischer Fehlertexte.
+- Idempotente Prüfungen bei sicherheitsrelevanten Abläufen, etwa die erneute Guthabenprüfung unmittelbar vor der Verrechnung beim Kauf.
+- Audit-Log zur nachträglichen Analyse von Admin-Aktionen und protokollierten Ausfällen externer Dienste.
 
-## S3.2 Zu erhaltende Daten
+Der „Point of no Return" ist mit der Produktivfreigabe für alle THM-Studierenden erreicht. Ab diesem Zeitpunkt existieren reale Nutzerkonten, Inserate und Guthabenstände in derselben Datenbank, die auch während der Entwicklung genutzt wurde, sodass tiefgreifende Änderungen am Datenbankschema nur noch mit Migrationsaufwand und nicht mehr durch einfaches Zurücksetzen der Datenbank möglich sind.
 
-Bei späteren Änderungen oder Aktualisierungen der Anwendung sollen bereits gespeicherte Nutzerdaten erhalten bleiben. Dazu gehören insbesondere:
-
-- Benutzerkonten und Verifizierungsstatus,
-- Inserate,
-- Bilder beziehungsweise Bildreferenzen,
-- Kategorien,
-- Favoriten,
-- Konversationen,
-- Chat-Nachrichten,
-- Meldungen und deren Bearbeitungsstatus,
-- Transaktionen,
-- Bewertungen. 
-
-Die genaue technische Umsetzung der Datensicherung und der Aktualisierung späterer Versionen ist noch festzulegen.
-
-## S3.3 Erstinbetriebnahme
-
-Für die erstmalige Inbetriebnahme ist derzeit folgender grundsätzlicher Ablauf vorgesehen:
-
-1. Technische Voraussetzungen prüfen.
-2. PostgreSQL-Datenbank bereitstellen.
-3. Das benötigte Datenbankschema anlegen.
-4. Notwendige Konfigurationswerte hinterlegen.
-5. Backend bereitstellen und Verbindung zur Datenbank prüfen.
-6. Frontend bereitstellen und Verbindung zum Backend prüfen.
-7. Registrierung und E-Mail-Verifizierung testen.
-8. Login und Zugriffsbeschränkungen testen.
-9. Erstellen, Suchen und Öffnen von Inseraten testen.
-10. Bild-Upload testen.
-11. Favoriten und Meldungen testen.
-12. Chat-Kommunikation und Nachrichtenspeicherung testen.
-13. Verwaltungsfunktionen für Nutzer und Administratoren prüfen.
-14. Beta-Phase durchführen.
-15. Erkannte Fehler bearbeiten und einen abschließenden Systemtest durchführen.
-16. Anwendung für den vorgesehenen Nutzerkreis freischalten.
-
-Die konkrete technische Durchführung der einzelnen Schritte kann sich im weiteren Projektverlauf noch ändern.
-
-## S3.4 Zu prüfende Fehlersituationen
-
-Vor der Freischaltung sollen insbesondere folgende Situationen überprüft werden:
-
-- nicht erreichbarer oder fehlerhaft konfigurierter E-Mail-Dienst,
-- nicht erreichbarer oder fehlerhaft konfigurierter Bildspeicherdienst,
-- nicht erreichbarer oder fehlerhaft konfigurierter KI-Beschreibungsdienst,
-- ungültiger oder abgelaufener Verifizierungslink,
-- nicht erreichbare Datenbank,
-- Verbindungsabbrüche im Chat,
-- ungültige oder zu große Bild-Uploads,
-- fehlende oder ungültige Formulareingaben,
-- unberechtigte Zugriffe auf geschützte Funktionen,
-- Darstellung auf unterschiedlichen Bildschirmgrößen und Endgeräten.
-
-## S3.5 Vorgesehene Maßnahmen
-
-Zur Absicherung sind nach aktuellem Stand folgende Maßnahmen vorgesehen:
-
-- verständliche Fehlermeldungen,
-- erneutes Anfordern des Verifizierungslinks,
-- automatische Wiederverbindungsversuche im Chat,
-- Prüfung von Formulareingaben,
-- Prüfung der hochgeladenen Bilder,
-- Zugriffskontrolle für geschützte Funktionen,
-- responsive Gestaltung der Benutzeroberfläche,
-- Protokollierung technischer Fehler zur späteren Analyse.
-
-Die genaue technische Umsetzung dieser Maßnahmen ist teilweise noch offen und wird während der Entwicklung konkretisiert.
-
-## S3.6 Spätere Aktualisierungen
-
-Für spätere Versionen soll sichergestellt werden, dass gespeicherte Nutzerdaten nicht unbeabsichtigt gelöscht oder überschrieben werden.
-
-Ein möglicher grundsätzlicher Ablauf besteht aus:
-
-1. Prüfung des aktuellen Systemzustands,
-2. Bereitstellung der neuen Anwendungsversion,
-3. gegebenenfalls Anpassung des Datenbankschemas,
-4. Prüfung der Verbindungen zu Datenbank und E-Mail-Dienst,
-5. Durchführung eines kurzen Funktionstests,
-6. Freigabe der neuen Version.
-
-Die konkrete Release-, Sicherungs- und Rollback-Strategie ist noch nicht abschließend festgelegt.
-
-## S3.7 Produktivstart und Rückkehrmöglichkeit
-
-Mit der Freischaltung für die Studierenden beginnt der Produktivbetrieb. Ab diesem Zeitpunkt werden reale Nutzerdaten innerhalb der Anwendung gespeichert.
-
-Die Freischaltung selbst ist kein zwingend irreversibler technischer Schritt. Bei schwerwiegenden Fehlern könnte die Anwendung grundsätzlich wieder vorübergehend deaktiviert werden.
-
-Ein technischer Point of no Return kann insbesondere dann entstehen, wenn später Änderungen an der Datenbank vorgenommen werden, die nicht ohne Weiteres rückgängig gemacht werden können. Wie solche Änderungen abgesichert werden, wird im weiteren Projektverlauf festgelegt.
-
-## S3.8 Beobachtung nach der Freischaltung
-
-Nach der Freischaltung ist eine Beobachtungsphase vorgesehen. Dabei sollen insbesondere folgende Punkte betrachtet werden:
-
-- technische Verfügbarkeit der Anwendung,
-- Erreichbarkeit des E-Mail-Dienstes,
-- Erreichbarkeit des Bildspeicherdienstes,
-- Erreichbarkeit des KI-Beschreibungsdienstes,
-- Fehler bei Registrierung und Login,
-- Stabilität der Chat-Kommunikation,
-- Probleme beim Bild-Upload,
-- sonstige technische Fehlermeldungen.
-
-Eine weitergehende Auswertung des Nutzerverhaltens ist in der derzeitigen Spezifikation nicht festgelegt.
-
-## S3.9 Querverweise
-
-- UC01 – Login
-- UC02 – Registrierung
-- UC03 – Inserat erstellen
-- UC07 – Chat mit Nutzer führen
-- UC10 – Nutzerkonten verwalten
-- UC11 – Meldungen und Inserate moderieren
-- P2 – Architekturüberblick
-- N1 – Nichtfunktionale Anforderungen
+Nach dem Go-Live schließt sich eine Beobachtungsphase an, in der insbesondere die Fehlerraten der drei externen Dienste, die Ladezeit der Inseratübersicht (NFA-01) sowie die Audit-Log-Einträge zu fehlgeschlagenen Bildmoderationen beobachtet werden. So lassen sich Probleme frühzeitig erkennen und beheben, ohne die grundsätzliche Verfügbarkeit der Plattform zu gefährden.
