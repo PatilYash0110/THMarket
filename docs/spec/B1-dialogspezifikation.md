@@ -1,423 +1,579 @@
-
-
-- [4. Benutzerschnittstelle](#4-benutzerschnittstelle)
-  - [4.1 Dialoglandkarte](#41-dialoglandkarte)
-  - [4.2 Dialogspezifikation](#42-dialogspezifikation)
-    - [4.2.1 Login-Dialog](#421-login-dialog)
-    - [4.2.2 Registrierungs-Dialog](#422-registrierungs-dialog)
-    - [4.2.3 Marktplatz-Dialog (Dashboard)](#423-marktplatz-dialog-dashboard)
-    - [4.2.4 Inseratdetail-Dialog](#424-inseratdetail-dialog)
-    - [4.2.5 Inserat-erstellen-Dialog](#425-inserat-erstellen-dialog)
-    - [4.2.6 Kauf-Dialog](#426-kauf-dialog)
-    - [4.2.7 Chat-Dialog](#427-chat-dialog)
-    - [4.2.8 Profil-Dialog (Meine Inserate & Favoriten)](#428-profil-dialog-meine-inserate--favoriten)
-    - [4.2.9 Adminbereich-Dialog](#429-adminbereich-dialog)
-
-
 # 4. Benutzerschnittstelle
-## 4.1 Dialoglandkarte
-Die Dialoglandkarte zeigt die Struktur und Navigation der THMarket-Anwendung. Sie gliedert sich in drei Bereiche: öffentlich zugängliche Seiten (Login und Registrierung), den Benutzerbereich nach Login (Marktplatz, Inseratdetail, Inserat erstellen, Chat, Profil/Meine Inserate & Favoriten) sowie administrative Funktionen (Benutzerverwaltung, Meldungen, Logs).
-Die Dialoglandkarte stellt vereinfacht dar, welche Dialoge es gibt und wie zwischen ihnen navigiert werden kann – etwa vom Login zum Marktplatz oder vom Marktplatz zur Inseratdetailseite und von dort in den Chat. Die genauen Abläufe, Auslöser und Wirkungen werden in Kapitel 4.2 beschrieben.
-**Hinweis:** Ein Logout ist grundsätzlich von jedem Dialog aus möglich. Um die Darstellung nicht zu überladen, wird diese Möglichkeit nicht an jeder Stelle einzeln dargestellt, sondern gilt als durchgängig verfügbar.
-<p align="center">
-  <img src="diagram_images/B1-dialogspezifikation_01-dialoglandkarte.png" alt="Dialoglandkarte der THMarket-Anwendung" width="900">
-</p>
 
-<p align="center"><em>Abbildung 8: Übersicht der Dialoglandkarte der Benutzeroberfläche</em></p>
+## 4.1 Dialoglandkarte
+
+Die Dialoglandkarte zeigt alle Seiten, die ein Nutzer besuchen kann, gegliedert in einen öffentlichen Bereich, einen angemeldeten Bereich und den Admin-Bereich. Ein Logout ist von jeder Seite im angemeldeten bzw. Admin-Bereich aus möglich und wird der Übersichtlichkeit halber nur als ein Übergang zurück zur Landingpage dargestellt.
+
+Die Übergänge zwischen den Dialogen sind nummeriert (①–⑫). Dieselben Nummern tauchen im Abschnitt „Navigationsmöglichkeiten" der jeweiligen Dialogspezifikation (Kapitel 4.2) wieder auf, sodass sich jederzeit nachvollziehen lässt, welcher Pfad in der Übersicht gemeint ist. Die folgende Tabelle löst die Nummern zusätzlich in Textform auf:
+
+| Nr. | Von → Nach | Beschreibung |
+|---|---|---|
+| ① | Landingpage → Login-Dialog / Registrierungs-Dialog | Einstiegspunkt aus dem öffentlichen Bereich ([4.2.1](#421-landingpage)). |
+| ② | Login-Dialog ↔ Registrierungs-Dialog | Wechselseitiger Sprung über „Jetzt registrieren" bzw. „Schon registriert?" ([4.2.2](#422-login-dialog), [4.2.3](#423-registrierungs-dialog)). |
+| ③ | Login-Dialog ↔ Passwort-vergessen-/-zurücksetzen-Dialog | Reset-Ablauf inkl. E-Mail-Link ([4.2.4](#424-passwort-vergessen---zurücksetzen-dialog)). |
+| ④ | Login-Dialog → Marktplatz-Dialog bzw. Adminbereich-Dialog | Rollenabhängige Weiterleitung nach erfolgreichem Login ([4.2.2](#422-login-dialog), [4.2.16](#4216-adminbereich-dialog)). |
+| ⑤ | Marktplatz-Dialog → Profil-/Favoriten-/Chat-/Erstellen-Dialog | Navigationsleiste des Marktplatzes ([4.2.6](#426-marktplatz-dialog-startseite)). |
+| ⑥ | Marktplatz-/Profil-/Favoriten-Dialog → Inseratdetail-Dialog | Öffnen eines konkreten Inserats ([4.2.6](#426-marktplatz-dialog-startseite), [4.2.7](#427-inseratdetail-dialog), [4.2.11](#4211-profil-dialog), [4.2.12](#4212-favoriten-dialog)). |
+| ⑦ | Inseratdetail-Dialog ↔ Kauf-Dialog | Kaufabschluss und Rücksprung nach Erfolg ([4.2.7](#427-inseratdetail-dialog), [4.2.9](#429-kauf-dialog-checkout)). |
+| ⑧ | Inseratdetail-Dialog → Chat-Dialog | „Anbieter kontaktieren" ([4.2.7](#427-inseratdetail-dialog), [4.2.10](#4210-chat-dialog)). |
+| ⑨ | Inseratdetail-/Profil-Dialog ↔ Erstellen-/Bearbeiten-Dialog | Neues Inserat anlegen bzw. bestehendes bearbeiten ([4.2.7](#427-inseratdetail-dialog), [4.2.8](#428-inserat-erstellen--bearbeiten-dialog), [4.2.11](#4211-profil-dialog)). |
+| ⑩ | Profil-Dialog ↔ Aufladen-/Auszahlen-/Kontoeinstellungen-Dialog | Kontofunktionen im Profilbereich ([4.2.11](#4211-profil-dialog), [4.2.13](#4213-guthaben-aufladen-dialog)–[4.2.15](#4215-kontoeinstellungen-dialog)). |
+| ⑪ | Adminbereich-Dialog → Inseratdetail-Dialog | Nur lesender Meldungskontext aus dem Tab „Meldungen" ([4.2.16](#4216-adminbereich-dialog)). |
+| ⑫ | Angemeldeter Bereich / Adminbereich → Landingpage | Abmelden, von jedem angemeldeten Dialog aus möglich. |
 
 ## 4.2 Dialogspezifikation
-### 4.2.1 Login-Dialog
 
-#### Allgemeine Beschreibung
+### 4.2.1 Landingpage
 
-- **Zweck des Dialogs:** Anmeldung registrierter, verifizierter Nutzer zur Nutzung der Plattform
-- **Anwendungsfall:** „Benutzer meldet sich an“
-- **Ergebnis:** Erfolgreiche Anmeldung führt zur Weiterleitung auf den Marktplatz
-- **Sichtbar für:** Alle nicht angemeldeten Nutzer (Gäste)
-- **Besonderheiten:** Link zur Registrierung, Dark-Mode-Schalter
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Marketing-/Einstiegsseite für nicht angemeldete Besucher.
+- Anwendungsfall: Einstiegspunkt vor UC01/UC02, kein eigener Use Case.
+- Ergebnis: Weiterleitung zu Registrierung oder Login.
+- Sichtbar für: Gäste (keine aktive Sitzung).
 
-#### Navigationsmöglichkeiten
+**Navigationsmöglichkeiten**
 
-- Über „Noch kein Konto? Jetzt registrieren“ zum Registrierungsdialog
-- Nach erfolgreichem Login zum Marktplatz
+Von hier gelangt man zu: „Registrieren" → Registrierungs-Dialog (S02), „Anmelden" → Login-Dialog (S01). Rücksprungmöglichkeit gibt es keine, dies ist der Einstiegspunkt (S00) der Dialoglandkarte.
 
-#### Statik – Formular: Login-Formular (Felder)
-| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Bezug zum Datenmodell |
+**Statik**
+
+Kein Formular, rein informative Seite.
+
+**Dynamik – Aktionsliste**
+
+| Aktion | Auslöser | Wirkung | Datenmodell | Use Case |
+|---|---|---|---|---|
+| Registrierung öffnen | Button „Registrieren" | Navigation zum Registrierungs-Dialog | Kein Bezug | UC01 |
+| Anmeldung öffnen | Button „Anmelden" | Navigation zum Login-Dialog | Kein Bezug | UC02 |
+| Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
+
+### 4.2.2 Login-Dialog
+
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Anmeldung registrierter, verifizierter Nutzer.
+- Anwendungsfall: „Nutzer meldet sich an".
+- Ergebnis: Erfolgreiche Anmeldung führt zur Weiterleitung auf den Marktplatz (Student) oder den Admin-Bereich (Admin).
+- Sichtbar für: Gäste.
+
+**Navigationsmöglichkeiten**
+
+Von hier gelangt man zu: „Jetzt registrieren" → Registrierungs-Dialog, „Passwort vergessen?" → Passwort-vergessen-Dialog, nach erfolgreichem Login → Marktplatz-Dialog (Student) oder Adminbereich-Dialog (Admin). Rücksprungmöglichkeit: keine.
+
+**Statik – Formular (Felder)**
+
+| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Datenmodell |
 |---|---|---|---|---|---|
-| E-Mail | Textfeld | Ja | Nein | gültige THM-E-Mail | `Benutzer.email` |
-| Passwort | Passwortfeld | Ja | Nein | mindestens 8 Zeichen | `Benutzer.password_hash` |
+| E-Mail | Textfeld | Ja | Nein | muss gültiges E-Mail-Format haben | `USER.email` |
+| Passwort | Passwortfeld | Ja | Nein | Pflichtfeld | `USER.passwordHash` |
 
-*Tab. 21: Dialogspezifikation Login-Dialog – Felder*
-#### Dynamik – Aktionsliste
+**Dynamik – Aktionsliste**
 
-| Aktion | Auslöser | Wirkung | Bezug zum Datenmodell | Bezug zum Use Case |
+| Aktion | Auslöser | Wirkung | Datenmodell | Use Case |
 |---|---|---|---|---|
-| Anmeldung starten | Button „Anmelden“ | Validierung → Authentifizierung → Weiterleitung zum Marktplatz oder Fehlermeldung | `Benutzer.email`, `Benutzer.password_hash` | UC01 – Login |
-| Registrierung öffnen | Link „Jetzt registrieren“ | Navigation zum Registrierungsdialog | Kein Bezug | UC02 – Registrierung |
-| Dark Mode umschalten | Switch rechts oben | Wechsel des Designs | Kein Bezug | Kein Bezug |
+| Anmeldung starten | Button „Anmelden" | Validierung → Authentifizierung → Weiterleitung oder Fehlermeldung | `USER.email`, `USER.passwordHash` | UC02 |
+| Registrierung öffnen | Link „Jetzt registrieren" | Navigation zum Registrierungs-Dialog | Kein Bezug | UC01 |
+| Passwort-Reset öffnen | Link „Passwort vergessen?" | Navigation zum Passwort-vergessen-Dialog | Kein Bezug | UC03 |
+| Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
 
-*Tab. 22: Dialogspezifikation Login-Dialog – Aktionsliste*
-#### Zustände
+**Zustände**
+- Fehler „Ungültige E-Mail oder Passwort".
+- Hinweis bei unverifiziertem Konto.
 
-- Kein Fehler (Standard)
-- Fehler: „Ungültige E-Mail oder Passwort“ → Anzeige einer Fehlermeldung über dem Formular
-- Konto nicht verifiziert → Hinweis zur E-Mail-Bestätigung
+### 4.2.3 Registrierungs-Dialog
 
-### 4.2.2 Registrierungs-Dialog
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Anlegen eines neuen Kontos mit THM-E-Mail-Adresse.
+- Anwendungsfall: „Nutzer registriert sich".
+- Ergebnis: Ein neues, unverifiziertes Konto wird angelegt; nach Bestätigung der E-Mail ist es login-fähig.
+- Sichtbar für: Gäste.
 
-Der Registrierungsdialog erlaubt es Studierenden, ein Konto für THMarket anzulegen. Nach Eingabe von THM-E-Mail-Adresse, Benutzername und Passwort wird ein unverifiziertes Konto angelegt und eine Bestätigungs-E-Mail versendet. Erst nach Klick auf den Verifizierungslink ist das Konto aktiv.
+**Navigationsmöglichkeiten**
 
-![Mockup Registrierungs-Dialog](diagram_images/b1-registrierungs-dialog.png)
+Von hier gelangt man zu: „Schon registriert? Jetzt anmelden" → Login-Dialog, nach erfolgreicher Registrierung → Hinweis „Bitte bestätige deine E-Mail-Adresse" (verbleibt im selben Dialog, bis der Link geöffnet wird), danach ebenfalls zurück zum Login-Dialog. Rücksprungmöglichkeit: über den Link zum Login-Dialog.
 
-*Abbildung 10: Mockup „Registrierung“*
+**Statik – Formular (Felder)**
 
-#### Allgemeine Beschreibung
-
-- **Zweck des Dialogs:** Registrierung neuer Nutzer mit THM-E-Mail-Adresse
-- **Anwendungsfall:** „Benutzer registriert sich“
-- **Ergebnis:** Ein neues, nach E-Mail-Bestätigung verifiziertes Benutzerkonto wird erstellt
-- **Sichtbar für:** Alle nicht angemeldeten Nutzer (Gäste)
-- **Besonderheiten:** THM-Domain-Prüfung, E-Mail-Verifizierung, Link zur Login-Seite
-
-#### Navigationsmöglichkeiten
-
-- Nach erfolgreicher Registrierung und Verifizierung → zum Login-Dialog
-- Über „Schon registriert? Jetzt anmelden“ → zurück zum Login-Dialog
-
- #### Statik – Formular: Registrierungsformular (Felder)
-
-| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Bezug zum Datenmodell |
+| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Datenmodell |
 |---|---|---|---|---|---|
-| E-Mail | Textfeld | Ja | Nein | gültige THM-E-Mail | `Benutzer.email` |
-| Benutzername | Textfeld | Ja | Nein | mindestens 3 Zeichen | `Benutzer.username` |
-| Passwort | Passwortfeld | Ja | Nein | mindestens 8 Zeichen | `Benutzer.password_hash` |
+| Name | Textfeld | Ja | Nein | Pflichtfeld | `USER.name` |
+| E-Mail | Textfeld | Ja | Nein | muss auf `@thm.de` enden (inkl. Subdomains) | `USER.email` |
+| Passwort | Passwortfeld | Ja | Nein | mind. 8 Zeichen, mit mindestens einem Klein-, einem Großbuchstaben und einer Ziffer | `USER.passwordHash` |
 
-*Tab. 23: Dialogspezifikation Registrierungsdialog – Felder*
+**Dynamik – Aktionsliste**
 
-#### Dynamik – Aktionsliste
-
-| Aktion | Auslöser | Wirkung | Bezug zum Datenmodell | Bezug zum Use Case |
+| Aktion | Auslöser | Wirkung | Datenmodell | Use Case |
 |---|---|---|---|---|
-| Registrierung starten | Button „Registrieren“ | Validierung → Konto anlegen → Bestätigungs-E-Mail versenden | `Benutzer.email`, `Benutzer.username`, `Benutzer.password_hash` | UC02 – Registrierung |
-| Anmeldung öffnen | Link „Jetzt anmelden“ | Navigation zum Login-Dialog | Kein Bezug | UC01 – Login |
-| Dark Mode umschalten | Switch rechts oben | Wechsel des Designs | Kein Bezug | Kein Bezug |
+| Registrierung starten | Button „Registrieren" | Validierung → unverifiziertes Konto anlegen → Bestätigungsmail versenden | `USER.name`, `USER.email`, `USER.passwordHash` | UC01 |
+| Anmeldung öffnen | Link „Schon registriert? Jetzt anmelden" | Navigation zum Login-Dialog | Kein Bezug | UC02 |
+| Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
 
-*Tab. 24: Dialogspezifikation Registrierungsdialog – Aktionsliste*
+**Zustände**
+- Fehler bei ungültiger, bereits vergebener Adresse oder zu kurzem Passwort.
+- Erfolg „Bitte bestätige deine E-Mail-Adresse".
 
-#### Zustände
+### 4.2.4 Passwort-vergessen- / Zurücksetzen-Dialog
 
-- Kein Fehler (Standard)
-- Fehler: E-Mail ist keine THM-Adresse oder bereits vergeben → Fehlermeldung über dem Formular
-- Erfolgreiche Registrierung → Hinweis: „Bitte bestätige deine E-Mail-Adresse“
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Neues Passwort setzen, wenn das alte vergessen wurde.
+- Anwendungsfall: „Nutzer setzt Passwort zurück".
+- Ergebnis: Nutzer erhält bei Bedarf einen Reset-Link per E-Mail und kann darüber ein neues Passwort setzen.
+- Sichtbar für: Gäste.
 
-### 4.2.3 Marktplatz-Dialog (Dashboard)
+**Navigationsmöglichkeiten**
 
-Der Marktplatz ist die Startseite nach dem Login. Hier werden die aktuellen Inserate als Kachel- oder Listenübersicht angezeigt. Über ein Suchfeld und Filter nach Kategorie, Angebotstyp und Preisbereich kann der Nutzer die Anzeige eingrenzen. Von hier gelangt er zur Detailansicht eines Inserats, zum Erstellen eines eigenen Inserats sowie zu seinem Profil.
+Von hier gelangt man zu: nach dem Setzen des neuen Passworts → Login-Dialog. Rücksprungmöglichkeit: über Browser-Navigation zurück zum Login-Dialog.
 
-> Mockup des Marktplatz-Dialogs wird noch ergänzt.
+**Statik – Formular (Felder)**
 
-*Abbildung 11: Mockup „Marktplatz“*
-
-#### Allgemeine Beschreibung
-
-- **Zweck des Dialogs:** Anzeige, Suche und Filterung der Inserate
-- **Anwendungsfall:** „Benutzer durchsucht den Marktplatz“
-- - **Ergebnis:** Anzeige der passenden Inserate, Einstieg in die Detailansicht und weitere Funktionen
-- **Sichtbar für:** Alle eingeloggten Nutzer
-- **Besonderheiten:** Such- und Filterleiste, Zugang zu „Inserat erstellen“ und Profil
-
-#### Navigationsmöglichkeiten
-
-- Über ein Inserat → zur Inseratdetailseite
-- Über „Inserat erstellen“ → zum Inserat-erstellen-Dialog
-- Über „Profil/Meine Inserate“ → zum Profildialog
-- Über Logout → zurück zum Login-Dialog
-
-#### Statik – Formular: Such-/Filterformular (Felder)
-
-| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Bezug zum Datenmodell |
+| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Datenmodell |
 |---|---|---|---|---|---|
-| Suchbegriff | Textfeld | Nein | Nein | Freitext | `Inserat.titel`, `Inserat.beschreibung` |
-| Kategorie | Dropdown | Nein | „Alle“ | Auswahl aus Liste | `Kategorie.name` |
-| Angebotstyp | Dropdown | Nein | „Alle“ | Verkauf / Miete | `Inserat.typ` |
-| Preis von/bis | Zahlenfeld | Nein | Nein | numerisch, ≥ 0 | `Inserat.preis` |
-| Campus | Dropdown | Nein | „Alle“ | Auswahl aus Liste | `Inserat.campus` |
+| Schritt 1 – E-Mail | Textfeld | Ja | Nein | muss gültiges E-Mail-Format haben | `USER.email` |
+| Schritt 2 – Neues Passwort | Passwortfeld | Ja | Nein | mind. 8 Zeichen, mit mindestens einem Klein-, einem Großbuchstaben und einer Ziffer | `USER.passwordHash` |
 
-*Tab. 25: Dialogspezifikation Marktplatz-Dialog – Felder*
+**Dynamik – Aktionsliste**
 
-#### Dynamik – Aktionsliste
-
-| Aktion | Auslöser | Wirkung | Bezug zum Datenmodell | Bezug zum Use Case |
+| Aktion | Auslöser | Wirkung | Datenmodell | Use Case |
 |---|---|---|---|---|
-| Inserate suchen/filtern | Button „Suchen“ oder Filter | Abruf und Anzeige passender Inserate | `Inserat.*`, `Kategorie.name` | UC04 – Inserate durchsuchen und filtern |
-| Inserat öffnen | Klick auf Inseratkachel | Navigation zur Detailansicht | `Inserat.id` | UC05 – Inseratdetails ansehen |
-| Inserat erstellen | Button „Inserat erstellen“ | Navigation zum Erstellen-Dialog | `Inserat.*` | UC03 – Inserat erstellen |
-| Profil öffnen | Button „Profil“ | Navigation zum Profildialog | `Benutzer.id` | UC09 – Eigene Inserate verwalten |
+| Link anfordern | Button „Link anfordern" | Sucht Konto, versendet bei Treffer einen Reset-Link, zeigt in jedem Fall denselben Hinweis | `USER.email`, `USER.passwordResetToken` | UC03 |
+| Neues Passwort setzen | Button „Passwort setzen" | Prüft Reset-Link, setzt bei Erfolg neues Passwort | `USER.passwordHash` | UC03 |
+| Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
 
-*Tab. 26: Dialogspezifikation Marktplatz-Dialog – Aktionsliste*
-#### Zustände
+**Zustände**
+- Hinweis „E-Mail wurde versendet".
+- Hinweis bei unverifiziertem Konto.
+- Fehler bei ungültigem/abgelaufenem Link.
+- Erfolg.
 
-- Standard: Inserate werden angezeigt
-- Kein Treffer: Hinweis „Keine Inserate gefunden“
-- Fehler (optional): Datenabruf fehlgeschlagen → Fehlermeldung
+### 4.2.5 Impressum
 
-### 4.2.4 Inseratdetail-Dialog
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Rechtlich vorgeschriebene Anbieterkennzeichnung.
+- Anwendungsfall: Kein Use-Case-Bezug.
+- Sichtbar für: Alle (Gäste und angemeldete Nutzer).
 
-Die Detailansicht zeigt alle Informationen zu einem Inserat: Bildergalerie, Titel, Beschreibung, Preis, Angebotstyp, Kategorie und Angaben zum Anbieter. Von hier kann der Nutzer das Inserat favorisieren, den Anbieter kontaktieren oder das Inserat melden.
+**Navigationsmöglichkeiten**
 
-> Mockup des Inseratdetail-Dialogs wird noch ergänzt.
+Über Browser-Navigation zurück zur vorherigen Seite.
 
-*Abbildung 12: Mockup „Inseratdetail“*
+**Statik**
 
-#### Allgemeine Beschreibung
+Kein Formular, keine Aktionen außer Navigation.
 
-- **Zweck des Dialogs:** Anzeige aller Details eines Inserats und Einstieg in Folgeaktionen
-- **Anwendungsfall:** „Benutzer sieht sich ein Inserat an“
-- **Ergebnis:** Anzeige der Inseratdetails; Favorisieren, Kontaktieren oder Melden möglich
-- **Sichtbar für:** Alle eingeloggten Nutzer
-- **Besonderheiten:** Bildergalerie, Kontakt-, Favoriten- und Melde-Button
+### 4.2.6 Marktplatz-Dialog (Startseite)
 
-#### Navigationsmöglichkeiten
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Anzeige, Suche und Filterung aller aktiven Inserate.
+- Anwendungsfall: „Nutzer durchsucht den Marktplatz".
+- Ergebnis: Anzeige der passenden Inserate, Einstieg in Detailansicht, Inserat-Erstellung und Navigation.
+- Sichtbar für: Alle angemeldeten Studenten (Admins werden stattdessen direkt in den Admin-Bereich geleitet).
 
-- Über „Anbieter kontaktieren“ → zum Chat-Dialog
-- Über „Zurück“ → zum Marktplatz
+**Navigationsmöglichkeiten**
 
-#### Dynamik – Aktionsliste
+Von hier gelangt man zu:
+- einem Inserat → Inseratdetail-Dialog
+- „Inserat erstellen" → Erstellen-Dialog
+- „Profil" → Profil-Dialog
+- „Favoriten" → Favoriten-Dialog
+- „Nachrichten" → Chat-Dialog
 
-| Aktion | Auslöser | Wirkung | Bezug zum Datenmodell | Bezug zum Use Case |
-|---|---|---|---|---|
-| Favorit speichern | Button „Favorit“ | Inserat wird der Favoritenliste hinzugefügt oder daraus entfernt | `Favorit.user_id`, `Favorit.inserat_id` | UC06 – Favorit speichern |
-| Anbieter kontaktieren | Button „Kontaktieren“ | Öffnet oder erstellt eine Konversation und öffnet den Chat | `Konversation.*` | UC07 – Chat mit Nutzer führen |
-| Inserat melden | Button „Melden“ | Öffnet das Meldeformular | `Meldung.*` | UC08 – Inserat melden |
-| Kaufen | Button „Kaufen“ | Öffnet den Kauf-Dialog | `Transaktion.*` | UC12 – Kauf abschließen (neu) |
+Rücksprungmöglichkeit: dies ist die Startseite nach dem Login, es gibt keinen übergeordneten Dialog.
 
-*Tab. 27: Dialogspezifikation Inseratdetail-Dialog – Aktionsliste*
-#### Zustände
+**Statik – Formular (Felder)**
 
-- Standard: Detaildaten und Bilder werden angezeigt
-- Favorisiert: Favoriten-Button ist aktiv markiert
-- Fehler: Inserat nicht mehr vorhanden → Hinweis
-
-### 4.2.5 Inserat-erstellen-Dialog
-
-In diesem Dialog legt der Nutzer ein neues Inserat an. Er gibt Titel, Beschreibung, Kategorie, Angebotstyp und Preis ein und lädt ein oder mehrere Bilder hoch. Nach dem Absenden wird das Inserat gespeichert und auf dem Marktplatz veröffentlicht.
-
-> Mockup des Inserat-erstellen-Dialogs wird noch ergänzt.
-
-*Abbildung 13: Mockup „Inserat erstellen“*
-
-#### Allgemeine Beschreibung
-
-- **Zweck des Dialogs:** Erstellen eines neuen Inserats inklusive Bild-Upload
-- **Anwendungsfall:** „Benutzer erstellt ein Inserat“
-- **Ergebnis:** Ein neues Inserat wird gespeichert und veröffentlicht
-- **Sichtbar für:** Alle eingeloggten Nutzer
-- **Besonderheiten:** Mehrfach-Bild-Upload, Validierung von Pflichtfeldern und Bildern
-
-#### Navigationsmöglichkeiten
-
-- Nach erfolgreichem Speichern → zurück zum Marktplatz oder zur Detailansicht des neuen Inserats
-- Über „Abbrechen“ → zurück zum Marktplatz
-
-#### Statik – Formular: Inserat-Formular (Felder)
-
-| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Bezug zum Datenmodell |
+| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Datenmodell |
 |---|---|---|---|---|---|
-| Titel | Textfeld | Ja | Nein | mindestens 3 Zeichen | `Inserat.titel` |
-| Beschreibung | Textbereich | Ja | Nein | mindestens 10 Zeichen | `Inserat.beschreibung` |
-| Kategorie | Dropdown | Ja | „Bitte wählen“ | Auswahl treffen | `Kategorie.id` |
-| Angebotstyp | Dropdown | Ja | „Verkauf“ | Verkauf / Miete | `Inserat.typ` |
-| Preis | Zahlenfeld | Ja | Nein | numerisch, ≥ 0 | `Inserat.preis` |
-| Campus | Dropdown | Ja | „Bitte wählen“ | Auswahl treffen | `Inserat.campus` |
-| Bilder | Datei-Upload | Ja | Nein | Format und Größe | `Bild.*` |
+| Suchbegriff | Textfeld | Nein | Nein | Freitext | `LISTING.title`, `LISTING.description` |
+| Kategorie | Dropdown | Nein | „Alle" | Auswahl aus fester Liste (6 Kategorien) | `LISTING.category` |
+| Sortierung | Dropdown | Nein | Standard | Auswahl aus fester Liste | Kein Bezug |
 
-*Tab. 28: Dialogspezifikation Inserat-erstellen-Dialog – Felder*
+**Dynamik – Aktionsliste**
 
-#### Dynamik – Aktionsliste
-
-| Aktion | Auslöser | Wirkung | Bezug zum Datenmodell | Bezug zum Use Case |
+| Aktion | Auslöser | Wirkung | Datenmodell | Use Case |
 |---|---|---|---|---|
-| Inserat speichern | Button „Veröffentlichen“ | Validierung → Inserat und Bilder werden gespeichert oder Fehler angezeigt | `Inserat.*`, `Bild.*` | UC03 – Inserat erstellen |
-| Bild hinzufügen | Datei-Upload | Bild wird der Vorschau hinzugefügt | `Bild.*` | UC03 – Inserat erstellen |
-| Beschreibung vorschlagen | Button „Vorschlag generieren“ | Externer Dienst erzeugt Vorschlag für Titel/Beschreibung/Kategorie aus den Bildern | `Inserat.titel`, `Inserat.beschreibung`, `Kategorie.id` | UC03 – Inserat erstellen |
-| Abbrechen | Button „Abbrechen“ | Rückkehr zum Marktplatz ohne Speicherung | Kein Bezug | Kein Bezug |
+| Inserate durchsuchen/filtern | Eingabe/Auswahl in Suchleiste | Sofortige clientseitige Aktualisierung der Liste | `LISTING.*` | UC06 |
+| Inserat öffnen | Klick auf Inseratkachel | Navigation zur Inseratdetailseite | `LISTING.id` | UC06 |
+| Inserat erstellen | Button „Inserat erstellen" | Navigation zum Erstellen-Dialog | Kein Bezug | UC04 |
+| Profil/Favoriten/Nachrichten öffnen | Klick in Navigationsleiste | Navigation zum jeweiligen Dialog | Kein Bezug | UC05 / UC06 / UC07 |
+| Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
 
-*Tab. 29: Dialogspezifikation Inserat-erstellen-Dialog – Aktionsliste*
-#### Zustände
+**Zustände**
+- Standard (Inserate werden angezeigt).
+- kein Treffer (Hinweis „Keine Inserate gefunden").
+- Fehler beim initialen Laden (Datenbank nicht erreichbar).
 
-- Kein Fehler (Standard): Eingabe möglich
-- Fehler: Leere Pflichtfelder oder ungültige Bilder → feldspezifische Fehlermeldungen
-- Erfolg: Bestätigung und Weiterleitung
+### 4.2.7 Inseratdetail-Dialog
 
-### 4.2.6 Kauf-Dialog
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Anzeige aller Details eines Inserats und Einstieg in Folgeaktionen.
+- Anwendungsfall: „Nutzer sieht sich ein Inserat an".
+- Ergebnis: Anzeige der Inseratdetails, Kaufen, Kontaktieren, Favorisieren, Melden oder Bearbeiten möglich.
+- Sichtbar für: Alle angemeldeten Nutzer.
 
-Im Kauf-Dialog schließt der Käufer den Erwerb eines Inserats ab. Er wählt einen Zahlungsmodus (Simulation oder In-App-Guthaben). Nach Abschluss der Transaktion kann der Käufer den Verkäufer bewerten.
+**Navigationsmöglichkeiten**
 
-> Mockup des Kauf-Dialogs wird noch ergänzt.
+Von hier gelangt man zu:
+- „Kaufen" → Kauf-Dialog
+- „Anbieter kontaktieren" → Chat-Dialog
+- „Bearbeiten" (nur Eigentümer) → Erstellen-/Bearbeiten-Dialog
 
-*Abbildung 17: Mockup „Kauf abschließen“*
+Rücksprungmöglichkeit: über „Zurück" bzw. Browser-Navigation zum Marktplatz-Dialog.
 
-#### Allgemeine Beschreibung
+**Statik**
 
-- **Zweck des Dialogs:** Abschluss eines simulierten Kaufs und optionale Bewertung
-- **Anwendungsfall:** „Benutzer schließt einen Kauf ab“
-- **Ergebnis:** Transaktion wird gespeichert, Inserat als verkauft markiert
-- **Sichtbar für:** Eingeloggte Nutzer, die nicht selbst Anbieter des Inserats sind
-- **Besonderheiten:** Zwei Zahlungsmodi, anschließende Bewertungsmöglichkeit
+Keine Eingabefelder, nur Anzeige der Inseratdaten.
 
-#### Navigationsmöglichkeiten
+**Sichtbarkeitsbedingungen der Aktions-Buttons**
 
-- Über „Kaufen“ im Inseratdetail-Dialog → zu diesem Dialog
-- Nach Abschluss → zurück zur Inseratdetailseite oder zum Marktplatz
+| Aktion | Ausgeblendet wenn |
+|---|---|
+| Kaufen | Admin, Eigentümer, bereits verkauft oder Sofortkauf deaktiviert |
+| Anbieter kontaktieren | Eigenes Inserat oder bereits verkauft |
+| Favorit (Herz-Symbol) | Eigenes Inserat (unabhängig vom Verkaufsstatus) |
+| Inserat melden | Admin oder eigenes Inserat |
+| Bearbeiten | Nur sichtbar für den Eigentümer |
 
-#### Statik – Formular: Kauf-Formular (Felder)
+**Dynamik – Aktionsliste**
 
-| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Bezug zum Datenmodell |
+| Aktion | Auslöser | Wirkung | Datenmodell | Use Case |
+|---|---|---|---|---|
+| Kaufen | Button „Kaufen" | Navigation zum Kauf-Dialog | `LISTING.id` | UC08 |
+| Anbieter kontaktieren | Button „Anbieter kontaktieren" | Öffnet/erstellt Konversation, Navigation zum Chat-Dialog | `CONVERSATION.*` | UC07 |
+| Favorisieren | Klick auf Herz-Symbol | Merkt/entmerkt Inserat | `FAVORITE.*` | UC06 |
+| Inserat melden | Button „Melden" | Öffnet Meldeformular, speichert Meldung | `REPORT.*` | UC11 |
+| Bearbeiten | Button „Bearbeiten" | Navigation zum Bearbeiten-Dialog | `LISTING.*` | UC05 |
+| Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
+
+**Zustände**
+- Standard.
+- Favorisiert (Herz-Symbol aktiv markiert).
+- Verkauft (Status-Badge, Kaufen/Kontaktieren ausgeblendet).
+- Fehler, falls Inserat zwischenzeitlich gelöscht wurde.
+
+### 4.2.8 Inserat-erstellen-/-bearbeiten-Dialog
+
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Anlegen bzw. Bearbeiten eines Inserats inklusive Bild-Upload.
+- Anwendungsfall: „Nutzer erstellt/bearbeitet ein Inserat".
+- Ergebnis: Ein neues Inserat wird veröffentlicht bzw. ein bestehendes aktualisiert.
+- Sichtbar für: Alle angemeldeten Studenten (Erstellen) und der Eigentümer (Bearbeiten).
+- Besonderheiten: Mehrfach-Bild-Upload mit clientseitiger Kompression, optionaler KI-Beschreibungsvorschlag.
+
+**Navigationsmöglichkeiten**
+
+Von hier gelangt man zu:
+- nach erfolgreichem Speichern → Inseratdetail-Dialog des Inserats
+- über „Abbrechen" → Marktplatz- bzw. Inseratdetail-Dialog.
+
+Rücksprungmöglichkeit: über „Abbrechen".
+
+**Statik – Formular (Felder)**
+
+| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Datenmodell |
 |---|---|---|---|---|---|
-| Zahlungsmodus | Radiobutton | Ja | „Simulation“ | Auswahl treffen | `Transaktion.zahlungsmodus` |
+| Titel | Textfeld | Ja | Nein (bzw. bestehender Titel bei Bearbeiten) | Pflichtfeld | `LISTING.title` |
+| Kategorie | Dropdown | Ja | Erste Kategorie der Liste | Auswahl aus fester Liste (6 Werte) | `LISTING.category` |
+| Preis | Zahlenfeld | Ja | Nein | Numerisch, ≥ 0 | `LISTING.priceCents` |
+| Beschreibung | Textbereich | Ja | Nein bzw. KI-Vorschlag | Pflichtfeld | `LISTING.description` |
+| Sofortkauf möglich | Checkbox | Nein | Aktiviert | Kein Bezug | `LISTING.sofortkaufMoeglich` |
+| Bilder | Datei-Upload (mehrfach) | Ja | Nein | 1 bis 6 Bilder | `LISTING.images` |
 
-*Tab. 35: Dialogspezifikation Kauf-Dialog – Felder*
+**Dynamik – Aktionsliste**
 
-#### Statik – Formular: Bewertungsformular (Felder)
+| Aktion | Auslöser | Wirkung | Datenmodell | Use Case |
+|---|---|---|---|---|
+| Beschreibung vorschlagen | Button „Vorschlag generieren" | Ruft Gemini mit Titel/Kategorie/Hinweis und Fotos auf, füllt Beschreibungsfeld | `LISTING.description` | UC04 |
+| Bild hinzufügen | Datei-Upload | Bild wird komprimiert und der Vorschau hinzugefügt | `LISTING.images` | UC04 |
+| Inserat speichern | Button „Veröffentlichen"/„Speichern" | Validierung → Inserat (und Bilder) werden gespeichert oder Fehler angezeigt | `LISTING.*` | UC04 / UC05 |
+| Abbrechen | Button „Abbrechen" | Rückkehr ohne Speichern | Kein Bezug | Kein Bezug |
+| Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
 
-| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Bezug zum Datenmodell |
+**Zustände**
+- Standard.
+- Fehler (leere Pflichtfelder, kein Bild).
+- KI-Fehler.
+- Erfolg.
+
+### 4.2.9 Kauf-Dialog (Checkout)
+
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Abschluss des simulierten Kaufs.
+- Anwendungsfall: „Nutzer schließt einen Kauf ab".
+- Ergebnis: Inserat wird als verkauft markiert und bei Guthaben-Modus wird der Betrag verrechnet.
+- Sichtbar für: Angemeldete Nutzer, die nicht Eigentümer des Inserats sind, sofern Sofortkauf aktiviert und das Inserat noch nicht verkauft ist.
+
+**Navigationsmöglichkeiten**
+
+Von hier gelangt man zu:
+- über „Kaufen" im Inseratdetail-Dialog hierher
+- nach Abschluss → zurück zum Inseratdetail-Dialog
+
+Rücksprungmöglichkeit: über „Abbrechen".
+
+**Statik – Formular (Felder)**
+
+| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Datenmodell |
 |---|---|---|---|---|---|
-| Sterne | Sternebewertung | Ja | Nein | 1 bis 5 | `Bewertung.sterne` |
-| Kommentar | Textbereich | Nein | Nein | Freitext | `Bewertung.kommentar` |
+| Zahlungsmodus | Radiobutton (Simulation / Guthaben) | Ja | „Simulation" | Auswahl treffen | Steuert weiteren Ablauf |
+| Kartennummer | Textfeld (nur Simulation) | Ja | Nein | Formatprüfung (Testkarte: `4242 4242 4242 4242`) | Nicht persistiert |
+| Ablaufdatum | Textfeld (nur Simulation) | Ja | Nein | Formatprüfung | Nicht persistiert |
+| CVC | Textfeld (nur Simulation) | Ja | Nein | Formatprüfung | Nicht persistiert |
 
-*Tab. 36: Dialogspezifikation Kauf-Dialog – Bewertungsfelder*
+**Dynamik – Aktionsliste**
 
-#### Dynamik – Aktionsliste
-
-| Aktion | Auslöser | Wirkung | Bezug zum Datenmodell | Bezug zum Use Case |
+| Aktion | Auslöser | Wirkung | Datenmodell | Use Case |
 |---|---|---|---|---|
-| Kauf abschließen | Button „Kauf bestätigen“ | Transaktion wird gespeichert, Inserat als verkauft markiert | `Transaktion.*`, `Inserat.status` | UC12 – Kauf abschließen (neu) |
-| Bewertung abgeben | Button „Bewertung senden“ | Bewertung wird gespeichert | `Bewertung.*` | UC12 – Kauf abschließen (neu) |
-| Abbrechen | Button „Abbrechen“ | Rückkehr ohne Kaufabschluss | Kein Bezug | Kein Bezug |
+| Kauf bestätigen | Button „Kauf bestätigen" | Je nach Modus: Testkarte validieren oder Guthaben prüfen → Inserat als verkauft markieren | `LISTING.status`, `LISTING.buyerId`, `USER.balanceCents` | UC08 |
+| Abbrechen | Button „Abbrechen" | Rückkehr ohne Kaufabschluss | Kein Bezug | Kein Bezug |
+| Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
 
-*Tab. 37: Dialogspezifikation Kauf-Dialog – Aktionsliste*
+**Zustände**
+- Standard.
+- Fehler (ungültige Testkarte oder nicht genügend Guthaben).
+- Erfolg.
 
-#### Zustände
+### 4.2.10 Chat-Dialog
 
-- Standard: Zahlungsmodus-Auswahl möglich
-- Erfolg: Bestätigung, anschließend Bewertungsformular
-- Fehler: Datenbank nicht erreichbar → Fehlermeldung, Kauf wird nicht gespeichert
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Echtzeit-Nachrichtenaustausch zwischen Interessent und Anbieter zu einem Inserat.
+- Anwendungsfall: „Nutzer kommuniziert mit einem anderen Nutzer".
+- Ergebnis: Nachrichten werden in Echtzeit ausgetauscht und dauerhaft gespeichert.
+- Sichtbar für: die beiden an einer Konversation beteiligten angemeldeten Nutzer.
 
-### 4.2.7 Chat-Dialog
+**Navigationsmöglichkeiten**
 
-Der Chat-Dialog ermöglicht die Echtzeit-Kommunikation zwischen Interessent und Anbieter zu einem Inserat. Links werden die vorhandenen Konversationen angezeigt, rechts der Nachrichtenverlauf der ausgewählten Konversation. Nachrichten werden über Socket.io in Echtzeit übertragen.
+Von hier gelangt man zu:
+- über das verknüpfte Inserat → Inseratdetail-Dialog
+- „Melden" → Meldeformular für den gemeldeten Nutzer.
 
-> Mockup des Chat-Dialogs wird noch ergänzt.
+Rücksprungmöglichkeit: über die Navigationsleiste zum Marktplatz-Dialog.
 
-*Abbildung 14: Mockup „Chat“*
+**Statik – Formular (Felder)**
 
-#### Allgemeine Beschreibung
-
-- **Zweck des Dialogs:** Nachrichtenaustausch zwischen Nutzern zu einem Inserat
-- **Anwendungsfall:** „Benutzer kommuniziert mit einem anderen Nutzer“
-- **Ergebnis:** Nachrichten werden in Echtzeit ausgetauscht und gespeichert
-- **Sichtbar für:** Die an der Konversation beteiligten eingeloggten Nutzer
-- **Besonderheiten:** Echtzeit-Übertragung über Socket.io, Konversationsliste, Lesestatus
-
-#### Navigationsmöglichkeiten
-
-- Über eine Konversation in der Liste → Anzeige des jeweiligen Verlaufs
-- Über das verknüpfte Inserat → zur Inseratdetailseite
-
-#### Statik – Formular: Nachricht senden (Felder)
-
-| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Bezug zum Datenmodell |
+| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Datenmodell |
 |---|---|---|---|---|---|
-| Nachricht | Textfeld | Ja | Nein | nicht leer | `Nachricht.inhalt` |
+| Nachricht | Textfeld | Ja | Nein | Nicht leer | `MESSAGE.text` |
 
-*Tab. 30: Dialogspezifikation Chat-Dialog – Felder*
+**Dynamik – Aktionsliste**
 
-#### Dynamik – Aktionsliste
-
-| Aktion | Auslöser | Wirkung | Bezug zum Datenmodell | Bezug zum Use Case |
+| Aktion | Auslöser | Wirkung | Datenmodell | Use Case |
 |---|---|---|---|---|
-| Nachricht senden | Button „Senden“ | Validierung → Nachricht wird in Echtzeit übertragen und gespeichert | `Nachricht.*`, `Konversation.id` | UC07 – Chat mit Nutzer führen |
-| Konversation wählen | Klick in der Liste | Anzeige des Nachrichtenverlaufs | `Konversation.id` | UC07 – Chat mit Nutzer führen |
+| Nachricht senden | Button „Senden" | Validierung → Nachricht wird in Echtzeit übertragen und gespeichert | `MESSAGE.*` | UC07 |
+| Konversation wählen | Klick in der Liste | Anzeige des Nachrichtenverlaufs | `CONVERSATION.id` | UC07 |
+| Nutzer melden | Button „Melden" im Chat | Öffnet Meldeformular, speichert Meldung mit Chat-Kontext | `REPORT.*` | UC12 |
+| Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
 
-*Tab. 31: Dialogspezifikation Chat-Dialog – Aktionsliste*
+**Zustände**
+- Standard.
+- Empfänger nicht in der Unterhaltung (Nachricht wird als Benachrichtigung markiert, Konversation springt nach oben).
+- Verbindungsabbruch (Hinweis, automatischer Wiederverbindungsversuch).
 
-#### Zustände
+### 4.2.11 Profil-Dialog
 
-- Standard: Konversationen und Verlauf werden angezeigt
-- Empfänger offline: Nachricht wird gespeichert und später zugestellt
-- Fehler: Verbindungsabbruch → Hinweis, dass die Nachricht nicht gesendet werden konnte
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Verwaltung der eigenen Inserate und Zugang zu Kontofunktionen.
+- Anwendungsfall: „Nutzer verwaltet eigene Inserate und Konto".
+- Ergebnis: Eigene Inserate sind aktuell. Aufladen/Auszahlen/Kontoeinstellungen sind erreichbar.
+- Sichtbar für: Alle angemeldeten Nutzer.
+- Besonderheiten: Trennung in die Bereiche „Aktive Inserate" und „Verkaufte Inserate".
 
-### 4.2.8 Profil-Dialog (Meine Inserate & Favoriten)
+**Navigationsmöglichkeiten**
 
-Im Profildialog verwaltet der Nutzer seine eigenen Inserate und sieht seine Favoriten. Eigene Inserate können bearbeitet, als abgeschlossen markiert oder gelöscht werden. Über die Favoritenliste gelangt der Nutzer schnell zu gemerkten Inseraten.
+Von hier gelangt man zu:
+- einem eigenen Inserat → Inseratdetail-Dialog
+- „Aufladen" → Aufladen-Dialog
+- „Auszahlen" → Auszahlen-Dialog
+- „Kontoeinstellungen" → Kontoeinstellungen-Dialog
+- „Neues Inserat" → Erstellen-Dialog.
 
-> Mockup des Profil-Dialogs wird noch ergänzt.
+Rücksprungmöglichkeit: über die Navigationsleiste zum Marktplatz-Dialog.
 
-*Abbildung 15: Mockup „Profil / Meine Inserate & Favoriten“*
-#### Allgemeine Beschreibung
+**Statik**
 
-- **Zweck des Dialogs:** Verwaltung der eigenen Inserate und Ansicht der Favoriten
-- **Anwendungsfall:** „Benutzer verwaltet eigene Inserate und Favoriten“
-- **Ergebnis:** Eigene Inserate sind aktuell; Favoriten sind schnell erreichbar
-- **Sichtbar für:** Alle eingeloggten Nutzer
-- **Besonderheiten:** Trennung in „Meine Inserate“ und „Favoriten“
+Kein Eingabeformular, nur die beiden Listenbereiche „Aktive Inserate" und „Verkaufte Inserate" (`LISTING.*` gefiltert nach `sellerId` und `status`).
 
-#### Navigationsmöglichkeiten
+**Dynamik – Aktionsliste**
 
-- Über ein eigenes Inserat → zum Bearbeiten-Formular
-- Über ein favorisiertes Inserat → zur Inseratdetailseite
-- Über „Zurück“ → zum Marktplatz
-
-#### Dynamik – Aktionsliste
-
-| Aktion | Auslöser | Wirkung | Bezug zum Datenmodell | Bezug zum Use Case |
+| Aktion | Auslöser | Wirkung | Datenmodell | Use Case |
 |---|---|---|---|---|
-| Inserat bearbeiten | Button „Bearbeiten“ | Öffnet das Formular zur Änderung des Inserats | `Inserat.*` | UC09 – Eigene Inserate verwalten |
-| Inserat löschen | Button „Löschen“ | Entfernt das Inserat inklusive Bilder | `Inserat.id`, `Bild.*` | UC09 – Eigene Inserate verwalten |
-| Favorit öffnen | Klick auf Favorit | Navigation zur Inseratdetailseite | `Favorit.user_id`, `Favorit.inserat_id` | UC06 – Favorit speichern |
+| Eigenes Inserat öffnen | Klick auf Inserat in „Aktive/Verkaufte Inserate" | Navigation zur Inseratdetailseite | `LISTING.id` | UC05 |
+| Aufladen öffnen | Button „Aufladen" | Navigation zum Aufladen-Dialog | Kein Bezug | UC09 |
+| Auszahlen öffnen | Button „Auszahlen" | Navigation zum Auszahlen-Dialog | Kein Bezug | UC10 |
+| Kontoeinstellungen öffnen | Link „Kontoeinstellungen" | Navigation zum Kontoeinstellungen-Dialog | Kein Bezug | Kein Bezug |
+| Neues Inserat | Button „Neues Inserat" | Navigation zum Erstellen-Dialog | Kein Bezug | UC04 |
+| Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
 
-*Tab. 32: Dialogspezifikation Profil-Dialog – Aktionsliste*
-#### Zustände
+**Zustände**
+- Standard.
+- keine eigenen Inserate vorhanden (Hinweis statt Liste).
 
-- Standard: Eigene Inserate und Favoriten werden angezeigt
-- Keine Inserate oder Favoriten vorhanden → entsprechender Hinweis
+### 4.2.12 Favoriten-Dialog
 
-### 4.2.9 Adminbereich-Dialog
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Übersicht der gemerkten Inserate für den schnellen Wiederzugriff.
+- Anwendungsfall: „Nutzer sieht seine Favoriten ein".
+- Ergebnis: Favorisierte Inserate sind direkt abrufbar.
+- Sichtbar für: Alle angemeldeten Nutzer.
 
-Der Adminbereich stellt autorisierten Administratoren erweiterte Verwaltungsfunktionen zur Verfügung. Über eine Sidebar wechselt der Administrator zwischen Benutzerverwaltung, Meldungen und Logs beziehungsweise Aktivitäten. Der Bereich ist nur nach dem Login mit Adminrechten sichtbar.
+**Navigationsmöglichkeiten**
 
-> Mockup des Adminbereichs wird noch ergänzt.
+Von hier gelangt man zu:
+- einem favorisierten Inserat → Inseratdetail-Dialog
 
-*Abbildung 16: Mockup „Adminbereich“*
+Rücksprungmöglichkeit: über die Navigationsleiste zum Marktplatz-Dialog.
 
-#### Allgemeine Beschreibung
+**Statik**
 
-- **Zweck des Dialogs:** Zentrale Verwaltungsaufgaben für Nutzer, Meldungen und Logs
-- **Anwendungsfall:** „Admin verwaltet Nutzer und Meldungen“
-- **Ergebnis:** Erfolgreiche Verwaltung von Nutzern und Meldungen sowie Einsicht in Logs
-- **Sichtbar für:** Nur eingeloggte Nutzer mit Adminrechten
-- **Besonderheiten:** Navigierbarer Mehrbereichsdialog mit Sidebar und drei Teilbereichen
+Kein Eingabeformular, nur die Liste der favorisierten Inserate (`FAVORITE.*` verknüpft mit `LISTING.*`).
 
-#### Statik – Sidebar
+**Dynamik – Aktionsliste**
 
-| Element | Typ | Funktion | Bezug zum Datenmodell | Bezug zum Use Case |
+| Aktion | Auslöser | Wirkung | Datenmodell | Use Case |
 |---|---|---|---|---|
-| Benutzerverwaltung | Link/Button | Zeigt alle registrierten Nutzer | `Benutzer.*` | UC10 |
-| Meldungen | Link/Button | Zeigt offene Meldungen zu Inseraten | `Meldung.*` | UC11 |
-| Logs / Aktivitäten | Link/Button | Zeigt Login-Erfolge, Fehlversuche und Zeitstempel | Kein Bezug | UC10 |
+| Favorit öffnen | Klick auf Favorit | Navigation zur Inseratdetailseite | `FAVORITE.listingId` | UC06 |
+| Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
 
-*Tab. 33: Dialogspezifikation Adminbereich – Sidebar*
-#### Dynamik – Aktionsliste
+**Zustände**
+- Standard.
+- keine Favoriten vorhanden (Hinweis statt Liste).
 
-| Aktion | Auslöser | Wirkung | Bezug zum Datenmodell | Bezug zum Use Case |
+### 4.2.13 Guthaben-aufladen-Dialog
+
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Mock-Einzahlung auf das In-App-Guthaben.
+- Anwendungsfall: „Nutzer lädt Guthaben auf".
+- Ergebnis: Guthaben ist um den eingezahlten Betrag erhöht.
+- Sichtbar für: Alle angemeldeten Nutzer.
+
+**Navigationsmöglichkeiten**
+
+Von hier gelangt man zu:
+- über „Aufladen" im Profil-Dialog hierher
+- nach Abschluss → zurück zum Profil-Dialog
+
+**Statik – Formular (Felder)**
+
+| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Datenmodell |
+|---|---|---|---|---|---|
+| Betrag | Zahlenfeld | Ja | 25 € | min. 5 €, max. 500 € | `USER.balanceCents` |
+| Kartennummer | Textfeld | Ja | Nein | Formatprüfung | Nicht persistiert |
+| Ablaufdatum | Textfeld | Ja | Nein | Formatprüfung | Nicht persistiert |
+| CVC | Textfeld | Ja | Nein | Formatprüfung | Nicht persistiert |
+
+**Dynamik – Aktionsliste**
+
+| Aktion | Auslöser | Wirkung | Datenmodell | Use Case |
 |---|---|---|---|---|
-| Bereich wechseln | Klick auf Sidebar | Anzeige des gewählten Verwaltungsbereichs | Kein Bezug | UC10 / UC11 |
-| Nutzer bearbeiten, sperren oder löschen | Buttons in der Benutzerverwaltung | Änderung, Sperrung oder Löschung des Nutzers | `Benutzer.*` | UC10 – Nutzerkonten verwalten |
-| Meldung bearbeiten | Buttons im Bereich „Meldungen“ | Verwarnung aussprechen, Inserat ausblenden oder Nutzer sperren | `Meldung.*`, `Inserat.id`, `Benutzer.id` | UC11 – Meldungen und Inserate moderieren |
-| Logs lesen | Bereich „Logs / Aktivitäten“ | Anzeige der Login-Logs | Kein Bezug | UC10 – Nutzerkonten verwalten |
+| Aufladen bestätigen | Button „Aufladen" | Prüft Betrag und Testkarte → erhöht Guthaben | `USER.balanceCents` | UC09 |
+| Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
 
-*Tab. 34: Dialogspezifikation Adminbereich – Aktionsliste*
-#### Zustände
+**Zustände**
+- Standard.
+- Fehler (Betrag außerhalb 5–500 €, ungültige Testkarte).
+- Erfolg (neuer Kontostand wird angezeigt).
 
-- Standard: Aktueller Bereich wird angezeigt, Daten sind geladen
-- Fehler: Datenbank nicht erreichbar → Fehlermeldung
+### 4.2.14 Guthaben-auszahlen-Dialog
+
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Mock-Auszahlung des In-App-Guthabens.
+- Anwendungsfall: „Nutzer zahlt Guthaben aus".
+- Ergebnis: Guthaben ist um den ausgezahlten Betrag verringert.
+- Sichtbar für: Alle angemeldeten Nutzer.
+
+**Navigationsmöglichkeiten**
+
+Von hier gelangt man zu:
+- über „Auszahlen" im Profil-Dialog hierher
+- nach Abschluss → zurück zum Profil-Dialog
+
+**Statik – Formular (Felder)**
+
+| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Datenmodell |
+|---|---|---|---|---|---|
+| Betrag | Zahlenfeld | Ja | Aktuelles Guthaben (siehe Hinweis) | min. 0,01 €, max. aktuelles Guthaben | `USER.balanceCents` |
+| Kartennummer | Textfeld | Ja | Nein | Formatprüfung | Nicht persistiert |
+| Ablaufdatum | Textfeld | Ja | Nein | Formatprüfung | Nicht persistiert |
+| CVC | Textfeld | Ja | Nein | Formatprüfung | Nicht persistiert |
+
+**Dynamik – Aktionsliste**
+
+| Aktion | Auslöser | Wirkung | Datenmodell | Use Case |
+|---|---|---|---|---|
+| Auszahlen bestätigen | Button „Auszahlen" | Prüft Betrag und Testkarte → verringert Guthaben | `USER.balanceCents` | UC10 |
+| Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
+
+**Zustände**
+- Kein Guthaben (Hinweis „Kein Guthaben zum Auszahlen vorhanden" statt Formular).
+- Standard.
+- Fehler (Betrag ungültig oder über verfügbarem Guthaben).
+- Erfolg.
+
+### 4.2.15 Kontoeinstellungen-Dialog
+
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Ändern von Anzeigename und Passwort.
+- Anwendungsfall: Querschnittsfunktion ohne direkten Use-Case-Bezug.
+- Ergebnis: Name bzw. Passwort sind aktualisiert.
+- Sichtbar für: Alle angemeldeten Nutzer.
+
+**Navigationsmöglichkeiten**
+
+Von hier gelangt man zu:
+- über den Link „Kontoeinstellungen" im Profil-Dialog hierher
+
+Rücksprungmöglichkeit: über die Navigationsleiste zum Profil-Dialog.
+
+**Statik – Formular (Felder)**
+
+| Feldname | Typ | Pflicht | Vorbelegung | Validierung | Datenmodell |
+|---|---|---|---|---|---|
+| Name (Formular 1) | Textfeld | Ja | Aktueller Name | Pflichtfeld | `USER.name` |
+| Aktuelles Passwort (Formular 2) | Passwortfeld | Ja | Nein | Muss mit gespeichertem Hash übereinstimmen | `USER.passwordHash` |
+| Neues Passwort (Formular 2) | Passwortfeld | Ja | Nein | mind. 8 Zeichen, mit mindestens einem Klein-, einem Großbuchstaben und einer Ziffer | `USER.passwordHash` |
+
+**Dynamik – Aktionsliste**
+
+| Aktion | Auslöser | Wirkung | Datenmodell | Use Case |
+|---|---|---|---|---|
+| Name speichern | Button „Speichern" (Name) | Validierung → Name wird aktualisiert | `USER.name` | Kein Bezug |
+| Passwort speichern | Button „Speichern" (Passwort) | Prüft aktuelles Passwort → setzt neues Passwort | `USER.passwordHash` | Kein Bezug |
+| Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
+
+**Zustände**
+- Standard, getrennt pro Formular.
+- Erfolg bzw. Fehler (z. B. falsches aktuelles Passwort) je Formular unabhängig voneinander.
+
+### 4.2.16 Adminbereich-Dialog
+
+**Allgemeine Beschreibung**
+- Zweck des Dialogs: Zentrale Verwaltungsaufgaben für Meldungen, Nutzer, Inserate und Audit-Log.
+- Anwendungsfall: „Admin verwaltet Meldungen, Nutzer und Inserate".
+- Ergebnis: Meldungen sind bearbeitet, Nutzer-/Inseratbestand ist gepflegt.
+- Sichtbar für: Nur Nutzer mit Rolle `ADMIN`.
+
+**Navigationsmöglichkeiten**
+
+Interne Navigation über die Sidebar zwischen den vier Tabs „Meldungen", „Nutzer", „Inserate" und „Audit-Log". Aus dem Tab „Meldungen" gelangt man bei Inserat-Kontext zum (nur lesbaren) Inseratdetail-Dialog. Rücksprungmöglichkeit über „Abmelden" zurück zur Landingpage.
+
+**Statik – Sidebar**
+
+| Element | Typ | Funktion | Datenmodell | Use Case |
+|---|---|---|---|---|
+| Meldungen | Link/Button | Zeigt offene und geschlossene Meldungen | `REPORT.*` | UC13 |
+| Nutzer | Link/Button | Zeigt alle registrierten Nutzerkonten | `USER.*` | UC14 |
+| Inserate | Link/Button | Zeigt alle Inserate | `LISTING.*` | UC14 |
+| Audit-Log | Link/Button | Zeigt chronologische Liste aller Admin-Aktionen | `AUDITLOGENTRY.*` | UC14 |
+
+**Dynamik – Aktionsliste**
+
+| Aktion | Auslöser | Wirkung | Datenmodell | Use Case |
+|---|---|---|---|---|
+| Bereich wechseln | Klick auf Sidebar-Element | Anzeige des gewählten Tabs | Kein Bezug | UC13 / UC14 |
+| Meldung bearbeiten | Buttons im Tab „Meldungen" (schließen / löschen / verwarnen) | Setzt Meldung auf geschlossen, führt ggf. Maßnahme aus | `REPORT.*`, `LISTING.*`, `USER.warningMessage` | UC13 |
+| Nutzer löschen | Button „Löschen" im Tab „Nutzer" | Prüft Selbst-/Admin-/aktive-Inserate-Regeln, löscht bei Erfolg das Konto | `USER.*` | UC14 |
+| Inserat löschen | Button „Löschen" im Tab „Inserate" | Löscht das Inserat | `LISTING.*` | UC14 |
+| Audit-Log lesen | Tab „Audit-Log" | Zeigt Log-Einträge (nur Lesefunktion) | `AUDITLOGENTRY.*` | UC14 |
+| Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
+
+**Zustände**
+- Standard je Tab, Daten sind geladen.
+- Fehler bei Löschversuch (z. B. Selbstlöschung, anderes Admin-Konto, noch aktive Inserate vorhanden — Aktion wird abgelehnt).
