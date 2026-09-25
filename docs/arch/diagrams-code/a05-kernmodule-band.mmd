@@ -1,0 +1,44 @@
+flowchart LR
+  subgraph E2["Verfeinerungsebene 2 · Whitebox der Kernmodule"]
+    direction LR
+    subgraph AUTH["Auth (Benutzerverwaltung)"]
+      direction TB
+      A1["Registrierung"]:::sub
+      A2["E-Mail-Verifizierung"]:::sub
+      A3["Login (JWT)"]:::sub
+      A4["Passwort-Reset"]:::sub
+      A5["Profil & Verwarnung"]:::sub
+      A6["JWT-Guard / Rollen"]:::sub
+      A1 ~~~ A2 ~~~ A3 ~~~ A4 ~~~ A5 ~~~ A6
+    end
+    subgraph LST["Listings"]
+      direction TB
+      L1["Inserat-Verwaltung"]:::sub
+      L2["Bild-Upload"]:::sub
+      L3["KI-Beschreibung"]:::sub
+      L4["Favoriten"]:::sub
+      L5["Kaufabschluss"]:::sub
+      L1 ~~~ L2 ~~~ L3 ~~~ L4 ~~~ L5
+    end
+    subgraph CHT["Chat"]
+      direction TB
+      C1["Konversationen (REST)"]:::sub
+      C2["Socket.io-Gateway"]:::sub
+      C3["Nachrichten-Persistenz"]:::sub
+      C1 ~~~ C2 ~~~ C3
+    end
+    subgraph ADM["Admin"]
+      direction TB
+      D1["Meldungsverwaltung"]:::sub
+      D2["Maßnahmen"]:::sub
+      D3["Audit-Log"]:::sub
+      D1 ~~~ D2 ~~~ D3
+    end
+    AUTH ~~~ LST ~~~ CHT ~~~ ADM
+  end
+  classDef sub fill:#ffffff,stroke:#495057,color:#212529
+  style E2  fill:#f8fafc,stroke:#94a3b8,color:#0f172a
+  style AUTH fill:#d0ebff,stroke:#1971c2,color:#0b3a66
+  style LST  fill:#d3f9d8,stroke:#2f9e44,color:#14532d
+  style CHT  fill:#ffe3e3,stroke:#e03131,color:#7a1010
+  style ADM  fill:#fff3bf,stroke:#f08c00,color:#663c00
