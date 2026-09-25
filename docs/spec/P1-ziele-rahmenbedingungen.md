@@ -2,6 +2,13 @@
 
 THMarket ist ein Campus-Marktplatz, der ausschließlich für verifizierte Studierende der Technischen Hochschule Mittelhessen (THM) offensteht. Ziel ist es, den informellen Second-Hand-Handel unter Studierenden (Bücher, Elektronik, Möbel, Fahrräder, Kleidung u. Ä.), der bisher über verstreute WhatsApp-Gruppen läuft, auf einer eigenen, geschlossenen Plattform zu bündeln.
 
+**Zentrale Ziele:**
+
+- **Geschlossene Nutzerbasis:** Zugang nur mit einer verifizierten `@thm.de`-Adresse.
+- **Einfaches Anbieten:** Ein Inserat lässt sich mit wenigen Feldern und Fotos veröffentlichen, dazu kann eine KI auf Wunsch einen Beschreibungsvorschlag liefern.
+- **Direkter Kontakt:** Ein eingebauter Echtzeit-Chat ersetzt den Umweg über externe Messenger.
+- **Moderierbarkeit:** Nutzer können Inserate und andere Nutzer melden, ein Admin-Bereich erlaubt es, Meldungen zu bearbeiten und im Bedarfsfall Inserate zu löschen oder Konten zu verwarnen bzw. zu löschen.
+
 # 1.2 Stakeholder
 
 ### Nutzende Stakeholder
