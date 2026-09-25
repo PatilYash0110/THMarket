@@ -59,7 +59,7 @@ Das Datenmodell (ER-Diagramm) ist nicht Teil dieses Dokuments — es wird mit de
 
 | Werkzeug | Rolle im Projekt |
 |----------|------------------|
-| Claude (Claude Code) | Entwürfe für Kapiteltexte und ADRs, Code-Vervollständigung im Backend, Repository- und Commit-Verwaltung |
+| Claude (Claude Code) | Entwürfe für Kapiteltexte und ADRs, Code-Vervollständigung im Backend, Repository- und Commit-Verwaltung, Hilfestellung bei Mermaid Diagramm Erstellung |
 | Google Gemini | Code-Vervollständigung, Recherche zu Technologiealternativen |
 | ChatGPT | Formulierungsvorschläge, Gegenlesen einzelner Kapitel |
 
