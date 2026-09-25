@@ -55,7 +55,6 @@ Das Grundmuster gilt für die meisten Anfragen: Der Nutzer löst im Frontend ein
 - KI liefert nur die Beschreibung — kein Titel, keine Kategorie, kein Preis
 - Fällt Gemini aus: manuelle Eingabe bleibt möglich (fail-open)
 
-> **Hinweis:** Jedes hochgeladene Foto wird zusätzlich einzeln von Gemini auf unangemessene Inhalte geprüft (fail-open — schlägt die Prüfung fehl, wird der Upload trotzdem zugelassen und im Audit-Log vermerkt). Dieser Schritt ist der Übersichtlichkeit halber nicht separat dargestellt.
 
 *Abbildung 11: Laufzeitsicht — Inserat mit KI-Beschreibung*
 
