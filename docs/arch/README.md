@@ -33,7 +33,7 @@ Alle 15 Diagramme sind als Bild eingebettet (standardmäßig eingeklappt, `📊 
 | Abbildung | Datei |
 |---|---|
 | 1 — Fachlicher Kontext | [`diagrams-png/01-fachlicher-kontext.png`](diagram_images/01-fachlicher-kontext.png) |
-| 2 — Technischer Kontext | [`diagrams-png/02-technischer-kontext.png`](diagrams_images/02-technischer-kontext.png) |
+| 2 — Technischer Kontext | [`diagrams-png/02-technischer-kontext.png`](diagram_images/02-technischer-kontext.png) |
 | 3 — Bausteinsicht Zerlegungsübersicht | [`diagrams-png/03-bausteinsicht-zerlegungsuebersicht.png`](diagram_images/003-ebene0-1-2-uebersicht.png) |
 | 4 — Whitebox „System THMarket" | [`diagrams-png/04-whitebox-system-thmarket.png`](diagram_images/04-ebene1-whitebox-system.png) |
 | 5 — Whitebox „Auth" | [`diagrams-png/05-whitebox-auth.png`](diagram_images/05-ebene2-kernmodule-band.png) |
