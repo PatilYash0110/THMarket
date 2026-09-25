@@ -8,7 +8,7 @@ Die folgende Zerlegungsübersicht stellt alle drei Ebenen gestapelt dar, die ges
 *Abbildung 3: Bausteinsicht — Zerlegungsübersicht (Ebene 0 → 2)*
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary> Diagramm anzeigen</summary>
 
 ![Bausteinsicht — Zerlegungsübersicht](diagram_images/03-ebene0-1-2-uebersicht.png)
 
@@ -23,7 +23,7 @@ Auf Ebene 1 besteht THMarket aus fünf fachlichen Kernmodulen (Auth, Listings, W
 *Abbildung 4: Whitebox „System THMarket" (Verfeinerungsebene 1)*
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary> Diagramm anzeigen</summary>
 
 ![Whitebox „System THMarket"](diagram_images/04-ebene1-whitebox-system.png)
 
@@ -139,7 +139,7 @@ Die vier zentralen Kernmodule werden nun in ihre inneren Bausteine zerlegt. Für
 *Abbildung 5: Whitebox „Auth" (Verfeinerungsebene 2)*
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary> Diagramm anzeigen</summary>
 
 ![Whitebox „Auth"](diagram_images/07-ebene2-whitebox-auth.png)
 
