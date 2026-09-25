@@ -37,8 +37,8 @@
 | Baustein | Titel | Status | Datei |
 |---|---|---|---|
 | B1 | Dialogspezifikation | ✅ | [`B1-dialogspezifikation.md`](B1-dialogspezifikation.md) |
-| B2 | Stapelverarbeitung | 🛠 | — |
-| B3 | Druckausgabe | 🛠 | — |
+| B2 | Stapelverarbeitung | ⛔ | — |
+| B3 | Druckausgabe | ⛔ | — |
 
 ### 5. Schnittstellen zu Alt- und Nachbarsystemen
 
@@ -53,13 +53,13 @@
 | Baustein | Titel | Status | Datei |
 |---|---|---|---|
 | N1 | Nichtfunktionale Anforderungen | ✅ | [`N1-nichtfunktional.md`](N1-nichtfunktional.md) |
-| N2 | Querschnittskonzepte | 🛠 | `` |
+| N2 | Querschnittskonzepte | ✅ | [`N2-querschnittskonzepte.md`](N2-querschnittsknozepte.md) |
 
 ### 7. Ergänzende Bausteine
 
 | Baustein | Titel | Status | Datei |
 |---|---|---|---|
-| E1 | Leitfaden zum Lesen | 🛠 | `` |
+| E1 | Leitfaden zum Lesen | ✅ | Diese Readme File |
 | E2 | Glossar | 🛠 | `` |
 
 ## Nicht anwendbare Bausteine
@@ -72,7 +72,7 @@
 
 | Werkzeug | Rolle im Projekt |
 |----------|------------------|
-| Claude (Claude Code) | Entwürfe und Umformulierungen von Bausteintexten, Repository- und Commit-Verwaltung |
+| Claude (Claude Code) | Entwürfe und Umformulierungen von Bausteintexten, Repository- und Commit-Verwaltung, Hilfestellung bei Mermaid Diagramm Erstellung |
 | Google Gemini | Recherche, Formulierungsvorschläge |
 | ChatGPT | Formulierungsvorschläge, Gegenlesen einzelner Abschnitte |
 
