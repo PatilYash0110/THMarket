@@ -66,7 +66,7 @@ sequenceDiagram
 
 *Abbildung 12: Laufzeitsicht — Registrierung & Verifizierung*
 
-![Registrierung & Verifizierung](diagram_images/a06-laufzeitdiagramm_registrierung_verifizierung.png)
+![Registrierung & Verifizierung](diagram_images/15-registrierung-verifizierung.png)
 *(Quelltext: `diagrams-code/a06-laufzeitdiagramm_registrierung_verifizierung.mmd`)*
 
 ## 6.3 Inserat mit KI-Beschreibung
