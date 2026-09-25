@@ -1,18 +1,22 @@
-%% Abbildung 15: Laufzeitsicht - Mock-Kauf
 sequenceDiagram
-    actor K as Käufer
+    autonumber
+    actor K as Kaeufer
     participant FE as Frontend
-    participant P as PaymentsController
-    participant SVC as PaymentsService
+    participant L as ListingsController
+    participant SVC as ListingsService
     participant DB as Datenbank
-    K->>FE: Kaufen + Mock-Kreditkarte
-    FE->>P: POST /payments/checkout
-    P->>SVC: processMockPayment(id, methode)
+
+    K->>FE: Kaufen, Zahlungsmodus waehlen
+    FE->>L: POST /listings/:id/purchase
+    L->>SVC: purchase(id, buyerId, role, dto)
+    SVC->>SVC: Berechtigung pruefen (Rolle, Eigentuemer,<br/>Sofortkauf aktiviert)
     alt Methode = Simulation
-        SVC->>SVC: Zahlung simulieren (kein Geldfluss)
+        SVC->>SVC: Test-Kreditkarte validieren (kein Geldfluss)
+        SVC->>DB: Inserat = VERKAUFT, buyerId setzen
     else Methode = In-App-Guthaben
-        SVC->>DB: Guthaben des Verkäufers erhöhen
+        SVC->>DB: Guthaben pruefen und verrechnen<br/>(Kaeufer -, Verkaeufer +), Inserat = VERKAUFT
     end
-    SVC->>DB: Transaktion speichern, Inserat = VERKAUFT
-    SVC-->>FE: Kaufbestätigung
-    Note over DB: Verkäufer sieht Kauf in "Verkäufe"
+    DB-->>SVC: Bestaetigung
+    SVC-->>L: Ergebnis
+    L-->>FE: Kaufbestaetigung
+    FE-->>K: Erfolg anzeigen
