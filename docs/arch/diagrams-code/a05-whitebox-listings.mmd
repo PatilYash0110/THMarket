@@ -1,0 +1,22 @@
+flowchart TB
+  subgraph LSTWB["Whitebox Listings · Verfeinerungsebene 2"]
+    direction TB
+    INV["Inserat-Verwaltung (CRUD)"]:::sub
+    IMG["Bild-Upload"]:::sub
+    KI["KI-Beschreibung"]:::sub
+    FAV["Favoriten"]:::sub
+    BUY["Kaufabschluss (purchase)"]:::sub
+  end
+  CLDX["Cloudinary-Anbindung"]:::int
+  GEMX["Gemini-Anbindung"]:::int
+  DBX[("Datenbank")]:::db
+  IMG -->|lädt hoch via| CLDX
+  KI -->|Beschreibung/Moderation via| GEMX
+  IMG -->|liefert URLs an| INV
+  KI -->|liefert Text an| INV
+  INV --> DBX
+  FAV --> DBX
+  BUY -->|Status + Guthabenverrechnung| DBX
+  classDef sub fill:#e7f5ff,stroke:#4dabf7,color:#0b3a66
+  classDef int fill:#e5dbff,stroke:#7048e8,color:#3b2764
+  classDef db fill:#1d2b53,stroke:#101a3a,color:#ffffff
