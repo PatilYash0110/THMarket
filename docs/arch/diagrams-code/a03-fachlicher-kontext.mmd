@@ -1,14 +1,25 @@
 graph LR
-    Nutzer(("Gast oder<br/>Verifizierter Nutzer"))
-    Admin(("Admin"))
-    subgraph System["System THMarket (Blackbox)"]
-        THM["THMarket"]
-    end
-    Gemini["Gemini-API<br/>(KI-Beschreibung)"]
-    Cloudinary["Cloudinary<br/>(Bildspeicher)"]
-    SMTP["SMTP-Mailserver<br/>(Verifizierung)"]
-    Nutzer -->|"nutzt"| THM
-    Admin -->|"administriert"| THM
-    THM -->|"Bild + Prompt / Text"| Gemini
-    THM -->|"Bild-Upload / URL"| Cloudinary
-    THM -->|"Verifizierungs-Mail"| SMTP
+    Student["«person»<br/><b>THM-Student</b><br/><br/>verifiziert, Käufer oder<br/>Verkäufer zugleich"]
+    Admin["«person»<br/><b>Administrator</b><br/><br/>moderiert die Plattform"]
+
+    THM["«system»<br/><b>THMarket</b><br/><br/>Campus-Marktplatz für<br/>gebrauchte Artikel"]
+
+    Gemini["«externe_dienste»<br/><b>Google Gemini</b><br/><br/>KI-Beschreibung,<br/>Bild-Inhaltsmoderation"]
+    Cloudinary["«externe_dienste»<br/><b>Cloudinary</b><br/><br/>Bildspeicher"]
+    SMTP["«externe_dienste»<br/><b>Gmail SMTP</b><br/><br/>Verifizierungs-E-Mails"]
+
+    Student -->|"durchsucht, favorisiert,<br/>erstellt, kauft, chattet, meldet"| THM
+    Admin -->|"bearbeitet Meldungen,<br/>verwaltet Nutzer/Inserate"| THM
+
+    THM -->|"Bild + Kontext -> Beschreibung/Moderation"| Gemini
+    THM -->|"Bild-Upload -> URL"| Cloudinary
+    THM -->|"Verifizierungs-/Reset-Mail"| SMTP
+
+    classDef person fill:#1e3a5f,stroke:#1e3a5f,color:#ffffff
+    classDef system fill:#2563eb,stroke:#2563eb,color:#ffffff
+    classDef external fill:#6b7280,stroke:#6b7280,color:#ffffff
+
+    class Student,Admin person
+    class THM system
+    class Gemini,Cloudinary,SMTP external
+
