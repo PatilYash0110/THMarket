@@ -4,22 +4,28 @@
 
 Die Dialoglandkarte zeigt alle Seiten, die ein Nutzer besuchen kann, gegliedert in einen öffentlichen Bereich, einen angemeldeten Bereich und den Admin-Bereich. Ein Logout ist von jeder Seite im angemeldeten bzw. Admin-Bereich aus möglich und wird der Übersichtlichkeit halber nur als ein Übergang zurück zur Landingpage dargestellt.
 
-Die Übergänge zwischen den Dialogen sind nummeriert (①–⑫). Dieselben Nummern tauchen im Abschnitt „Navigationsmöglichkeiten" der jeweiligen Dialogspezifikation (Kapitel 4.2) wieder auf, sodass sich jederzeit nachvollziehen lässt, welcher Pfad in der Übersicht gemeint ist. Die folgende Tabelle löst die Nummern zusätzlich in Textform auf:
+Abbildung 1: Dialoglandkarte von THMarket
+
+<img width="600" alt="grafik" src="https://github.com/user-attachments/assets/dc1588e2-823e-4fa6-b368-49c2841b1b6f" />
+
+*(Mermaid-Quelldatei: [`diagrams-code/navigationskarte.mermaid`](diagrams-code/navigationskarte.mermaid))*
+
+Die Übergänge zwischen den Dialogen sind nummeriert (1–12). Dieselben Nummern tauchen im Abschnitt „Navigationsmöglichkeiten" der jeweiligen Dialogspezifikation (Kapitel 4.2) wieder auf, sodass sich jederzeit nachvollziehen lässt, welcher Pfad in der Übersicht gemeint ist. Die folgende Tabelle löst die Nummern zusätzlich in Textform auf:
 
 | Nr. | Von → Nach | Beschreibung |
 |---|---|---|
-| ① | Landingpage → Login-Dialog / Registrierungs-Dialog | Einstiegspunkt aus dem öffentlichen Bereich ([4.2.1](#421-landingpage)). |
-| ② | Login-Dialog ↔ Registrierungs-Dialog | Wechselseitiger Sprung über „Jetzt registrieren" bzw. „Schon registriert?" ([4.2.2](#422-login-dialog), [4.2.3](#423-registrierungs-dialog)). |
-| ③ | Login-Dialog ↔ Passwort-vergessen-/-zurücksetzen-Dialog | Reset-Ablauf inkl. E-Mail-Link ([4.2.4](#424-passwort-vergessen---zurücksetzen-dialog)). |
-| ④ | Login-Dialog → Marktplatz-Dialog bzw. Adminbereich-Dialog | Rollenabhängige Weiterleitung nach erfolgreichem Login ([4.2.2](#422-login-dialog), [4.2.16](#4216-adminbereich-dialog)). |
-| ⑤ | Marktplatz-Dialog → Profil-/Favoriten-/Chat-/Erstellen-Dialog | Navigationsleiste des Marktplatzes ([4.2.6](#426-marktplatz-dialog-startseite)). |
-| ⑥ | Marktplatz-/Profil-/Favoriten-Dialog → Inseratdetail-Dialog | Öffnen eines konkreten Inserats ([4.2.6](#426-marktplatz-dialog-startseite), [4.2.7](#427-inseratdetail-dialog), [4.2.11](#4211-profil-dialog), [4.2.12](#4212-favoriten-dialog)). |
-| ⑦ | Inseratdetail-Dialog ↔ Kauf-Dialog | Kaufabschluss und Rücksprung nach Erfolg ([4.2.7](#427-inseratdetail-dialog), [4.2.9](#429-kauf-dialog-checkout)). |
-| ⑧ | Inseratdetail-Dialog → Chat-Dialog | „Anbieter kontaktieren" ([4.2.7](#427-inseratdetail-dialog), [4.2.10](#4210-chat-dialog)). |
-| ⑨ | Inseratdetail-/Profil-Dialog ↔ Erstellen-/Bearbeiten-Dialog | Neues Inserat anlegen bzw. bestehendes bearbeiten ([4.2.7](#427-inseratdetail-dialog), [4.2.8](#428-inserat-erstellen--bearbeiten-dialog), [4.2.11](#4211-profil-dialog)). |
-| ⑩ | Profil-Dialog ↔ Aufladen-/Auszahlen-/Kontoeinstellungen-Dialog | Kontofunktionen im Profilbereich ([4.2.11](#4211-profil-dialog), [4.2.13](#4213-guthaben-aufladen-dialog)–[4.2.15](#4215-kontoeinstellungen-dialog)). |
-| ⑪ | Adminbereich-Dialog → Inseratdetail-Dialog | Nur lesender Meldungskontext aus dem Tab „Meldungen" ([4.2.16](#4216-adminbereich-dialog)). |
-| ⑫ | Angemeldeter Bereich / Adminbereich → Landingpage | Abmelden, von jedem angemeldeten Dialog aus möglich. |
+| 1 | Landingpage → Login-Dialog / Registrierungs-Dialog | Einstiegspunkt aus dem öffentlichen Bereich ([4.2.1](#421-landingpage)). |
+| 2 | Login-Dialog ↔ Registrierungs-Dialog | Wechselseitiger Sprung über „Jetzt registrieren" bzw. „Schon registriert?" ([4.2.2](#422-login-dialog), [4.2.3](#423-registrierungs-dialog)). |
+| 3 | Login-Dialog ↔ Passwort-vergessen-/-zurücksetzen-Dialog | Reset-Ablauf inkl. E-Mail-Link ([4.2.4](#424-passwort-vergessen---zurücksetzen-dialog)). |
+| 4 | Login-Dialog → Marktplatz-Dialog bzw. Adminbereich-Dialog | Rollenabhängige Weiterleitung nach erfolgreichem Login ([4.2.2](#422-login-dialog), [4.2.16](#4216-adminbereich-dialog)). |
+| 5 | Marktplatz-Dialog → Profil-/Favoriten-/Chat-/Erstellen-Dialog | Navigationsleiste des Marktplatzes ([4.2.6](#426-marktplatz-dialog-startseite)). |
+| 6 | Marktplatz-/Profil-/Favoriten-Dialog → Inseratdetail-Dialog | Öffnen eines konkreten Inserats ([4.2.6](#426-marktplatz-dialog-startseite), [4.2.7](#427-inseratdetail-dialog), [4.2.11](#4211-profil-dialog), [4.2.12](#4212-favoriten-dialog)). |
+| 7 | Inseratdetail-Dialog ↔ Kauf-Dialog | Kaufabschluss und Rücksprung nach Erfolg ([4.2.7](#427-inseratdetail-dialog), [4.2.9](#429-kauf-dialog-checkout)). |
+| 8 | Inseratdetail-Dialog → Chat-Dialog | „Anbieter kontaktieren" ([4.2.7](#427-inseratdetail-dialog), [4.2.10](#4210-chat-dialog)). |
+| 9 | Inseratdetail-/Profil-Dialog ↔ Erstellen-/Bearbeiten-Dialog | Neues Inserat anlegen bzw. bestehendes bearbeiten ([4.2.7](#427-inseratdetail-dialog), [4.2.8](#428-inserat-erstellen--bearbeiten-dialog), [4.2.11](#4211-profil-dialog)). |
+| 10 | Profil-Dialog ↔ Aufladen-/Auszahlen-/Kontoeinstellungen-Dialog | Kontofunktionen im Profilbereich ([4.2.11](#4211-profil-dialog), [4.2.13](#4213-guthaben-aufladen-dialog)–[4.2.15](#4215-kontoeinstellungen-dialog)). |
+| 11 | Adminbereich-Dialog → Inseratdetail-Dialog | Nur lesender Meldungskontext aus dem Tab „Meldungen" ([4.2.16](#4216-adminbereich-dialog)). |
+| 12 | Angemeldeter Bereich / Adminbereich → Landingpage | Abmelden, von jedem angemeldeten Dialog aus möglich. |
 
 ## 4.2 Dialogspezifikation
 
