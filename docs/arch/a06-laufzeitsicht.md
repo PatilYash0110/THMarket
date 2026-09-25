@@ -1,9 +1,9 @@
-# 6. Laufzeitsicht
+# A06. Laufzeitsicht
 
 
 Die Laufzeitsicht zeigt das dynamische Verhalten von THMarket anhand der wichtigsten Abläufe.
 
-## 6.1 Allgemeiner Ablauf
+## A06.1 Allgemeiner Ablauf
 
 Das Grundmuster gilt für die meisten Anfragen: Der Nutzer löst im Frontend eine Aktion aus. Das Frontend schickt einen Request an den zuständigen Controller, der an den passenden Service weiterleitet. Der Service antwortet entweder mit einem Ergebnis (erfolgreiche Response) oder mit einer Exception, die der Controller als Fehler-Response abbildet.
 
@@ -23,7 +23,7 @@ Das Grundmuster gilt für die meisten Anfragen: Der Nutzer löst im Frontend ein
 
 </details>
 
-## 6.2 Registrierung & Verifizierung
+## A06.2 Registrierung & Verifizierung
 
 **Ablauf:**
 
@@ -44,7 +44,7 @@ Das Grundmuster gilt für die meisten Anfragen: Der Nutzer löst im Frontend ein
 
 </details>
 
-## 6.3 Inserat mit KI-Beschreibung
+## A06.3 Inserat mit KI-Beschreibung
 
 **Ablauf:**
 
@@ -65,7 +65,7 @@ Das Grundmuster gilt für die meisten Anfragen: Der Nutzer löst im Frontend ein
 
 </details>
 
-## 6.4 Echtzeit-Chat
+## A06.4 Echtzeit-Chat
 
 **Ablauf:**
 
@@ -85,7 +85,7 @@ Das Grundmuster gilt für die meisten Anfragen: Der Nutzer löst im Frontend ein
 
 </details>
 
-## 6.5 Mock-Kauf
+## A06.5 Mock-Kauf
 
 **Ablauf:**
 
@@ -105,7 +105,7 @@ Das Grundmuster gilt für die meisten Anfragen: Der Nutzer löst im Frontend ein
 
 </details>
 
-## 6.6 Meldung
+## A06.6 Meldung
 
 **Ablauf:**
 
