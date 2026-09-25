@@ -1,3 +1,5 @@
+# E2 Glossar
+
 | Begriff | Bedeutung |
 |---|---|
 | Audit-Log | Chronologisches, unveränderliches Protokoll aller vom Admin-Bereich ausgehenden Aktionen. |
