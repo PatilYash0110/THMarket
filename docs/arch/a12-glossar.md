@@ -23,14 +23,3 @@
 | Whitebox | Baustein mit seinen inneren Strukturen und Unterbausteinen. |
 
 *Glossar der verwendeten Begriffe*
-
-## Quellen und verwandte Dokumente
-
-**Diagrammquelldateien**
-
-Die 15 Abbildungen dieses Dokuments liegen als PNG (direkt aus dem Original-PDF extrahiert) unter [`docs/arch/diagram_images/`](diagram_images/) vor. Für das im Quelldokument referenzierte Datenmodell wird auf die Mermaid-Quelldatei [`docs/spec/diagrams-code/d1-datenmodell.mermaid`](../spec/diagrams-code/d1-datenmodell.mermaid) der Spezifikation verwiesen — beide Dokumente teilen sich dasselbe Datenmodell.
-
-**Verwandte Dokumente**
-
-Für die fachliche Spezifikation (Use Cases, Dialoge, Datentypenverzeichnis) siehe die [Spezifikation](../spec/README.md). Dieses Architekturdokument ersetzt inhaltlich die älteren arc42-Bausteine aus der frühen Konzeptphase, die und teils nicht umgesetzte Funktionen beschrieben (Bewertungssystem, Inserat-Felder „Zustand"/„Campus", EXIF-/GPS-Entfernung, ein eigenständiges „Transaktion"-Modul). Alle technischen Aussagen dieses Dokuments (Modulstruktur, Routen, Klassennamen, Admin-Aktionen) wurden gegen den Code unter `backend/src` verifiziert.
-
