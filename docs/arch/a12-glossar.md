@@ -28,7 +28,7 @@
 
 **Diagrammquelldateien**
 
-Die 15 Abbildungen dieses Dokuments liegen als PNG (direkt aus dem Original-PDF extrahiert) unter [`docs/arch/diagram_png/`](diagram_png/) vor. Für das im Quelldokument referenzierte Datenmodell wird auf die Mermaid-Quelldatei [`docs/spec/diagrams-code/datenmodell.mmd`](../spec/diagrams-code/datenmodell.mmd) der Spezifikation verwiesen — beide Dokumente teilen sich dasselbe Datenmodell.
+Die 15 Abbildungen dieses Dokuments liegen als PNG (direkt aus dem Original-PDF extrahiert) unter [`docs/arch/diagram_images/`](diagram_images/) vor. Für das im Quelldokument referenzierte Datenmodell wird auf die Mermaid-Quelldatei [`docs/spec/diagrams-code/datenmodell.mmd`](../spec/diagrams-code/datenmodell.mmd) der Spezifikation verwiesen — beide Dokumente teilen sich dasselbe Datenmodell.
 
 **Verwandte Dokumente**
 
