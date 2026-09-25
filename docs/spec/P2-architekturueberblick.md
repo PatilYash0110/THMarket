@@ -1,4 +1,6 @@
-# 1.4 Systemkontext
+# P2 Architekturüberblick
+
+## P2.1 Systemkontext
 
 THMarket besteht aus einem React/Vite-Frontend (Vercel) und einem NestJS-Backend (Render) mit einer PostgreSQL-Datenbank (Neon, über Prisma angebunden). Für drei Aufgaben werden externe Dienste angebunden: Versand von Verifizierungs- und Reset-E-Mails (Gmail SMTP), Speicherung von Inseratbildern (Cloudinary) und automatische Beschreibungsvorschläge sowie Bildmoderation (Google Gemini). Die Datenbank ist kein externes Nachbarsystem, sondern Teil von THMarket selbst, und wird deshalb hier nicht als eigener Akteur dargestellt.
 
@@ -38,7 +40,7 @@ graph TD
 
 *(Mermaid-Quelldatei: [`diagrams-code/p2-systemkontext.mermaid`](diagrams-code/p2-systemkontext.mermaid))*
 
-# 1.5 Technischer Rahmen
+## P2.2 Technischer Rahmen
 
 | Baustein | Technologie |
 |---|---|
