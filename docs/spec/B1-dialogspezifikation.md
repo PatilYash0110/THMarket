@@ -31,6 +31,12 @@ Die Übergänge zwischen den Dialogen sind nummeriert (1–12). Dieselben Nummer
 
 ### 4.2.1 Landingpage
 
+Abbildung 2: Landingpage von THMarket
+
+<p align="center">
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/4e7dfec1-5ac7-4af1-a380-7e6926f1b9ef" />
+</p>
+
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Marketing-/Einstiegsseite für nicht angemeldete Besucher.
 - Anwendungsfall: Einstiegspunkt vor UC01/UC02, kein eigener Use Case.
@@ -54,6 +60,12 @@ Kein Formular, rein informative Seite.
 | Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
 
 ### 4.2.2 Login-Dialog
+
+Abbildung 3: Login-Dialog von THMarket
+
+<p align="center">
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/b1844aac-531c-42f3-8f3e-88a707af2fb8" />
+</p>
 
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Anmeldung registrierter, verifizierter Nutzer.
@@ -87,6 +99,12 @@ Von hier gelangt man zu: „Jetzt registrieren" → Registrierungs-Dialog, „Pa
 
 ### 4.2.3 Registrierungs-Dialog
 
+Abbildung 4: Registrierungs-Dialog von THMarket
+
+<p align="center">
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/5ba91080-a30a-4ef7-92fc-b2a76c12397c" />
+</p>
+
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Anlegen eines neuen Kontos mit THM-E-Mail-Adresse.
 - Anwendungsfall: „Nutzer registriert sich".
@@ -118,6 +136,13 @@ Von hier gelangt man zu: „Schon registriert? Jetzt anmelden" → Login-Dialog,
 - Erfolg „Bitte bestätige deine E-Mail-Adresse".
 
 ### 4.2.4 Passwort-vergessen- / Zurücksetzen-Dialog
+
+Abbildung 5: Passwort-vergessen- / Zurücksetzen-Dialog von THMarket
+
+<p align="center">
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/0580f2a8-d7c2-4caf-9370-bb5943255bd5" />
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/695291a6-1161-4945-854b-beee16c2197f" />
+</p>
 
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Neues Passwort setzen, wenn das alte vergessen wurde.
@@ -152,6 +177,12 @@ Von hier gelangt man zu: nach dem Setzen des neuen Passworts → Login-Dialog. R
 
 ### 4.2.5 Impressum
 
+Abbildung 6: Impressum von THMarket
+
+<p align="center">
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/d3f30407-5731-4265-9d11-6c99cae03245" />
+</p>
+
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Rechtlich vorgeschriebene Anbieterkennzeichnung.
 - Anwendungsfall: Kein Use-Case-Bezug.
@@ -166,6 +197,12 @@ Von hier gelangt man zu: nach dem Setzen des neuen Passworts → Login-Dialog. R
 Kein Formular, keine Aktionen außer Navigation.
 
 ### 4.2.6 Marktplatz-Dialog (Startseite)
+
+Abbildung 7: Marktplatz-Dialog von THMarket
+
+<p align="center">
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/7d51670e-3c5a-47d5-a810-ed7573136855" />
+</p>
 
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Anzeige, Suche und Filterung aller aktiven Inserate.
@@ -208,6 +245,12 @@ Rücksprungmöglichkeit: dies ist die Startseite nach dem Login, es gibt keinen 
 - Fehler beim initialen Laden (Datenbank nicht erreichbar).
 
 ### 4.2.7 Inseratdetail-Dialog
+
+Abbildung 8: Inseratdetail-Dialog von THMarket
+
+<p align="center">
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/34f35986-c964-413c-afa8-24afb2701c01" />
+</p>
 
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Anzeige aller Details eines Inserats und Einstieg in Folgeaktionen.
@@ -257,6 +300,12 @@ Keine Eingabefelder, nur Anzeige der Inseratdaten.
 
 ### 4.2.8 Inserat-erstellen-/-bearbeiten-Dialog
 
+Abbildung 9: Inserat-erstellen-/-bearbeiten-Dialog von THMarket
+
+<p align="center">
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/8fa81e7a-cbda-446c-add3-2f48b4bf7a8e" />
+</p>
+
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Anlegen bzw. Bearbeiten eines Inserats inklusive Bild-Upload.
 - Anwendungsfall: „Nutzer erstellt/bearbeitet ein Inserat".
@@ -301,6 +350,12 @@ Rücksprungmöglichkeit: über „Abbrechen".
 
 ### 4.2.9 Kauf-Dialog (Checkout)
 
+Abbildung 10: Kauf-Dialog (Checkout) von THMarket
+
+<p align="center">
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/918d3020-81f7-4704-8963-286f4a294ffa" />
+</p>
+
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Abschluss des simulierten Kaufs.
 - Anwendungsfall: „Nutzer schließt einen Kauf ab".
@@ -339,6 +394,12 @@ Rücksprungmöglichkeit: über „Abbrechen".
 
 ### 4.2.10 Chat-Dialog
 
+Abbildung 11: Chat-Dialog von THMarket
+
+<p align="center">
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/38dd5791-f44a-448c-8eba-c73d7d31f63b" />
+</p>
+
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Echtzeit-Nachrichtenaustausch zwischen Interessent und Anbieter zu einem Inserat.
 - Anwendungsfall: „Nutzer kommuniziert mit einem anderen Nutzer".
@@ -374,6 +435,12 @@ Rücksprungmöglichkeit: über die Navigationsleiste zum Marktplatz-Dialog.
 - Verbindungsabbruch (Hinweis, automatischer Wiederverbindungsversuch).
 
 ### 4.2.11 Profil-Dialog
+
+Abbildung 12: Profil-Dialog von THMarket
+
+<p align="center">
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/ae77b452-ef3b-4923-95cf-7e349bc16250" />
+</p>
 
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Verwaltung der eigenen Inserate und Zugang zu Kontofunktionen.
@@ -414,6 +481,12 @@ Kein Eingabeformular, nur die beiden Listenbereiche „Aktive Inserate" und „V
 
 ### 4.2.12 Favoriten-Dialog
 
+Abbildung 13: Favoriten-Dialog von THMarket
+
+<p align="center">
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/7516f650-88d1-4d0a-affa-d22253eb6920" />
+</p>
+
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Übersicht der gemerkten Inserate für den schnellen Wiederzugriff.
 - Anwendungsfall: „Nutzer sieht seine Favoriten ein".
@@ -443,6 +516,12 @@ Kein Eingabeformular, nur die Liste der favorisierten Inserate (`FAVORITE.*` ver
 - keine Favoriten vorhanden (Hinweis statt Liste).
 
 ### 4.2.13 Guthaben-aufladen-Dialog
+
+Abbildung 14: Guthaben-aufladen-Dialog von THMarket
+
+<p align="center">
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/1f5f08ed-1c89-4e1c-909e-8305b4f13309" />
+</p>
 
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Mock-Einzahlung auf das In-App-Guthaben.
@@ -478,6 +557,12 @@ Von hier gelangt man zu:
 - Erfolg (neuer Kontostand wird angezeigt).
 
 ### 4.2.14 Guthaben-auszahlen-Dialog
+
+Abbildung 15: Guthaben-auszahlen-Dialog von THMarket
+
+<p align="center">
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/7d2dcdc9-755b-4866-ad7b-47463833b968" />
+</p>
 
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Mock-Auszahlung des In-App-Guthabens.
@@ -515,6 +600,12 @@ Von hier gelangt man zu:
 
 ### 4.2.15 Kontoeinstellungen-Dialog
 
+Abbildung 16: Kontoeinstellungen-Dialog
+
+<p align="center">
+  <img width="600" alt="grafik" src="https://github.com/user-attachments/assets/d0b0d7b8-2766-41f7-be84-fc5c1267bb0e" />
+</p>
+
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Ändern von Anzeigename und Passwort.
 - Anwendungsfall: Querschnittsfunktion ohne direkten Use-Case-Bezug.
@@ -549,6 +640,12 @@ Rücksprungmöglichkeit: über die Navigationsleiste zum Profil-Dialog.
 - Erfolg bzw. Fehler (z. B. falsches aktuelles Passwort) je Formular unabhängig voneinander.
 
 ### 4.2.16 Adminbereich-Dialog
+
+Abbildung 17: Adminbereich-Dialog
+
+<p align="center">
+<img width="600" alt="grafik" src="https://github.com/user-attachments/assets/dddc133f-e2d6-4a30-a083-6fbac716e09b" />
+</p>
 
 **Allgemeine Beschreibung**
 - Zweck des Dialogs: Zentrale Verwaltungsaufgaben für Meldungen, Nutzer, Inserate und Audit-Log.
