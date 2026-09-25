@@ -13,7 +13,7 @@ THMarket wird in diesem Kapitel als Blackbox betrachtet. Die Kontextabgrenzung z
 <details>
 <summary>📊 Diagramm anzeigen</summary>
 
-![Fachlicher Kontext der THMarket-Anwendung](diagrams_images/01-fachlicher-kontext.png)
+![Fachlicher Kontext der THMarket-Anwendung](diagrams-code/01-fachlicher-kontext.png)
 
 </details>
 
