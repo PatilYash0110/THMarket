@@ -1,205 +1,126 @@
 # 6. Laufzeitsicht
 
-Die Laufzeitsicht zeigt, wie sich THMarket zur Laufzeit verhält — anhand der wichtigsten Abläufe.
-Zu jedem Ablauf gehört ein Sequenzdiagramm, dessen Quelltext als eigene `.mmd`-Datei im Repository liegt.
+
+Die Laufzeitsicht zeigt das dynamische Verhalten von THMarket anhand der wichtigsten Abläufe.
 
 ## 6.1 Allgemeiner Ablauf
 
-Das Grundmuster gilt für die meisten Anfragen im System: Der Nutzer löst im Frontend eine Aktion aus, zum Beispiel einen Button-Klick.
-Das Frontend schickt daraufhin einen Request an den zuständigen Controller unter `/endpoint`.
-Der Controller verarbeitet die Anfrage und antwortet entweder mit einer erfolgreichen Response, die das Frontend dem Nutzer als Ergebnis anzeigt, oder mit einer Fehler-Response, woraufhin das Frontend eine Fehlermeldung anzeigt.
-Dieses Muster liegt praktisch allen anderen Abläufen in diesem Kapitel zugrunde.
+Das Grundmuster gilt für die meisten Anfragen: Der Nutzer löst im Frontend eine Aktion aus. Das Frontend schickt einen Request an den zuständigen Controller, der an den passenden Service weiterleitet. Der Service antwortet entweder mit einem Ergebnis (erfolgreiche Response) oder mit einer Exception, die der Controller als Fehler-Response abbildet.
 
-```mermaid
-%% Abbildung 11: Laufzeitsicht - Allgemeiner Ablauf
-sequenceDiagram
-    actor U as Nutzer
-    participant FE as Frontend
-    participant C as Controller
-    U->>FE: Aktion (Button-Klick)
-    FE->>C: REQUEST /endpoint
-    alt Erfolg
-        C-->>FE: Response OK
-        FE-->>U: Ergebnis anzeigen
-    else Fehler
-        C-->>FE: Response Fehler
-        FE-->>U: Fehlermeldung anzeigen
-    end
-```
+- Nutzer löst im Frontend eine Aktion aus (z. B. Button-Klick)
+- Frontend sendet Request an den zuständigen Controller
+- Controller delegiert die Fachlogik an den passenden Service
+- Erfolg: Service liefert Ergebnis → Controller antwortet OK → Frontend zeigt Ergebnis
+- Fehler: Service wirft Exception → Controller antwortet 4xx/5xx → Frontend zeigt Fehlermeldung
+- Grundmuster für fast alle Abläufe: Nutzer → Frontend → Controller → Service → DB/externer Dienst → Frontend
 
-*Abbildung 11: Laufzeitsicht — Allgemeiner Ablauf*
+*Abbildung 9: Laufzeitsicht — Allgemeiner Ablauf*
 
-![Allgemeiner Ablauf](diagram_images/10-allgemeiner-ablauf.png)
-*(Quelltext: `diagrams-code/a06-laufzeitdiagramm_allgemeiner_ablauf.mmd`)*
+<details>
+<summary>📊 Diagramm anzeigen</summary>
+
+![Laufzeitsicht — Allgemeiner Ablauf](diagram_images/09-ebene2-whitebox-listings.png)
+
+</details>
 
 ## 6.2 Registrierung & Verifizierung
 
-Ein THM-Student füllt im Frontend das Formular mit E-Mail-Adresse und Passwort aus und schickt es ab.
-Das Frontend sendet die Daten per `POST /auth/register` an den AuthController, der sie an den AuthService zur eigentlichen Verarbeitung weitergibt.
-Der AuthService prüft zunächst, ob die E-Mail-Adresse wirklich auf `.thm.de` endet.
-Ist das erfüllt, hasht er das Passwort und erzeugt einen Verifizierungs-Token.
-Anschließend legt er den Nutzer in der Datenbank an — allerdings mit dem Feld `isVerified = false`, das Konto ist also noch nicht aktiv.
-Danach lässt der AuthService über SMTP eine Verifizierungs-E-Mail mit dem Bestätigungslink an den Studenten verschicken.
-Klickt der Student auf diesen Link, ruft er `GET /auth/verify?token` auf; der AuthController setzt daraufhin `isVerified` in der Datenbank auf `true` und bestätigt dem Frontend die erfolgreiche Verifizierung, die dem Nutzer als Pop-up angezeigt wird.
+**Ablauf:**
 
-```mermaid
-%% Abbildung 12: Laufzeitsicht - Registrierung & Verifizierung
-sequenceDiagram
-    actor S as THM-Student
-    participant FE as Frontend
-    participant API as AuthController
-    participant SVC as AuthService
-    participant DB as Datenbank
-    participant M as SMTP
-    S->>FE: Formular (E-Mail, Passwort)
-    FE->>API: POST /auth/register
-    API->>SVC: register(dto)
-    SVC->>SVC: THM-Domain pruefen (.thm.de)
-    SVC->>SVC: Passwort hashen, Token erzeugen
-    SVC->>DB: User anlegen (isVerified = false)
-    SVC->>M: Verifizierungs-E-Mail senden
-    M-->>S: E-Mail mit Bestaetigungslink
-    S->>API: GET /auth/verify?token
-    API->>DB: isVerified = true
-    API-->>FE: Bestaetigung (Pop-up)
-```
+- Studierender füllt Formular aus (Name, THM-E-Mail, Passwort)
+- `POST /auth/register`: Prüfung der THM-Domain (`@thm.de`) und der Passwortstärke
+- Prüfung, ob die E-Mail bereits vergeben ist → falls ja: gleiche Erfolgsantwort (Anti-Enumeration)
+- Falls frei: Passwort per bcrypt hashen, Verifizierungs-Token erzeugen, Konto mit `verified = false` anlegen
+- Verifizierungs-E-Mail über die Mail-Anbindung versenden
+- Studierender öffnet den Link → `GET /auth/verify-email?token` → Token prüfen, `verified = true`
+- Erst danach ist ein Login möglich
 
-*Abbildung 12: Laufzeitsicht — Registrierung & Verifizierung*
+*Abbildung 10: Laufzeitsicht — Registrierung & Verifizierung*
 
-![Registrierung & Verifizierung](diagram_images/15-registrierung-verifizierung.png)
-*(Quelltext: `diagrams-code/a06-laufzeitdiagramm_registrierung_verifizierung.mmd`)*
+<details>
+<summary>📊 Diagramm anzeigen</summary>
+
+![Laufzeitsicht — Registrierung & Verifizierung](diagram_images/10-allgemeiner-ablauf.png)
+
+</details>
 
 ## 6.3 Inserat mit KI-Beschreibung
 
-Der Student lädt im Frontend ein oder mehrere Bilder hoch, die per `POST /listings/images` an den ListingsController gehen.
-Dieser speichert die Bilder bei Cloudinary — dabei werden automatisch die EXIF-Daten entfernt — und bekommt von Cloudinary die fertigen Bild-URLs zurück.
-Anschließend ruft der ListingsController den AiService auf und übergibt ihm die Bild-URLs (`generateDescription(urls)`).
-Der AiService schickt die Bilder an Google Gemini, das daraus Titel, Beschreibung und Kategorie ableitet und als JSON-Entwurf zurückliefert.
-Dieser Entwurf wird dem Frontend als editierbarer Vorschlag angezeigt.
-Der Student kann den Entwurf anpassen und veröffentlicht das Inserat anschließend per `POST /listings`; der ListingsController speichert es daraufhin in der Datenbank mit dem Status `AKTIV`.
+**Ablauf:**
 
-```mermaid
-%% Abbildung 13: Laufzeitsicht - Inserat mit KI-Beschreibung
-sequenceDiagram
-    actor S as THM-Student
-    participant FE as Frontend
-    participant L as ListingsController
-    participant C as Cloudinary
-    participant AI as AiService
-    participant G as Google Gemini
-    participant DB as Datenbank
-    S->>FE: Bilder hochladen
-    FE->>L: POST /listings/images
-    L->>C: Bilder speichern (EXIF entfernt)
-    C-->>L: Bild-URLs
-    L->>AI: generateDescription(urls)
-    AI->>G: Bilder -> Titel/Beschreibung/Kategorie
-    G-->>AI: JSON-Entwurf
-    AI-->>FE: Entwurf (editierbar)
-    S->>FE: anpassen & veroeffentlichen
-    FE->>L: POST /listings
-    L->>DB: Inserat speichern (Status = AKTIV)
-```
+- Fotos auswählen (clientseitig komprimiert)
+- `POST /listings/upload`: Cloudinary-Upload → Rückgabe der Bild-URLs
+- Optional `POST /listings/generate-description`: Gemini erhält Bilder + Titel/Kategorie/Hinweis → editierbarer Beschreibungsentwurf
+- Nutzer passt den Entwurf an und veröffentlicht: `POST /listings` → Inserat mit Status `AKTIV` speichern
+- KI liefert nur die Beschreibung — kein Titel, keine Kategorie, kein Preis
+- Fällt Gemini aus: manuelle Eingabe bleibt möglich (fail-open)
 
-*Abbildung 13: Laufzeitsicht — Inserat mit KI-Beschreibung*
+> **Hinweis:** Jedes hochgeladene Foto wird zusätzlich einzeln von Gemini auf unangemessene Inhalte geprüft (fail-open — schlägt die Prüfung fehl, wird der Upload trotzdem zugelassen und im Audit-Log vermerkt). Dieser Schritt ist der Übersichtlichkeit halber nicht separat dargestellt.
 
-![Inserat mit KI-Beschreibung](diagram_images/12-inserat-ki-beschreibung.png)
-*(Quelltext: `diagrams-code/a06-laufzeitdiagramm_Inserat_KI_Beschreibung.mmd`)*
+*Abbildung 11: Laufzeitsicht — Inserat mit KI-Beschreibung*
+
+<details>
+<summary>📊 Diagramm anzeigen</summary>
+
+![Laufzeitsicht — Inserat mit KI-Beschreibung](diagram_images/11-echtzeit-chat.png)
+
+</details>
 
 ## 6.4 Echtzeit-Chat
 
-Käufer und Verkäufer verbinden sich jeweils über das Socket.io-Gateway; das JWT wird dabei direkt im Verbindungsaufbau (Handshake) mitgeschickt und vom Gateway geprüft.
-Sendet der Käufer eine Nachricht (`sendMessage(conversationId, text)`), speichert das Gateway sie sofort in der Datenbank und stellt sie in Echtzeit dem Verkäufer zu.
-Dieses Muster gilt symmetrisch in beide Richtungen.
-Wichtig dabei: Die Nachrichten sind bewusst privat — der Administrator hat auf diese Konversationen standardmäßig keinen Zugriff.
+**Ablauf:**
 
-```mermaid
-%% Abbildung 14: Laufzeitsicht - Echtzeit-Chat
-sequenceDiagram
-    actor A as Käufer
-    actor B as Verkäufer
-    participant WS as Socket.io-Gateway
-    participant DB as Datenbank
-    A->>WS: connect (JWT im Handshake)
-    WS->>WS: Token prüfen
-    A->>WS: sendMessage(conversationId, text)
-    WS->>DB: Nachricht speichern
-    WS-->>B: Nachricht in Echtzeit
-    Note over A,B: Nachrichten privat - Admin hat keinen Zugriff
-```
+- Interessent verbindet sich per Socket.io mit dem ChatGateway
+- JWT (Cookie/Handshake) wird einmalig beim Verbindungsaufbau geprüft
+- `joinConversation` → Beitritt zur Konversation
+- `sendMessage`: Nachricht wird zuerst gespeichert, dann in Echtzeit an den Anbieter zugestellt
+- Nachrichten privat: kein genereller Admin-Zugriff, nur im Kontext einer Meldung
+- Weicht bewusst vom Request-Response-Muster ab (dauerhafte Verbindung)
 
-*Abbildung 14: Laufzeitsicht — Echtzeit-Chat*
+*Abbildung 12: Laufzeitsicht — Echtzeit-Chat*
 
-![Echtzeit-Chat](diagram_images/11-echtzeit-chat.png)
-*(Quelltext: `diagrams-code/a06-laufzeitdiagramm_echtzeit_chat.mmd`)*
+<details>
+<summary>📊 Diagramm anzeigen</summary>
+
+![Laufzeitsicht — Echtzeit-Chat](diagram_images/12-inserat-ki-beschreibung.png)
+
+</details>
 
 ## 6.5 Mock-Kauf
 
-Der Käufer schließt im Frontend den Kauf ab, indem er eine simulierte Kreditkarte hinterlegt, und schickt die Anfrage per `POST /payments/checkout` an den PaymentsController.
-Dieser ruft den PaymentsService auf (`processMockPayment(id, methode)`).
-Je nach gewählter Zahlungsmethode passiert dabei unterschiedliches: Bei der Methode „Simulation" wird die Zahlung nur simuliert, es fließt kein echtes Geld.
-Bei der Methode „In-App-Guthaben" erhöht der PaymentsService stattdessen das Guthaben des Verkäufers direkt in der Datenbank.
-Unabhängig davon, welche Methode gewählt wurde, speichert der PaymentsService anschließend die Transaktion und setzt das betreffende Inserat auf den Status VERKAUFT.
-Der Käufer bekommt eine Kaufbestätigung; der Verkäufer sieht den abgeschlossenen Kauf danach in seiner Übersicht „Verkäufe".
+**Ablauf:**
 
-```mermaid
-%% Abbildung 15: Laufzeitsicht - Mock-Kauf
-sequenceDiagram
-    actor K as Käufer
-    participant FE as Frontend
-    participant P as PaymentsController
-    participant SVC as PaymentsService
-    participant DB as Datenbank
-    K->>FE: Kaufen + Mock-Kreditkarte
-    FE->>P: POST /payments/checkout
-    P->>SVC: processMockPayment(id, methode)
-    alt Methode = Simulation
-        SVC->>SVC: Zahlung simulieren (kein Geldfluss)
-    else Methode = In-App-Guthaben
-        SVC->>DB: Guthaben des Verkäufers erhöhen
-    end
-    SVC->>DB: Transaktion speichern, Inserat = VERKAUFT
-    SVC-->>FE: Kaufbestätigung
-    Note over DB: Verkäufer sieht Kauf in "Verkäufe"
-```
+- Käufer wählt „Kaufen" + Zahlungsmodus → `POST /listings/:id/purchase`
+- Berechtigungsprüfung: Rolle `STUDENT`, nicht das eigene Inserat, Sofortkauf aktiviert
+- Simulation: Test-Kreditkarte validieren (kein Geldfluss) → Inserat `VERKAUFT`
+- In-App-Guthaben: Guthaben prüfen und verrechnen (Käufer −, Verkäufer +) → Inserat `VERKAUFT`
+- Atomarer Schreibvorgang → keine Doppelkäufe, keine Guthaben-Überziehung
+- Kein separater Payments-Endpunkt — alles über `ListingsController`/`-Service`
 
-*Abbildung 15: Laufzeitsicht — Mock-Kauf*
+*Abbildung 13: Laufzeitsicht — Mock-Kauf*
 
-![Mock-Kauf](diagram_images/14-mock-kauf.png)
-*(Quelltext: `diagrams-code/a06-laufzeitdiagramm_mock_kauf.mmd`)*
+<details>
+<summary>📊 Diagramm anzeigen</summary>
+
+![Laufzeitsicht — Mock-Kauf](diagram_images/13-meldung.png)
+
+</details>
 
 ## 6.6 Meldung
 
-Ein Nutzer meldet ein Inserat, einen anderen Nutzer oder — nur mit seiner eigenen Einwilligung — eine Chat-Konversation über das Melde-/Admin-Modul.
-Die Meldung wird zunächst mit dem Status „offen" in der Datenbank gespeichert.
-Der Administrator öffnet daraufhin das Admin Panel; das Melde-/Admin-Modul liefert ihm die Warteschlange der offenen Meldungen aus der Datenbank.
-Der Administrator wählt dann eine passende Maßnahme aus — Verwarnung, Inserat ausblenden oder Sperre.
-Diese Maßnahme wird ausgeführt und gleichzeitig im Audit Log protokolliert.
-Abschließend wird die Meldung in der Datenbank auf den Status „erledigt" gesetzt.
+**Ablauf:**
 
-```mermaid
-%% Abbildung 16: Laufzeitsicht - Meldung
-sequenceDiagram
-    actor U as Nutzer
-    actor Adm as Administrator
-    participant R as Melde-/Admin-Modul
-    participant DB as Datenbank
-    U->>R: Inserat/Nutzer melden (+ ggf. Chat, mit Einwilligung)
-    R->>DB: Meldung speichern (Status = offen)
-    Adm->>R: Admin Panel öffnen
-    R->>DB: Meldungen (Warteschlange)
-    Adm->>R: Maßnahme wählen (Verwarnung / ausblenden / Sperre)
-    R->>DB: Massnahme ausführen + Audit Log
-    R->>DB: Meldung = erledigt
-```
+- Nutzer meldet via `POST /admin/reports` (Inserat, Nutzer oder – mit Einwilligung – Chat-Kontext) → Status `OFFEN`
+- Admin lädt offene Meldungen: `GET /admin/reports`
+- Bei Chat-Kontext: `GET /admin/conversations/:id/messages` → nur die betroffene Konversation einsehbar
+- Maßnahme via `PATCH /admin/reports/:id/resolve`: Inserat löschen / Nutzer verwarnen / Nutzer löschen (strikt gegen den Meldungstyp geprüft)
+- Jede Maßnahme wird im Audit-Log protokolliert → Meldung `GESCHLOSSEN`
 
-*Abbildung 16: Laufzeitsicht — Meldung*
+*Abbildung 14: Laufzeitsicht — Meldung*
 
-![Meldung](diagram_images/13-meldung.png)
-*(Quelltext: `diagrams-code/a06-laufzeitdiagramm_Meldung.mmd`)*
+<details>
+<summary>📊 Diagramm anzeigen</summary>
 
-## 6.7 Zusammenfassung
+![Laufzeitsicht — Meldung](diagram_images/14-mock-kauf.png)
 
-Fast alle Abläufe folgen demselben Muster: Nutzer → Frontend → Controller → Service → Datenbank/externer Dienst → Frontend, mit einer klaren Unterscheidung zwischen Erfolgs- und Fehlerfall.
-Nur der Echtzeit-Chat weicht davon bewusst ab, weil er statt einzelner Requests eine dauerhafte WebSocket-Verbindung braucht, über die Nachrichten in beide Richtungen fließen können.
-Dieses einheitliche Prinzip macht die Struktur der Anwendung klar nachvollziehbar und sorgt dafür, dass Fehlerbehandlung an jeder Stelle nach demselben Schema funktioniert.
+</details>
