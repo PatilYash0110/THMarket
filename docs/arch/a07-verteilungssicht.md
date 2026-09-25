@@ -6,9 +6,9 @@ Die Softwarebausteine werden auf verschiedene Infrastruktur-Komponenten verteilt
 *Abbildung 15: Verteilungssicht*
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary>Diagramm anzeigen</summary>
 
-![Verteilungssicht](diagram_images/15-registrierung-verifizierung.png)
+![Verteilungssicht](diagram_images/16-verteilungssicht.png)
 
 </details>
 
