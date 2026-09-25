@@ -1,8 +1,8 @@
-# 2. Randbedingungen
+# A02. Randbedingungen
 
 Dieses Kapitel beschreibt die technischen und organisatorischen Randbedingungen, die bei Entwicklung und Betrieb von THMarket berücksichtigt werden.
 
-## 2.1 Technische Randbedingungen
+## A02.1 Technische Randbedingungen
 
 THMarket ist eine reine Webanwendung und wird ausschließlich über einen Browser genutzt. Eine App ist nicht vorgesehen. Die Architektur folgt dem Client-Server-Prinzip mit einer Trennung von Frontend, Backend, Datenhaltung und externen Diensten.
 
@@ -46,7 +46,7 @@ Google Gemini erzeugt auf Wunsch einen Beschreibungsvorschlag und prüft jedes F
 - Missbrauchsanfällige Endpunkte (mailversendende Auth-Routen, KI-Beschreibung, Meldungserstellung) sind per Rate-Limiting gedrosselt.
 - Ein per Passwortänderung gesetzter Zeitstempel (`passwordChangedAt`) entwertet zuvor ausgestellte Sitzungstoken.
 
-## 2.2 Organisatorische Randbedingungen
+## A02.2 Organisatorische Randbedingungen
 
 - THMarket wird im Rahmen der Veranstaltung „Projekt 1 – Softwaretechnik" als Einzelprojekt entwickelt.
 - Versionsverwaltung erfolgt über GitHub. Änderungen werden direkt auf `main` committet bzw. über Pull Requests zusammengeführt.
