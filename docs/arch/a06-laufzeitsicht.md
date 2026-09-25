@@ -130,7 +130,7 @@ sequenceDiagram
 
 *Abbildung 14: Laufzeitsicht — Echtzeit-Chat*
 
-![Echtzeit-Chat](diagram_images/a06-laufzeitdiagramm_echtzeit_chat.png)
+![Echtzeit-Chat](diagram_images/11-echtzeit-chat.png)
 *(Quelltext: `diagrams-code/a06-laufzeitdiagramm_echtzeit_chat.mmd`)*
 
 ## 6.5 Mock-Kauf
