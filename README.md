@@ -181,4 +181,4 @@ THMarket/
 
 ## Lizenz
 
-Studienprojekt der THM, keine Lizenz zur Weiterverwendung.
+Studienprojekt im Rahmen des Moduls WK_1106 an der THM. Keine Lizenz zur Weiterverwendung; alle Rechte liegen bei den Autoren.
