@@ -1,17 +1,42 @@
 sequenceDiagram
     autonumber
-    actor Nutzer as Interessent
-    participant System as THMarket (Socket.io)
-    actor Anbieter as Empfänger
-    
-    Nutzer->>System: Klickt auf "Anbieter kontaktieren"
-    System-->>Nutzer: Öffnet (neue) Konversation
-    Nutzer->>System: Verfasst Nachricht und sendet ab
-    System->>System: Speichert Nachricht in Datenbank
-    
-    alt Empfänger ist online
-        System->>Anbieter: Überträgt Nachricht in Echtzeit
-        Anbieter-->>System: Sieht Nachricht in Konversationsübersicht
-    else Empfänger ist offline
-        System->>System: Nachricht wird für späteren Login gespeichert
+    actor Interessent as Interessent
+    participant System as THMarket
+    participant DB as Datenbank
+    participant Socket as Socket.IO (Echtzeit-Zustellung)
+    actor Anbieter as Anbieter (Empfänger)
+
+    Interessent->>System: Öffnet Inseratseite
+
+    alt Eigenes Inserat oder bereits verkauft
+        System-->>Interessent: Button „Anbieter kontaktieren" nicht verfügbar
+    else Fremdes, noch aktives Inserat
+        Interessent->>System: Klickt „Anbieter kontaktieren"
+        System->>DB: Prüft, ob Unterhaltung zu diesem Inserat bereits existiert
+        DB-->>System: Ergebnis
+        alt Existiert bereits
+            System-->>Interessent: Öffnet bestehende Unterhaltung
+        else Existiert noch nicht
+            System->>DB: Legt neue Unterhaltung an
+            System-->>Interessent: Öffnet neue Unterhaltung
+        end
+
+        loop Nachrichten senden
+            Interessent->>System: Schreibt und sendet Nachricht
+            System->>DB: Prüft Teilnehmerschaft
+            DB-->>System: Ergebnis
+
+            alt Eine Prüfung schlägt fehl
+                System-->>Interessent: Zeigt passenden Fehler an
+            else Alle Prüfungen bestanden
+                System->>DB: Speichert Nachricht
+                System->>Socket: Gibt Nachricht zur Zustellung weiter
+
+                alt Empfänger hat Unterhaltung gerade offen
+                    Socket-->>Anbieter: Nachricht erscheint und gilt als gelesen
+                else Empfänger nicht in der Unterhaltung
+                    Socket-->>Anbieter: Benachrichtigung, Unterhaltung springt nach oben
+                end
+            end
+        end
     end

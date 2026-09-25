@@ -2,16 +2,33 @@ sequenceDiagram
     autonumber
     actor Nutzer as Registrierter Nutzer
     participant System as THMarket
-    
-    Nutzer->>System: Öffnet die Webseite
-    System-->>Nutzer: Zeigt Login Maske an
+    participant DB as Datenbank
+
     Nutzer->>System: Gibt E-Mail-Adresse und Passwort ein
-    System->>System: Prüft Eingaben und Verifizierungsstatus
-    
-    alt Eingaben korrekt und Konto verifiziert
-        System-->>Nutzer: Weiterleitung zum Marktplatz
-    else Falsche Zugangsdaten
-        System-->>Nutzer: Zeigt Fehlermeldung an
-    else Konto noch nicht verifiziert
-        System-->>Nutzer: Zeigt Hinweis zur E-Mail Bestätigung an
+    System->>DB: Sucht Konto zur E-Mail-Adresse
+    DB-->>System: Kontodaten
+
+    alt Kein Konto gefunden
+        System-->>Nutzer: Zeigt Fehlermeldung
+    else Konto gefunden
+        System->>System: Prüft Verifizierungsstatus
+
+        alt Konto nicht verifiziert
+            System-->>Nutzer: Zeigt Hinweis zur Verifizierung
+        else Konto verifiziert
+            System->>System: Prüft Passwort
+
+            alt Passwort falsch
+                System-->>Nutzer: Zeigt Fehlermeldung
+            else Passwort korrekt
+                System->>System: Erstellt Sitzung
+                System-->>Nutzer: Weiterleitung zum Marktplatz
+            end
+        end
     end
+
+    Nutzer->>System: Verwendet die Plattform
+
+    Nutzer->>System: Klickt „Abmelden"
+    System->>System: Beendet Sitzung
+    System-->>Nutzer: Weiterleitung zur Login-Seite

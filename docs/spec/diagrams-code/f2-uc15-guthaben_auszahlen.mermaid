@@ -1,0 +1,35 @@
+sequenceDiagram
+    autonumber
+    actor Nutzer as Eingeloggter Nutzer
+    participant System as THMarket
+    participant DB as Datenbank
+
+    Nutzer->>System: Öffnet Profil, klickt „Auszahlen"
+
+    alt Kein Guthaben vorhanden
+        System-->>Nutzer: Zeigt Fehlermeldung
+    else Guthaben vorhanden
+        System-->>Nutzer: Zeigt Eingabefeld
+        Nutzer->>System: Gibt Betrag ein
+        System->>System: Prüft Betrag gültig und im Rahmen
+
+        alt Betrag ungültig oder über verfügbarem Guthaben
+            System-->>Nutzer: Zeigt Fehlermeldung
+        else Betrag gültig
+            Nutzer->>System: Gibt Testkartendaten ein
+            System->>System: Validiert Testkarte
+
+            alt Karte ungültig
+                System-->>Nutzer: Zeigt Fehlermeldung
+            else Karte gültig
+                System->>DB: Prüft Guthaben erneut und verringert es um den Betrag
+                DB-->>System: Ergebnis
+
+                alt Nicht genug Guthaben
+                    System-->>Nutzer: Zeigt Fehlermeldung
+                else Genug Guthaben
+                    System-->>Nutzer: Zeigt neues Guthaben an
+                end
+            end
+        end
+    end

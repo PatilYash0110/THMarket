@@ -2,16 +2,36 @@ sequenceDiagram
     autonumber
     actor Admin as Administrator
     participant System as THMarket
-    
-    Admin->>System: Öffnet die Meldungsübersicht
-    System-->>Admin: Zeigt offene Meldungen an
-    Admin->>System: Wählt eine Meldung aus
-    Admin->>System: Prüft das gemeldete Inserat
-    
-    alt Entscheidung treffen
-        Admin->>System: Entfernt Inserat / lehnt ab / markiert als bearbeitet
-        System->>System: Speichert Entscheidung
-        System-->>Admin: Bestätigt Ausführung
-    else Vorgang abbrechen
-        Admin->>System: Schließt Vorgang ohne Entscheidung
+    participant DB as Datenbank
+
+    Admin->>System: Öffnet Meldungen Tab
+    System->>DB: Lädt Meldungen
+    DB-->>System: Meldungsliste
+    System-->>Admin: Zeigt Meldungen an
+    Admin->>System: Wählt eine offene Meldung
+
+    opt Kontext prüfen
+        alt Meldung hat Inserat-Kontext
+            Admin->>System: Öffnet verlinktes Inserat
+        end
+        alt Meldung hat Chat-Kontext
+            Admin->>System: Klappt Chat-Verlauf ein
+            System->>DB: Lädt Nachrichten der Unterhaltung
+            DB-->>System: Nachrichten
+            System-->>Admin: Zeigt Nachrichten
+        end
     end
+
+    Admin->>System: Trifft Entscheidung
+
+    alt Ohne Maßnahme schließen
+        System->>DB: Schließt Meldung
+    else Meldungstyp = Inserat: löschen
+        System->>DB: Löscht Inserat, schließt Meldung
+    else Meldungstyp = Nutzer: verwarnen
+        System->>DB: Setzt Warnhinweis auf Konto, schließt Meldung
+    else Meldungstyp = Nutzer: löschen
+        System->>DB: Löscht Konto, schließt Meldung
+    end
+
+    System-->>Admin: Bestätigt Ausführung

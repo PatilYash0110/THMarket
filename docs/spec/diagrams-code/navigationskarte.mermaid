@@ -1,0 +1,69 @@
+stateDiagram-v2
+    [*] --> S00
+
+    state "S00 Landingpage (Gast)" as S00
+
+    state "Öffentlicher Bereich (keine Anmeldung)" as Oeffentlich {
+        state "S01 Anmelden" as S01
+        state "S02 Registrieren" as S02
+        state "S03 E-Mail bestätigen" as S03
+        state "S04 Passwort vergessen" as S04
+        state "S05 Passwort zurücksetzen" as S05
+        state "S06 Impressum" as S06
+
+        S01 --> S02: Registrieren
+        S01 --> S04: Passwort vergessen?
+        S02 --> S01: nach Registrierung
+        S03 --> S01: bestätigt
+        S04 --> S05: E-Mail-Link
+        S05 --> S01: Passwort gesetzt
+    }
+
+    S00 --> S02: Registrieren
+    S00 --> S01: Anmelden
+
+    state "Angemeldeter Bereich (Student)" as Angemeldet {
+        state "S07 Startseite (Inserate-Übersicht)" as S07
+        state "S08 Inserat-Detail" as S08
+        state "S09 Inserat erstellen" as S09
+        state "S10 Inserat bearbeiten" as S10
+        state "S11 Kauf-Checkout" as S11
+        state "S12 Nachrichten" as S12
+        state "S13 Profil" as S13
+        state "S14 Favoriten" as S14
+        state "S15 Guthaben aufladen" as S15
+        state "S16 Guthaben auszahlen" as S16
+        state "S17 Kontoeinstellungen" as S17
+
+        S07 --> S13: Profil (Nav)
+        S07 --> S14: Favoriten (Nav)
+        S07 --> S12: Nachrichten (Nav)
+        S07 --> S09: Verkaufen (Nav)
+
+        S07 --> S08: Inserat anklicken
+        S08 --> S11: Kaufen
+        S08 --> S12: Anbieter kontaktieren
+        S08 --> S10: Bearbeiten (Eigentümer)
+        S11 --> S08: Kauf erfolgreich
+        S09 --> S08: Veröffentlicht
+        S10 --> S08: Gespeichert / Als verkauft markiert
+        S10 --> S13: Gelöscht
+        S13 --> S09: Neues Inserat
+        S13 --> S08: eigenes Inserat anklicken
+        S13 --> S15: Aufladen
+        S13 --> S16: Auszahlen
+        S13 --> S17: Kontoeinstellungen
+        S15 --> S13: zurück zum Profil
+        S16 --> S13: zurück zum Profil
+        S14 --> S08: Inserat anklicken
+    }
+
+    state "Admin-Bereich" as AdminBereich {
+        state "S18\nAdmin-Übersicht (Meldungen / Nutzer / Inserate / Audit-Log)" as S18
+    }
+
+    S01 --> S07: Anmeldung erfolgreich (Student)
+    S01 --> S18: Anmeldung erfolgreich (Admin)
+    Angemeldet --> S00: Abmelden / Sitzung abgelaufen
+    S18 --> S00: Abmelden
+    S18 --> S08: Meldungskontext öffnen (nur lesend)

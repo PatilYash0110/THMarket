@@ -1,0 +1,21 @@
+sequenceDiagram
+    autonumber
+    actor Student as Student
+    participant System as THMarket
+    participant DB as Datenbank
+
+    Student->>System: Klickt „Melden" im Chat
+    Student->>System: Wählt Grund
+    Student->>System: Klickt „Melden"
+
+    System->>DB: Prüft, ob gemeldeter Nutzer existiert und ob bereits eine offene eigene Meldung gegen ihn vorliegt
+    DB-->>System: Ergebnis
+
+    alt Nutzer nicht gefunden
+        System-->>Student: Zeigt Fehlermeldung
+    else Bereits offene Meldung vorhanden
+        System-->>Student: Zeigt Fehlermeldung
+    else Alles in Ordnung
+        System->>DB: Prüft Unterhaltungs Kontext und speichert Meldung
+        System-->>Student: Zeigt Bestätigung
+    end

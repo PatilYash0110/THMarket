@@ -1,25 +1,35 @@
 sequenceDiagram
     autonumber
-    actor Nutzer as Eingeloggter Nutzer (Käufer)
+    actor Kaeufer as Student (Käufer)
     participant System as THMarket
     participant DB as Datenbank
 
-    Nutzer->>System: Klickt bei Inserat auf "Kaufen"
-    System-->>Nutzer: Zeigt Kauf-Dialog an
-    Nutzer->>System: Wählt Zahlungsmodus (Simulation oder Guthaben)
-    Nutzer->>System: Bestätigt Kauf
+    Kaeufer->>System: Öffnet Inseratseite
 
-    alt Kauf erfolgreich
-        System->>DB: Speichert Transaktion, setzt Inserat.status = verkauft
-        DB-->>System: Bestätigung
-        System-->>Nutzer: Erfolgsmeldung, zeigt Bewertungsformular an
-        opt Bewertung abgeben
-            Nutzer->>System: Sendet Bewertung (Sterne, Kommentar)
-            System->>DB: Speichert Bewertung
-        end
-    else Datenbank nicht erreichbar
-        System-->>Nutzer: Zeigt Fehlermeldung an
-        opt Abbruch
-            Nutzer->>System: Bricht Vorgang ab
+    alt Admin, eigenes Inserat, bereits verkauft oder Sofortkauf deaktiviert
+        System-->>Kaeufer: „Kaufen"-Button nicht verfügbar
+    else Kaufbar
+        Kaeufer->>System: Klickt „Kaufen"
+        Kaeufer->>System: Wählt Zahlungsmodus
+
+        alt Simulation gewählt
+            Kaeufer->>System: Gibt Testkartendaten ein
+            System->>System: Validiert Testkarte
+            alt Karte ungültig
+                System-->>Kaeufer: Zeigt Fehlermeldung
+            else Karte gültig
+                System->>DB: Markiert Inserat als verkauft
+                System-->>Kaeufer: Zeigt Erfolgsmeldung an
+            end
+        else Guthaben gewählt
+            Kaeufer->>System: Bestätigt Kauf mit vorhandenem Guthaben
+            System->>DB: Prüft, ob Guthaben ausreicht
+            DB-->>System: Ergebnis
+            alt Nicht genug Guthaben
+                System-->>Kaeufer: Zeigt Fehlermeldung
+            else Genug Guthaben
+                System->>DB: Bucht Betrag vom Käufer ab, gutschreibt dem Verkäufer, markiert Inserat als verkauft
+                System-->>Kaeufer: Zeigt Erfolgsmeldung an
+            end
         end
     end

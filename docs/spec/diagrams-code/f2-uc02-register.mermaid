@@ -1,21 +1,43 @@
 sequenceDiagram
     autonumber
-    actor Nutzer as Studierender (Gast)
+    actor Gast as Gast (Student)
     participant System as THMarket
-    participant Mail as E-Mail Dienst
-    
-    Nutzer->>System: Klickt auf "Jetzt registrieren"
-    System-->>Nutzer: Zeigt Registrierungsformular an
-    Nutzer->>System: Gibt THM E-Mail und Passwort ein
-    System->>System: Prüft Eingaben und THM-Domain
-    
-    alt Gültige THM-Adresse und noch frei
-        System->>System: Legt unverifiziertes Konto an
-        System->>Mail: Löst Bestätigungs-E-Mail aus
-        Mail-->>Nutzer: Sendet E-Mail mit Verifizierungslink
-        Nutzer->>System: Öffnet den Verifizierungslink
-        System->>System: Konto wird verifiziert
-        System-->>Nutzer: Weiterleitung zum Login (UC01)
-    else E-Mail bereits vergeben oder keine THM-Adresse
-        System-->>Nutzer: Zeigt Fehlermeldung an / Registrierung abgelehnt
+    participant DB as Datenbank
+    participant Mail as Gmail SMTP
+
+    Gast->>System: Öffnet Registrierung, gibt Name, THM-E-Mail und Passwort ein
+    System->>System: Prüft Format (@thm.de, Passwortstärke)
+
+    alt Format ungültig
+        System-->>Gast: Zeigt Feldfehler an
+    else Format gültig
+        System->>DB: Prüft, ob E-Mail bereits registriert ist
+        DB-->>System: Ergebnis
+
+        alt E-Mail bereits vergeben
+            System-->>Gast: Zeigt Fehler: Konto existiert bereits, bitte melde dich an (ggf. zuerst E-Mail bestätigen)
+        else E-Mail noch frei
+            System->>DB: Legt unverifiziertes Konto an, erzeugt Bestätigungslink (24 Stunden gültig)
+            System->>Mail: Löst Verifizierungs-E-Mail aus
+            Mail-->>Gast: E-Mail kommt an
+            System-->>Gast: Zeigt Erfolgsmeldung
+
+            Gast->>System: Öffnet Bestätigungslink aus der E-Mail
+            System->>DB: Prüft Link auf Gültigkeit
+            DB-->>System: Ergebnis
+
+            alt Link unbekannt oder abgelaufen
+                System-->>Gast: Zeigt Fehlermeldung
+                opt Link erneut anfordern (höchstens alle 60 Sekunden)
+                    Gast->>System: Fordert neuen Link an
+                    System->>Mail: Versendet neuen Bestätigungslink
+                    System-->>Gast: Zeigt Erfolgsmeldung an
+                end
+            else Konto bereits verifiziert
+                System-->>Gast: Zeigt Erfolg an
+            else Link gültig, noch nicht verifiziert
+                System->>DB: Setzt Konto auf verifiziert
+                System-->>Gast: Zeigt Erfolg
+            end
+        end
     end

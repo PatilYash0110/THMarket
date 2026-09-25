@@ -3,14 +3,26 @@ sequenceDiagram
     actor Nutzer as Eingeloggter Nutzer
     participant System as THMarket
     participant DB as Datenbank
-    
-    Nutzer->>System: Gibt Suchbegriff ein / wählt Filter
-    System->>System: Übernimmt und prüft Eingaben
-    System->>DB: Fragt passende Inserate ab
-    DB-->>System: Liefert Ergebnisse
-    
-    alt Treffer vorhanden
-        System-->>Nutzer: Zeigt Ergebnisse im Hauptbereich an
-    else Keine Treffer
-        System-->>Nutzer: Zeigt Hinweis "Keine Inserate gefunden" an
+
+    Nutzer->>System: Öffnet Startseite
+    System->>DB: Lädt einmalig alle Inserate
+    DB-->>System: Inseratliste
+    System-->>Nutzer: Zeigt Inserate an
+
+    loop Suche/Filter/Sortierung
+        Nutzer->>System: Gibt Suchbegriff ein / wählt Filter / ändert Sortierung
+        System-->>Nutzer: Aktualisiert Anzeige sofort
+    end
+
+    Nutzer->>System: Klickt auf ein Inserat
+    System-->>Nutzer: Zeigt Detailansicht
+
+    opt Favorisieren
+        alt Eigentümer
+            System-->>Nutzer: Merken-Button nicht verfügbar
+        else Nicht Eigentümer
+                Nutzer->>System: Klickt Herz-Symbol
+                System->>DB: Merkt/entmerkt Inserat
+                System-->>Nutzer: Aktualisiert Favoritenliste
+        end
     end

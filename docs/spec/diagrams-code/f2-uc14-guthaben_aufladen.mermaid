@@ -1,0 +1,25 @@
+sequenceDiagram
+    autonumber
+    actor Nutzer as Eingeloggter Nutzer
+    participant System as THMarket
+    participant DB as Datenbank
+
+    Nutzer->>System: Öffnet Profil, klickt „Aufladen"
+    System-->>Nutzer: Zeigt Eingabefeld
+    Nutzer->>System: Gibt Betrag ein
+    System->>System: Prüft Betragsgrenzen
+
+    alt Betrag außerhalb des gültigen Bereichs
+        System-->>Nutzer: Zeigt Fehlermeldung
+    else Betrag gültig
+        Nutzer->>System: Gibt Testkartendaten ein
+        System->>System: Validiert Testkarte
+
+        alt Karte ungültig
+            System-->>Nutzer: Zeigt Fehlermeldung
+        else Karte gültig
+            System->>DB: Erhöht Guthaben um den Betrag
+            DB-->>System: Neuer Kontostand
+            System-->>Nutzer: Zeigt neues Guthaben an
+        end
+    end

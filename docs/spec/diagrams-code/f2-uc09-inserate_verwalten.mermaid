@@ -1,16 +1,29 @@
 sequenceDiagram
     autonumber
-    actor Nutzer as Eingeloggter Nutzer
+    actor Verkaeufer as Verkäufer (Eigentümer)
     participant System as THMarket
-    
-    Nutzer->>System: Öffnet "Meine Inserate"
-    System-->>Nutzer: Zeigt eigene Inserate an
-    Nutzer->>System: Wählt ein Inserat aus
-    
-    alt Inserat bearbeiten/löschen
-        Nutzer->>System: Bearbeitet Angaben oder löscht Inserat
-        System->>System: Validiert und speichert Änderung / löscht Daten
-        System-->>Nutzer: Bestätigt Ausführung
-    else Vorgang abbrechen
-        Nutzer->>System: Bricht ohne zu speichern ab
+    participant DB as Datenbank
+
+    Verkaeufer->>System: Öffnet Profil, klickt auf ein eigenes aktives Inserat
+    System-->>Verkaeufer: Zeigt Inserat-Detailseite
+    Verkaeufer->>System: Klickt „Bearbeiten"
+    System-->>Verkaeufer: Zeigt Bearbeiten-Seite
+
+    alt Bearbeiten
+    Verkaeufer->>System: Ändert Felder, speichert
+    System->>DB: Speichert Änderungen
+    System-->>Verkaeufer: Bestätigt Änderung
+
+
+    else Als verkauft markieren
+        System-->>Verkaeufer: Schickt Warnung
+        Verkaeufer->>System: Bestätigt Meldung
+        System->>DB: Setzt Status aufverkauft
+        System-->>Verkaeufer: Bestätigt Statusänderung
+
+    else Löschen
+            System-->>Verkaeufer: Schickt Warnung
+            Verkaeufer->>System: Bestätigt Löschung
+            System->>DB: Entfernt Inserat
+            System-->>Verkaeufer: Bestätigt Löschung
     end

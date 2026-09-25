@@ -1,0 +1,32 @@
+sequenceDiagram
+    autonumber
+    actor Nutzer as Nutzer (Passwort vergessen)
+    participant System as THMarket
+    participant DB as Datenbank
+    participant Mail as Gmail SMTP
+
+    Nutzer->>System: Klickt „Passwort vergessen?", gibt E-Mail-Adresse ein
+    System->>DB: Sucht Konto zur E-Mail-Adresse
+    DB-->>System: Kontodaten (falls vorhanden)
+
+    alt Konto existiert, aber unverifiziert
+        System-->>Nutzer: Zeigt Hinweis zur Verifizierung
+    else Konto existiert nicht ODER existiert und ist verifiziert
+        opt Nur falls Konto tatsächlich existiert und verifiziert ist
+            System->>DB: Erstellt Reset-Link
+            System->>Mail: Versendet Reset-E-Mail
+        end
+        System-->>Nutzer: Zeigt Hinweis zur Sendung der E-Mail
+        Mail-->>Nutzer: Sendung der E-Mail
+    end
+
+    Nutzer->>System: Öffnet Reset-Link aus der E-Mail, gibt neues Passwort ein
+    System->>DB: Prüft Link (gültig, nicht abgelaufen)
+    DB-->>System: Ergebnis
+
+    alt Link ungültig oder abgelaufen
+        System-->>Nutzer: Zeigt Fehlermeldung
+    else Link gültig
+        System->>DB: Setzt neues Passwort
+        System-->>Nutzer: Zeigt Erfolg an
+    end
