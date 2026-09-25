@@ -14,7 +14,7 @@
 | KI-Beschreibung | Von Google Gemini generierter Beschreibungsentwurf aus Fotos, Titel, Kategorie und optionalem Hinweis. |
 | Mock | Nachbildung einer Funktion ohne echte externe Anbindung. |
 | Prisma | ORM für den typsicheren Datenbankzugriff. |
-| Rate-Limiting | Drosselung der Anfragehäufigkeit; im Projekt gezielt auf sensible Endpunkte angewendet (siehe [Kapitel 8.2](a08-querschnittliche-konzepte.md#69-sicherheit--datenschutz)). |
+| Rate-Limiting | Drosselung der Anfragehäufigkeit; im Projekt gezielt auf sensible Endpunkte angewendet (siehe [Kapitel 8.2.5](a08-querschnittliche-konzepte.md#825-rate-limiting-gegen-missbrauch)). |
 | Simulation (Zahlungsmodus) | Kauf per Test-Kreditkarte ohne jeglichen Geldfluss. |
 | Sofortkauf | Vom Verkäufer aktivierbare Option; steuert, ob „Kaufen" oder nur „Anbieter kontaktieren" angezeigt wird. |
 | Socket.io | Bibliothek für Echtzeit-Kommunikation über WebSockets. |
@@ -28,7 +28,7 @@
 
 **Diagrammquelldateien**
 
-Die 15 Abbildungen dieses Dokuments liegen als PNG (direkt aus dem Original-PDF extrahiert) unter [`docs/arch/diagram_images/`](diagram_images/) vor. Für das im Quelldokument referenzierte Datenmodell wird auf die Mermaid-Quelldatei [`docs/spec/diagrams-code/datenmodell.mmd`](../spec/diagrams-code/datenmodell.mmd) der Spezifikation verwiesen — beide Dokumente teilen sich dasselbe Datenmodell.
+Die 15 Abbildungen dieses Dokuments liegen als PNG (direkt aus dem Original-PDF extrahiert) unter [`docs/arch/diagram_images/`](diagram_images/) vor. Für das im Quelldokument referenzierte Datenmodell wird auf die Mermaid-Quelldatei [`docs/spec/diagrams-code/d1-datenmodell.mermaid`](../spec/diagrams-code/d1-datenmodell.mermaid) der Spezifikation verwiesen — beide Dokumente teilen sich dasselbe Datenmodell.
 
 **Verwandte Dokumente**
 
