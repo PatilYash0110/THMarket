@@ -14,17 +14,17 @@ Die Übergänge zwischen den Dialogen sind nummeriert (1–12). Dieselben Nummer
 
 | Nr. | Von → Nach | Beschreibung |
 |---|---|---|
-| 1 | Landingpage → Login-Dialog / Registrierungs-Dialog | Einstiegspunkt aus dem öffentlichen Bereich ([4.2.1](#421-landingpage)). |
-| 2 | Login-Dialog ↔ Registrierungs-Dialog | Wechselseitiger Sprung über „Jetzt registrieren" bzw. „Schon registriert?" ([4.2.2](#422-login-dialog), [4.2.3](#423-registrierungs-dialog)). |
-| 3 | Login-Dialog ↔ Passwort-vergessen-/-zurücksetzen-Dialog | Reset-Ablauf inkl. E-Mail-Link ([4.2.4](#424-passwort-vergessen---zurücksetzen-dialog)). |
-| 4 | Login-Dialog → Marktplatz-Dialog bzw. Adminbereich-Dialog | Rollenabhängige Weiterleitung nach erfolgreichem Login ([4.2.2](#422-login-dialog), [4.2.16](#4216-adminbereich-dialog)). |
-| 5 | Marktplatz-Dialog → Profil-/Favoriten-/Chat-/Erstellen-Dialog | Navigationsleiste des Marktplatzes ([4.2.6](#426-marktplatz-dialog-startseite)). |
-| 6 | Marktplatz-/Profil-/Favoriten-Dialog → Inseratdetail-Dialog | Öffnen eines konkreten Inserats ([4.2.6](#426-marktplatz-dialog-startseite), [4.2.7](#427-inseratdetail-dialog), [4.2.11](#4211-profil-dialog), [4.2.12](#4212-favoriten-dialog)). |
-| 7 | Inseratdetail-Dialog ↔ Kauf-Dialog | Kaufabschluss und Rücksprung nach Erfolg ([4.2.7](#427-inseratdetail-dialog), [4.2.9](#429-kauf-dialog-checkout)). |
-| 8 | Inseratdetail-Dialog → Chat-Dialog | „Anbieter kontaktieren" ([4.2.7](#427-inseratdetail-dialog), [4.2.10](#4210-chat-dialog)). |
-| 9 | Inseratdetail-/Profil-Dialog ↔ Erstellen-/Bearbeiten-Dialog | Neues Inserat anlegen bzw. bestehendes bearbeiten ([4.2.7](#427-inseratdetail-dialog), [4.2.8](#428-inserat-erstellen--bearbeiten-dialog), [4.2.11](#4211-profil-dialog)). |
-| 10 | Profil-Dialog ↔ Aufladen-/Auszahlen-/Kontoeinstellungen-Dialog | Kontofunktionen im Profilbereich ([4.2.11](#4211-profil-dialog), [4.2.13](#4213-guthaben-aufladen-dialog)–[4.2.15](#4215-kontoeinstellungen-dialog)). |
-| 11 | Adminbereich-Dialog → Inseratdetail-Dialog | Nur lesender Meldungskontext aus dem Tab „Meldungen" ([4.2.16](#4216-adminbereich-dialog)). |
+| 1 | Landingpage → Login-Dialog / Registrierungs-Dialog | Einstiegspunkt aus dem öffentlichen Bereich |
+| 2 | Login-Dialog ↔ Registrierungs-Dialog | Wechselseitiger Sprung über „Jetzt registrieren" bzw. „Schon registriert?" |
+| 3 | Login-Dialog ↔ Passwort-vergessen-/-zurücksetzen-Dialog | Reset-Ablauf inkl. E-Mail-Link |
+| 4 | Login-Dialog → Marktplatz-Dialog bzw. Adminbereich-Dialog | Rollenabhängige Weiterleitung nach erfolgreichem Login |
+| 5 | Marktplatz-Dialog → Profil-/Favoriten-/Chat-/Erstellen-Dialog | Navigationsleiste des Marktplatzes |
+| 6 | Marktplatz-/Profil-/Favoriten-Dialog → Inseratdetail-Dialog | Öffnen eines konkreten Inserats |
+| 7 | Inseratdetail-Dialog ↔ Kauf-Dialog | Kaufabschluss und Rücksprung nach Erfolg |
+| 8 | Inseratdetail-Dialog → Chat-Dialog | „Anbieter kontaktieren" |
+| 9 | Inseratdetail-/Profil-Dialog ↔ Erstellen-/Bearbeiten-Dialog | Neues Inserat anlegen bzw. bestehendes bearbeiten |
+| 10 | Profil-Dialog ↔ Aufladen-/Auszahlen-/Kontoeinstellungen-Dialog | Kontofunktionen im Profilbereich |
+| 11 | Adminbereich-Dialog → Inseratdetail-Dialog | Nur lesender Meldungskontext aus dem Tab „Meldungen" |
 | 12 | Angemeldeter Bereich / Adminbereich → Landingpage | Abmelden, von jedem angemeldeten Dialog aus möglich. |
 
 ## B1.2 Dialogspezifikation
