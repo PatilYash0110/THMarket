@@ -32,5 +32,5 @@ Die 15 Abbildungen dieses Dokuments liegen als PNG (direkt aus dem Original-PDF 
 
 **Verwandte Dokumente**
 
-Für die fachliche Spezifikation (Use Cases, Dialoge, Datentypenverzeichnis) siehe die [Spezifikation](../spec/README.md). Dieses Architekturdokument ersetzt inhaltlich die älteren arc42-Bausteine a01–a12, die während der frühen Konzeptphase entstanden und teils nicht umgesetzte Funktionen beschrieben (Bewertungssystem, Inserat-Felder „Zustand"/„Campus", EXIF-/GPS-Entfernung, ein eigenständiges „Transaktion"-Modul). Alle technischen Aussagen dieses Dokuments (Modulstruktur, Routen, Klassennamen, Admin-Aktionen) wurden gegen den Code unter `backend/src` verifiziert.
+Für die fachliche Spezifikation (Use Cases, Dialoge, Datentypenverzeichnis) siehe die [Spezifikation](../spec/README.md). Dieses Architekturdokument ersetzt inhaltlich die älteren arc42-Bausteine aus der frühen Konzeptphase, die und teils nicht umgesetzte Funktionen beschrieben (Bewertungssystem, Inserat-Felder „Zustand"/„Campus", EXIF-/GPS-Entfernung, ein eigenständiges „Transaktion"-Modul). Alle technischen Aussagen dieses Dokuments (Modulstruktur, Routen, Klassennamen, Admin-Aktionen) wurden gegen den Code unter `backend/src` verifiziert.
 

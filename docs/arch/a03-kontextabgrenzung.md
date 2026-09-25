@@ -1,6 +1,5 @@
 # 3. Kontextabgrenzung
 
-[← 2. Randbedingungen](A02-architecture-constraints.md) · [Architekturübersicht](README.md) · [4. Lösungsstrategie →](A04-solution-strategy.md)
 
 ---
 

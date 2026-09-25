@@ -146,7 +146,7 @@ npm run lint             # oxlint
 THMarket/
   docs/
     spec/                 # Spezifikation nach Siedersleben (P, F, D, B, S, N)
-    arch/                 # Architektur nach arc42 (a01-a12) inkl. ADRs
+    arch/                 # Architektur nach arc42 (a01-a09, a12) inkl. ADRs
   backend/
     prisma/
       schema.prisma       # Datenmodell
