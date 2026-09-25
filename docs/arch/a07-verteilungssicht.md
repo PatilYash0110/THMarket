@@ -1,33 +1,43 @@
 # 7. Verteilungssicht
 
+
 Die Softwarebausteine werden auf verschiedene Infrastruktur-Komponenten verteilt.
 
-![Verteilungssicht](diagram_images/16-verteilungssicht.png)
+*Abbildung 15: Verteilungssicht*
 
-*Abbildung 17: Verteilungssicht*
+<details>
+<summary>📊 Diagramm anzeigen</summary>
+
+![Verteilungssicht](diagram_png/15-registrierung-verifizierung.png)
+
+</details>
 
 ## 7.1 Infrastruktur Ebene 1
 
-Infrastrukturkomponenten:
+Ebene 1 benennt die beteiligten Infrastruktur-Knoten und beschreibt, welche Bausteine auf ihnen laufen und wofür der jeweilige Knoten zuständig ist.
 
-- **Clientgeräte:** Smartphones und Laptops/PCs mit Browser; Darstellung des Frontends (React, HTML, CSS, JS).
-- **Frontend-Host (Vercel):** Auslieferung der statischen React/Vite-Anwendung, kein Sleep. Produktiv erreichbar unter <https://thmarket.vercel.app>.
-- **Backend-Host (Render, Free):** NestJS-App mit allen fachlichen Modulen inkl. Socket.io-Gateway; persistenter Web-Service. Hinweis: Der Free-Tarif schläft nach ca. 15 min Inaktivität und benötigt beim Aufwachen 30–50 s (Kaltstart).
-- **Datenbankserver (Neon):** PostgreSQL mit den Entitäten Benutzer, Inserat, Bild, Kategorie, Favorit, Konversation, Nachricht, Meldung, Transaktion und Bewertung.
-- **Externe Dienste:** Gemini-API (KI-Beschreibung), Cloudinary (Bildspeicher), SMTP-Mailserver (Verifizierung) – jeweils eigenständige externe Server, per HTTPS bzw. SMTP angebunden und nicht Teil der eigenen Infrastruktur.
+| Knoten | Technologie / Umgebung | Beschreibung & enthaltene Bausteine |
+|---|---|---|
+| Clientgerät | Smartphone, Laptop/PC mit Browser | Führt das React-Frontend als Single-Page-Application aus (HTML, CSS, JavaScript) und stellt die Oberfläche dar. Hält keine dauerhaften Daten und spricht nie direkt mit Datenbank oder externen Diensten. |
+| Frontend-Host | Vercel | Liefert die statisch gebaute React/Vite-Anwendung weltweit aus. Enthält keine Geschäftslogik. |
+| Backend-Host | Render (Free-Tarif), NestJS | Betreibt das gesamte Backend: die fachlichen Kernmodule Auth, Listings, Wallet, Chat und Admin, die Integrationsmodule Mail, Cloudinary- und Gemini-Anbindung sowie das Socket.io-Gateway. Der Free-Tarif schläft nach Inaktivität ein (Kaltstart ca. 30–50 s). |
+| Datenbankserver | Neon, PostgreSQL | Persistiert die sieben Kern-Entitäten User, Listing, Favorite, Report, AuditLogEntry, Conversation und Message. Bilder liegen nur als URL-Array am Inserat, nicht als Datei. |
+| Externe Dienste | Google Gemini, Cloudinary, Gmail SMTP | Eigenständige, fremdbetriebene Server: Gemini (KI-Beschreibung/-Moderation), Cloudinary (Bildspeicherung), Gmail SMTP (E-Mail-Versand). Werden ausschließlich vom Backend angesprochen und sind nicht Teil der eigenen Infrastruktur. |
 
-Deployment-Zuordnung der Bausteine:
-
-- Frontend (React, Vite, TS) → Clientgeräte (ausgeliefert über Vercel)
-- User Management, Inserat Management, Kommunikation, Transaktion Management, Admin Management → Backend-Host (NestJS)
-- Datenhaltung → Datenbankserver (PostgreSQL)
-- Externe Schnittstellen → externe Dienste (Gemini, Cloudinary, SMTP)
+*Infrastrukturknoten der Verteilungssicht*
 
 ## 7.2 Infrastruktur Ebene 2
 
-- **Endgerät ↔ Vercel/Render:** HTTPS bzw. WSS (WebSocket über TLS).
-- **Render ↔ Neon:** verschlüsselte SQL-Verbindung (TLS) über Prisma.
-- **Render ↔ Cloudinary / Google Gemini:** HTTPS.
-- **Render ↔ Gmail SMTP:** SMTP.
+Ebene 2 beschreibt die Kommunikationsbeziehungen zwischen den Knoten samt der eingesetzten Protokolle. Alle Verbindungen sind in der Produktion transportverschlüsselt.
 
-**Hinweis:** Der Render-Free-Tier kann nach Inaktivität einen Kaltstart verursachen (erste Anfrage verzögert).
+| Kommunikationsbeziehung | Protokoll | Zweck |
+|---|---|---|
+| Clientgerät ↔ Frontend-Host (Vercel) | HTTPS | Laden der Single-Page-Application. |
+| Clientgerät ↔ Backend-Host (Render) | HTTPS / REST | Reguläre Anwendungsfunktionen (Auth, Inserate, Kauf, Favoriten, Admin) als JSON. |
+| Clientgerät ↔ Backend-Host (Render) | WSS (Socket.io) | Echtzeit-Chat über eine dauerhafte WebSocket-Verbindung; JWT im Handshake. |
+| Backend-Host ↔ Datenbankserver (Neon) | SQL über TLS (Prisma) | Alle lesenden und schreibenden Datenzugriffe (CRUD). |
+| Backend-Host ↔ Cloudinary / Google Gemini | HTTPS | Bild-Upload sowie KI-Beschreibung und -Moderation. |
+| Backend-Host ↔ Gmail SMTP | SMTP (App-Passwort) | Versand der Verifizierungs- und Passwort-Reset-E-Mails. |
+
+*Kommunikationsbeziehungen und Protokolle*
+
