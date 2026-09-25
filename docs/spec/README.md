@@ -68,10 +68,26 @@
 
 ## Eingesetzte KI-Werkzeuge
 
-| Werkzeug | Eingesetzt für |
-|----------|----------------|
+### Welche Werkzeuge
+
+| Werkzeug | Rolle im Projekt |
+|----------|------------------|
 | Claude (Claude Code) | Entwürfe und Umformulierungen von Bausteintexten, Repository- und Commit-Verwaltung |
 | Google Gemini | Recherche, Formulierungsvorschläge |
 | ChatGPT | Formulierungsvorschläge, Gegenlesen einzelner Abschnitte |
 
-Die fachlichen Festlegungen — Projektidee, Nutzerkreis, Anwendungsfälle, Datenmodell — sind Entscheidungen der Gruppe und nicht KI-generiert. Jeder mit KI-Unterstützung entstandene Abschnitt wurde von mindestens einem Gruppenmitglied gegen die eigene Projektidee gelesen und überarbeitet; Diagramme wurden im Mermaid- bzw. PlantUML-Quelltext von Hand nachgearbeitet.
+### Wofür
+
+- **Doku-Erzeugung:** Erstentwürfe und Umformulierungen einzelner Bausteintexte.
+- **Recherche:** Klärung von Begriffen und Vorgehensweisen bei der Strukturierung nach Siedersleben.
+- **Diagramme:** Erzeugung von Mermaid-Quelltext als Ausgangspunkt für Use-Case-, Aktivitäts- und Sequenzdiagramme.
+- **Nicht KI-gestützt:** die fachlichen Festlegungen selbst — Projektidee, Abgrenzung des Nutzerkreises, Anwendungsfälle, Datenmodell und nichtfunktionale Anforderungen sind Entscheidungen der Gruppe.
+
+### Wie die Ergebnisse geprüft wurden
+
+- Jeder mit KI-Unterstützung entstandene Abschnitt wurde von mindestens einem Gruppenmitglied gegen die eigene Projektidee gelesen und überarbeitet.
+- Bezeichner — Use-Case-IDs und die Datentypnamen aus [`D2-datentypenverzeichnis.md`](D2-datentypenverzeichnis.md) — wurden manuell gegen Architektur und Code abgeglichen, nicht aus Vorschlägen übernommen.
+- Diagramme wurden im Mermaid- bzw. PlantUML-Quelltext von Hand nachgearbeitet, bis Anordnung und Beschriftung lesbar waren.
+- Vorschläge, die nicht zum tatsächlichen Stand des Projekts passten, wurden verworfen statt eingebaut.
+
+> **Abgrenzung:** Google Gemini ist außerdem Bestandteil der Anwendung selbst — als Dienst für den Beschreibungsvorschlag beim Anlegen eines Inserats. Das ist eine fachliche Funktion von THMarket und kein Entwicklungswerkzeug; die Entscheidung dazu ist in [`../arch/a09-entwurfsentscheidungen.md`](../arch/a09-entwurfsentscheidungen.md) als ADR-005 dokumentiert.

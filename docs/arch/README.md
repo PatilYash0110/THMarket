@@ -33,12 +33,27 @@ Referenz-Template: https://arc42.org/.
 
 ## Eingesetzte KI-Werkzeuge
 
-| Werkzeug | Eingesetzt für |
-|----------|----------------|
+### Welche Werkzeuge
+
+| Werkzeug | Rolle im Projekt |
+|----------|------------------|
 | Claude (Claude Code) | Entwürfe für Kapiteltexte und ADRs, Code-Vervollständigung im Backend, Repository- und Commit-Verwaltung |
 | Google Gemini | Code-Vervollständigung, Recherche zu Technologiealternativen |
 | ChatGPT | Formulierungsvorschläge, Gegenlesen einzelner Kapitel |
 
-Die Architekturentscheidungen wurden in der Gruppe getroffen; KI-Werkzeuge dienten der Recherche der Alternativen und der Ausformulierung. Bausteinsicht und Laufzeitsicht wurden gegen den tatsächlichen Modulschnitt in `backend/src/` abgeglichen, Diagramme im Quelltext von Hand nachgearbeitet.
+### Wofür
 
-Google Gemini ist außerdem Bestandteil der Anwendung selbst — siehe ADR-005 in [`a09-entwurfsentscheidungen.md`](a09-entwurfsentscheidungen.md).
+- **Doku-Erzeugung:** Erstentwürfe für Kapiteltexte und für die Struktur der ADRs.
+- **Recherche:** Sammeln und Vergleichen der Technologiealternativen, die in den ADRs als geprüfte Optionen aufgeführt sind.
+- **Code-Vervollständigung:** Unterstützung beim Schreiben von Backend-Code innerhalb der vom Team festgelegten Modulstruktur.
+- **Diagramme:** Erzeugung von Mermaid- und PlantUML-Quelltext als Ausgangspunkt für Bausteinsicht, Laufzeitsicht und Verteilungssicht.
+- **Nicht KI-gestützt:** die Architekturentscheidungen selbst. Auswahl und Begründung in ADR-001 bis ADR-010 sind Ergebnis der Abstimmung im Team; KI-Werkzeuge dienten der Recherche der Alternativen und der Ausformulierung.
+
+### Wie die Ergebnisse geprüft wurden
+
+- Jeder ADR wurde nach dem Entwurf daraufhin geprüft, ob die genannten Alternativen tatsächlich erwogen wurden und die Konsequenzen — auch die negativen — dem entsprechen, was im Projekt eingetreten ist.
+- Bausteinsicht und Laufzeitsicht wurden gegen den tatsächlichen Modulschnitt in `backend/src/` abgeglichen; Abweichungen wurden im Diagramm korrigiert, nicht in der Beschreibung überspielt.
+- Diagramme wurden im Quelltext von Hand nachgearbeitet, bis Kantenverläufe und Beschriftungen lesbar waren.
+- Generierte Passagen, die Technologien oder Konzepte nannten, die im Projekt nicht eingesetzt werden, wurden entfernt.
+
+> **Abgrenzung:** Google Gemini ist außerdem Bestandteil der Anwendung selbst — siehe ADR-005 in [`a09-entwurfsentscheidungen.md`](a09-entwurfsentscheidungen.md). Das ist eine fachliche Funktion von THMarket, kein Entwicklungswerkzeug.
