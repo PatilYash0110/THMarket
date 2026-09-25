@@ -1,0 +1,94 @@
+flowchart TB
+  subgraph E0["Verfeinerungsebene 0 · Systemkontext"]
+    direction TB
+    ST["THM-Student"]:::akteur
+    AD0["Administrator"]:::akteur
+    SYS0["System THMarket"]:::sys
+    ST -->|nutzt| SYS0
+    AD0 -->|administriert| SYS0
+  end
+  subgraph EXT["Externe Nachbarsysteme (nicht Teil von THMarket)"]
+    direction LR
+    CLDX["Cloudinary"]:::ext
+    GEMX["Google Gemini API"]:::ext
+    SMTPX["Gmail SMTP"]:::ext
+    NEON["Neon PostgreSQL"]:::ext
+  end
+  SYS0 -->|Bilder| CLDX
+  SYS0 -->|KI-Text| GEMX
+  SYS0 -->|E-Mail| SMTPX
+  SYS0 -->|Daten| NEON
+  subgraph E1["Verfeinerungsebene 1 · Whitebox System THMarket"]
+    direction TB
+    AUTH1["Auth ·<br/>Benutzerverwaltung"]:::core
+    LST1["Listings"]:::core
+    WAL1["Wallet"]:::core
+    CHT1["Chat"]:::core
+    ADM1["Admin"]:::core
+    MAIL1["Mail"]:::int
+    CLD1["Cloudinary-Anbindung"]:::int
+    GEM1["Gemini-Anbindung"]:::int
+    DB1[("Datenbank · Prisma")]:::db
+    ADM1 -->|liest gemeldeten<br/>Chat-Verlauf| CHT1
+    CHT1 -->|prüft JWT über| AUTH1
+    LST1 -->|Bild-Upload| CLD1
+    LST1 -->|KI-Beschreibung| GEM1
+    AUTH1 -->|E-Mail-Versand| MAIL1
+    AUTH1 -->|liest/schreibt| DB1
+    LST1 -->|liest/schreibt| DB1
+    WAL1 -->|liest/schreibt| DB1
+    CHT1 -->|liest/schreibt| DB1
+    ADM1 -->|liest/schreibt| DB1
+  end
+  subgraph E2["Verfeinerungsebene 2 · Whitebox der Kernmodule"]
+    direction LR
+    subgraph E2A["Auth (Benutzerverwaltung)"]
+      direction TB
+      A1["Registrierung"]:::sub
+      A2["E-Mail-Verifizierung"]:::sub
+      A3["Login (JWT)"]:::sub
+      A4["Passwort-Reset"]:::sub
+      A5["Profil & Verwarnung"]:::sub
+      A6["JWT-Guard / Rollen"]:::sub
+      A1 ~~~ A2 ~~~ A3 ~~~ A4 ~~~ A5 ~~~ A6
+    end
+    subgraph E2L["Listings"]
+      direction TB
+      L1["Inserat-Verwaltung"]:::sub
+      L2["Bild-Upload"]:::sub
+      L3["KI-Beschreibung"]:::sub
+      L4["Favoriten"]:::sub
+      L5["Kaufabschluss"]:::sub
+      L1 ~~~ L2 ~~~ L3 ~~~ L4 ~~~ L5
+    end
+    subgraph E2C["Chat"]
+      direction TB
+      C1["Konversationen (REST)"]:::sub
+      C2["Socket.io-Gateway"]:::sub
+      C3["Nachrichten-Persistenz"]:::sub
+      C1 ~~~ C2 ~~~ C3
+    end
+    subgraph E2AD["Admin"]
+      direction TB
+      D1["Meldungsverwaltung"]:::sub
+      D2["Maßnahmen"]:::sub
+      D3["Audit-Log"]:::sub
+      D1 ~~~ D2 ~~~ D3
+    end
+  end
+  E0 -.->|"verfeinert"| E1
+  AUTH1 -.->|"verfeinert"| E2A
+  LST1 -.->|"verfeinert"| E2L
+  CHT1 -.->|"verfeinert"| E2C
+  ADM1 -.->|"verfeinert"| E2AD
+  classDef akteur fill:#f8f9fa,stroke:#868e96,color:#212529
+  classDef sys fill:#dbe7ff,stroke:#3b5bdb,color:#1b264f
+  classDef core fill:#d0ebff,stroke:#1971c2,color:#0b3a66
+  classDef int fill:#e5dbff,stroke:#7048e8,color:#3b2764
+  classDef db fill:#1d2b53,stroke:#101a3a,color:#ffffff
+  classDef ext fill:#e9ecef,stroke:#868e96,color:#343a40
+  classDef sub fill:#ffffff,stroke:#495057,color:#212529
+  style E2A fill:#d0ebff,stroke:#1971c2,color:#0b3a66
+  style E2L fill:#d3f9d8,stroke:#2f9e44,color:#14532d
+  style E2C fill:#ffe3e3,stroke:#e03131,color:#7a1010
+  style E2AD fill:#fff3bf,stroke:#f08c00,color:#663c00
