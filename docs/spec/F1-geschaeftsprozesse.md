@@ -2,7 +2,7 @@
 
 THMarket unterstützt den Verkauf und die Vermietung von Gegenständen zwischen Studierenden der THM. Der zentrale Geschäftsprozess beginnt mit der Registrierung eines Nutzers und reicht über die Nutzung des Marktplatzes bis zur Kontaktaufnahme zwischen Interessent und Anbieter. Zusätzlich gibt es Verwaltungs- und Moderationsprozesse, die durch einen Administrator durchgeführt werden.
 
-## 2.1 Akteure
+## F1.1 Akteure
 
 In THMarket gibt es vier Akteure. Jeder hat eigene Rechte und typische Aktionen und bildet die Grundlage für die in [Kapitel 2.3–2.16](#23-uc01--registrieren) beschriebenen Use Cases.
 
@@ -66,7 +66,7 @@ Der Administrator ist ein spezieller Akteur mit Rolle `ADMIN`, angelegt über ei
 
 <br clear="left">
 
-## 2.2 Typischer Geschäftsprozess
+## F1.2 Typischer Geschäftsprozess
 
 Der typische Lebenszyklus eines Nutzers durchläuft folgende Stationen, die in den Use Cases UC01–UC14 im Detail beschrieben sind:
 
