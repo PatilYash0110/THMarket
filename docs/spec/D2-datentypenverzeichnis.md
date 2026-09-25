@@ -11,7 +11,11 @@
 | `role` | enum (`STUDENT`, `ADMIN`) | Pflicht | Steuert die sichtbare Oberfläche |
 | `verified` | boolean | Pflicht | Muss `true` sein, damit ein Login möglich ist |
 | `emailVerificationToken` | string | UK, nullable | Nur während der Verifizierung gesetzt (Eindeutiger Schlüssel) |
+| `emailVerificationExpires` | datetime | nullable | Ablaufzeitpunkt des Verifizierungslinks (24 Stunden nach Erstellung) |
+| `emailVerificationSentAt` | datetime | nullable | Zeitpunkt des letzten Versands des Verifizierungslinks, für die 60-Sekunden-Sperre beim erneuten Anfordern |
 | `passwordResetToken` | string | UK, nullable | Nur während eines aktiven Reset-Vorgangs gesetzt (Eindeutiger Schlüssel) |
+| `passwordResetExpires` | datetime | nullable | Ablaufzeitpunkt des Reset-Links (1 Stunde nach Erstellung) |
+| `passwordChangedAt` | datetime | nullable | Zeitpunkt der letzten Passwortänderung. Alle vorher ausgestellten Sitzungstoken (JWTs) werden dadurch serverseitig ungültig. |
 | `balanceCents` | int | Pflicht | In-App-Guthaben in Cent |
 | `warningMessage` | string | nullable | Admin-Verwarnung, sichtbar nur im eigenen Profil |
 | `createdAt` / `updatedAt` | datetime | Pflicht | Zeitstempel |
@@ -63,7 +67,7 @@
 | Feld | Typ | Pflicht/Nullable | Beschreibung |
 |---|---|---|---|
 | `id` | string | PK | Eindeutige Kennung des Protokolleintrags (Primärschlüssel) |
-| `actorId` | string (FK → USER) | — | Fremdschlüssel (FK) auf `USER.id`. Kennzeichnet den ausführenden Admin. Wird bei Konto-Löschung des Admins auf `NULL` gesetzt. |
+| `actorId` | string (FK → USER) | nullable, SetNull | Fremdschlüssel (FK) auf `USER.id`. Kennzeichnet den ausführenden Admin. Wird bei Konto-Löschung des Admins auf `NULL` gesetzt. |
 | `action` | string | Pflicht | Freitext-Beschreibung der Aktion |
 | `targetType` | string | nullable | Betroffener Objekttyp. Kein Fremdschlüssel (rein informativ für Audit-Zwecke). |
 | `targetId` | string | nullable | Kein Live-Fremdschlüssel, rein informativ |
