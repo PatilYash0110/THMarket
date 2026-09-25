@@ -1,6 +1,6 @@
 # B1 Dialogspezifikation
 
-## 4.1 Dialoglandkarte
+## B1.1 Dialoglandkarte
 
 Die Dialoglandkarte zeigt alle Seiten, die ein Nutzer besuchen kann, gegliedert in einen öffentlichen Bereich, einen angemeldeten Bereich und den Admin-Bereich. Ein Logout ist von jeder Seite im angemeldeten bzw. Admin-Bereich aus möglich und wird der Übersichtlichkeit halber nur als ein Übergang zurück zur Landingpage dargestellt.
 
@@ -27,9 +27,9 @@ Die Übergänge zwischen den Dialogen sind nummeriert (1–12). Dieselben Nummer
 | 11 | Adminbereich-Dialog → Inseratdetail-Dialog | Nur lesender Meldungskontext aus dem Tab „Meldungen" ([4.2.16](#4216-adminbereich-dialog)). |
 | 12 | Angemeldeter Bereich / Adminbereich → Landingpage | Abmelden, von jedem angemeldeten Dialog aus möglich. |
 
-## 4.2 Dialogspezifikation
+## B1.2 Dialogspezifikation
 
-### 4.2.1 Landingpage
+### B1.2.1 Landingpage
 
 Abbildung 2: Landingpage von THMarket
 
@@ -59,7 +59,7 @@ Kein Formular, rein informative Seite.
 | Anmeldung öffnen | Button „Anmelden" | Navigation zum Login-Dialog | Kein Bezug | UC02 |
 | Impressum öffnen | Button „Impressum" | Navigation zum Impressum-Dialog | Kein Bezug | – |
 
-### 4.2.2 Login-Dialog
+### B1.2.2 Login-Dialog
 
 Abbildung 3: Login-Dialog von THMarket
 
@@ -97,7 +97,7 @@ Von hier gelangt man zu: „Jetzt registrieren" → Registrierungs-Dialog, „Pa
 - Fehler „Ungültige E-Mail oder Passwort".
 - Hinweis bei unverifiziertem Konto.
 
-### 4.2.3 Registrierungs-Dialog
+### B1.2.3 Registrierungs-Dialog
 
 Abbildung 4: Registrierungs-Dialog von THMarket
 
@@ -135,7 +135,7 @@ Von hier gelangt man zu: „Schon registriert? Jetzt anmelden" → Login-Dialog,
 - Fehler bei ungültiger, bereits vergebener Adresse oder zu kurzem Passwort.
 - Erfolg „Bitte bestätige deine E-Mail-Adresse".
 
-### 4.2.4 Passwort-vergessen- / Zurücksetzen-Dialog
+### B1.2.4 Passwort-vergessen- / Zurücksetzen-Dialog
 
 Abbildung 5: Passwort-vergessen- / Zurücksetzen-Dialog von THMarket
 
@@ -175,7 +175,7 @@ Von hier gelangt man zu: nach dem Setzen des neuen Passworts → Login-Dialog. R
 - Fehler bei ungültigem/abgelaufenem Link.
 - Erfolg.
 
-### 4.2.5 Impressum
+### B1.2.5 Impressum
 
 Abbildung 6: Impressum von THMarket
 
@@ -196,7 +196,7 @@ Abbildung 6: Impressum von THMarket
 
 Kein Formular, keine Aktionen außer Navigation.
 
-### 4.2.6 Marktplatz-Dialog (Startseite)
+### B1.2.6 Marktplatz-Dialog (Startseite)
 
 Abbildung 7: Marktplatz-Dialog von THMarket
 
@@ -244,7 +244,7 @@ Rücksprungmöglichkeit: dies ist die Startseite nach dem Login, es gibt keinen 
 - kein Treffer (Hinweis „Keine Inserate gefunden").
 - Fehler beim initialen Laden (Datenbank nicht erreichbar).
 
-### 4.2.7 Inseratdetail-Dialog
+### B1.2.7 Inseratdetail-Dialog
 
 Abbildung 8: Inseratdetail-Dialog von THMarket
 
@@ -298,7 +298,7 @@ Keine Eingabefelder, nur Anzeige der Inseratdaten.
 - Verkauft (Status-Badge, Kaufen/Kontaktieren ausgeblendet).
 - Fehler, falls Inserat zwischenzeitlich gelöscht wurde.
 
-### 4.2.8 Inserat-erstellen-/-bearbeiten-Dialog
+### B1.2.8 Inserat-erstellen-/-bearbeiten-Dialog
 
 Abbildung 9: Inserat-erstellen-/-bearbeiten-Dialog von THMarket
 
@@ -348,7 +348,7 @@ Rücksprungmöglichkeit: über „Abbrechen".
 - KI-Fehler.
 - Erfolg.
 
-### 4.2.9 Kauf-Dialog (Checkout)
+### B1.2.9 Kauf-Dialog (Checkout)
 
 Abbildung 10: Kauf-Dialog (Checkout) von THMarket
 
@@ -392,7 +392,7 @@ Rücksprungmöglichkeit: über „Abbrechen".
 - Fehler (ungültige Testkarte oder nicht genügend Guthaben).
 - Erfolg.
 
-### 4.2.10 Chat-Dialog
+### B1.2.10 Chat-Dialog
 
 Abbildung 11: Chat-Dialog von THMarket
 
@@ -434,7 +434,7 @@ Rücksprungmöglichkeit: über die Navigationsleiste zum Marktplatz-Dialog.
 - Empfänger nicht in der Unterhaltung (Nachricht wird als Benachrichtigung markiert, Konversation springt nach oben).
 - Verbindungsabbruch (Hinweis, automatischer Wiederverbindungsversuch).
 
-### 4.2.11 Profil-Dialog
+### B1.2.11 Profil-Dialog
 
 Abbildung 12: Profil-Dialog von THMarket
 
@@ -479,7 +479,7 @@ Kein Eingabeformular, nur die beiden Listenbereiche „Aktive Inserate" und „V
 - Standard.
 - keine eigenen Inserate vorhanden (Hinweis statt Liste).
 
-### 4.2.12 Favoriten-Dialog
+### B1.2.12 Favoriten-Dialog
 
 Abbildung 13: Favoriten-Dialog von THMarket
 
@@ -515,7 +515,7 @@ Kein Eingabeformular, nur die Liste der favorisierten Inserate (`FAVORITE.*` ver
 - Standard.
 - keine Favoriten vorhanden (Hinweis statt Liste).
 
-### 4.2.13 Guthaben-aufladen-Dialog
+### B1.2.13 Guthaben-aufladen-Dialog
 
 Abbildung 14: Guthaben-aufladen-Dialog von THMarket
 
@@ -556,7 +556,7 @@ Von hier gelangt man zu:
 - Fehler (Betrag außerhalb 5–500 €, ungültige Testkarte).
 - Erfolg (neuer Kontostand wird angezeigt).
 
-### 4.2.14 Guthaben-auszahlen-Dialog
+### B1.2.14 Guthaben-auszahlen-Dialog
 
 Abbildung 15: Guthaben-auszahlen-Dialog von THMarket
 
@@ -598,7 +598,7 @@ Von hier gelangt man zu:
 - Fehler (Betrag ungültig oder über verfügbarem Guthaben).
 - Erfolg.
 
-### 4.2.15 Kontoeinstellungen-Dialog
+### B1.2.15 Kontoeinstellungen-Dialog
 
 Abbildung 16: Kontoeinstellungen-Dialog
 
@@ -639,7 +639,7 @@ Rücksprungmöglichkeit: über die Navigationsleiste zum Profil-Dialog.
 - Standard, getrennt pro Formular.
 - Erfolg bzw. Fehler (z. B. falsches aktuelles Passwort) je Formular unabhängig voneinander.
 
-### 4.2.16 Adminbereich-Dialog
+### B1.2.16 Adminbereich-Dialog
 
 Abbildung 17: Adminbereich-Dialog
 
