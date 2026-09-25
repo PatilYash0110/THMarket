@@ -1,12 +1,14 @@
-%% Abbildung 14: Laufzeitsicht - Echtzeit-Chat
 sequenceDiagram
-    actor A as Käufer
-    actor B as Verkäufer
-    participant WS as Socket.io-Gateway
+    autonumber
+    actor A as Interessent
+    actor B as Anbieter
+    participant WS as ChatGateway (Socket.io)
     participant DB as Datenbank
-    A->>WS: connect (JWT im Handshake)
-    WS->>WS: Token prüfen
+
+    A->>WS: connect (JWT via Cookie/Handshake)
+    WS->>WS: Token pruefen (JwtService)
+    A->>WS: joinConversation(conversationId)
     A->>WS: sendMessage(conversationId, text)
     WS->>DB: Nachricht speichern
-    WS-->>B: Nachricht in Echtzeit
-    Note over A,B: Nachrichten privat - Admin hat keinen Zugriff
+    WS-->>B: Nachricht in Echtzeit zustellen
+    Note over A,B: Nachrichten privat - Admin hat keinen<br/>generellen Zugriff, nur bei Meldung mit Kontext
