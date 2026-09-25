@@ -179,6 +179,22 @@ THMarket/
 | [`docs/arch/README.md`](docs/arch/README.md) | Kapitelindex der Architektur |
 | [`docs/arch/a09-entwurfsentscheidungen.md`](docs/arch/a09-entwurfsentscheidungen.md) | Architekturentscheidungen (ADR-001 bis ADR-010) |
 
+## Eingesetzte KI-Werkzeuge
+
+Bei der Entwicklung von THMarket wurden KI-Werkzeuge eingesetzt:
+
+| Werkzeug | Eingesetzt für |
+|----------|----------------|
+| Claude (Claude Code) | Code-Vervollständigung im Backend, Entwürfe für Dokumentationstexte und ADRs, Repository- und Commit-Verwaltung |
+| Google Gemini | Code-Vervollständigung, Recherche zu Technologiealternativen, Formulierungsvorschläge |
+| ChatGPT | Formulierungsvorschläge, Gegenlesen einzelner Kapitel |
+
+Die fachlichen und architektonischen Entscheidungen wurden in der Gruppe getroffen. Generierte Vorschläge wurden vor der Übernahme geprüft und überarbeitet; Vorschläge, die nicht zum tatsächlichen Stand des Projekts passten, wurden verworfen.
+
+Ausführlich dokumentiert ist der Einsatz je Dokument in [`docs/spec/README.md`](docs/spec/README.md#eingesetzte-ki-werkzeuge) und [`docs/arch/README.md`](docs/arch/README.md#eingesetzte-ki-werkzeuge).
+
+> **Abgrenzung:** Google Gemini ist außerdem Bestandteil der Anwendung selbst — als Dienst für den Beschreibungsvorschlag beim Anlegen eines Inserats und für die Bildmoderation. Das ist eine fachliche Funktion von THMarket und kein Entwicklungswerkzeug (siehe ADR-005).
+
 ## Lizenz
 
 Studienprojekt im Rahmen des Moduls WK_1106 an der THM. Keine Lizenz zur Weiterverwendung; alle Rechte liegen bei den Autoren.
