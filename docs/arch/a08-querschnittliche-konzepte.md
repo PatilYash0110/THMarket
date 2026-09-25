@@ -1,7 +1,7 @@
-# 8. Querschnittliche Konzepte
+# A08. Querschnittliche Konzepte
 
 
-## 8.1 Persistenz
+## A08.1 Persistenz
 
 **Ziel**
 
@@ -14,7 +14,7 @@ Einheitliches Muster für Datenbankzugriffe (CRUD über Prisma) und sichere Pass
 - Passwörter werden mit bcrypt gehasht.
 - Antworten externer Dienste werden nicht persistiert; nur die resultierenden Bild-URLs bzw. Beschreibungstexte landen in der Datenbank.
 
-### 8.1.1 Zentraler Datenbankzugriff
+### A08.1.1 Zentraler Datenbankzugriff
 
 Der Datenbankzugriff läuft über einen einzigen, global bereitgestellten Prisma-Client, der die Verbindung beim Start auf- und beim Herunterfahren abbaut:
 
@@ -27,7 +27,7 @@ export class PrismaService extends PrismaClient
 }
 ```
 
-### 8.1.2 Passwörter sicher speichern
+### A08.1.2 Passwörter sicher speichern
 
 Beim Registrieren wird das Passwort gehasht, beim Login nur noch der Hash verglichen — der Klartext wird nie gespeichert:
 
@@ -44,7 +44,7 @@ if (!ok) throw new UnauthorizedException('Ungültige E-Mail-Adresse oder Passwor
 const accessToken = await this.jwt.signAsync({ sub: user.id, role: user.role });
 ```
 
-### 8.1.3 Atomare, konkurrenzsichere Schreibzugriffe
+### A08.1.3 Atomare, konkurrenzsichere Schreibzugriffe
 
 Der Kaufabschluss ist der kritischste Schreibvorgang: Zwei parallele Käufe desselben Inserats dürfen nicht beide gelingen, und kein Konto darf sein Guthaben überziehen. Die Bedingungen stehen deshalb direkt im `WHERE` der Aktualisierung, innerhalb einer Transaktion:
 
@@ -66,13 +66,13 @@ return this.prisma.$transaction(async (tx) => {
 });
 ```
 
-## 8.2 Sicherheit & Datenschutz
+## A08.2 Sicherheit & Datenschutz
 
 **Ziel**
 
 Zugang nur für verifizierte THM-Konten, Schutz der Sitzungen, strikte Rollentrennung sowie Abwehr der typischen Web-Angriffe (CSRF, ungültige Eingaben, Brute-Force).
 
-### 8.2.1 Zugang nur für verifizierte THM-Konten
+### A08.2.1 Zugang nur für verifizierte THM-Konten
 
 Die Zugehörigkeit zur THM wird serverseitig über ein festes Muster erzwungen — auch Subdomains wie `@mnd.thm.de` sind erlaubt:
 
@@ -85,7 +85,7 @@ const THM_EMAIL_PATTERN = /^[^\s@]+@([a-z0-9-]+\.)*thm\.de$/i;
 email: string;
 ```
 
-### 8.2.2 JWT im httpOnly-Cookie & Sitzungsentwertung
+### A08.2.2 JWT im httpOnly-Cookie & Sitzungsentwertung
 
 Das JWT wird bevorzugt aus einem httpOnly-Cookie gelesen (für Browser, unsichtbar für JavaScript), ersatzweise aus dem Bearer-Header (curl/Tests). Bei jeder Anfrage wird geprüft, ob die Sitzung noch gültig ist:
 
@@ -102,7 +102,7 @@ async validate(payload: JwtPayload) {
 }
 ```
 
-### 8.2.3 Rollenbasierte Zugriffskontrolle
+### A08.2.3 Rollenbasierte Zugriffskontrolle
 
 Privilegierte Admin-Routen sind hinter einem eigenen Guard gebündelt, der die Rolle aus dem geprüften JWT liest:
 
@@ -117,7 +117,7 @@ export class AdminGuard implements CanActivate {
 }
 ```
 
-### 8.2.4 CSRF-Schutz & Eingabevalidierung
+### A08.2.4 CSRF-Schutz & Eingabevalidierung
 
 Schreibende Cross-Site-Anfragen werden anhand von Origin und Sec-Fetch-Site abgewiesen, alle Eingaben laufen durch eine global konfigurierte Validierung, die unbekannte Felder verwirft:
 
@@ -137,7 +137,7 @@ app.useGlobalPipes(new ValidationPipe({
 }));
 ```
 
-### 8.2.5 Rate-Limiting gegen Missbrauch
+### A08.2.5 Rate-Limiting gegen Missbrauch
 
 Rate-Limiting ist nicht flächendeckend, sondern gezielt auf die missbrauchsanfälligen Endpunkte begrenzt. Der Modul-Default gilt nur dort, wo der `ThrottlerGuard` aktiv ist, einzelne Routen überschreiben ihn:
 
@@ -152,7 +152,7 @@ Rate-Limiting ist nicht flächendeckend, sondern gezielt auf die missbrauchsanf�
 
 *Rate-Limits der missbrauchsanfälligen Endpunkte*
 
-### 8.2.6 Fail-open bei externer Moderation
+### A08.2.6 Fail-open bei externer Moderation
 
 Fällt die KI-Bildmoderation aus, wird nicht die Kernfunktion (Inserieren) blockiert, sondern der Upload durchgelassen und der Vorfall im Audit-Log festgehalten:
 
@@ -170,13 +170,13 @@ async moderateImage(image): Promise<boolean> {
 }
 ```
 
-## 8.3 API
+## A08.3 API
 
 **Ziel**
 
 Eine einheitliche REST-Schnittstelle als einziger Zugang des Frontends zum Backend. Der Chat läuft zusätzlich über Socket.io-Events. Antworten erfolgen als JSON und geschützte Endpunkte erfordern ein JWT (Cookie oder Authorization-Header).
 
-### 8.3.1 Aufbau eines Controllers
+### A08.3.1 Aufbau eines Controllers
 
 Controller sind schlank: Sie deklarieren Route, Guards und Rate-Limit und delegieren die Fachlogik an den zugehörigen Service:
 
@@ -194,7 +194,7 @@ export class ListingsController {
 }
 ```
 
-### 8.3.2 Endpunktübersicht
+### A08.3.2 Endpunktübersicht
 
 Die folgende Tabelle listet die tatsächlichen Endpunkte, verifiziert gegen die Controller unter `backend/src`:
 
@@ -236,5 +236,4 @@ Die folgende Tabelle listet die tatsächlichen Endpunkte, verifiziert gegen die 
 | DELETE | `/admin/listings/:id` | Inserat löschen (Admin) |
 | GET | `/admin/audit-log` | Audit-Log einsehen |
 
-*Übersicht der echten API-Endpunkte, verifiziert gegen die Controller unter `backend/src`*
 
