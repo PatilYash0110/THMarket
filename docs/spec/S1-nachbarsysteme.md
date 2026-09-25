@@ -1,93 +1,33 @@
 # S1 – Nachbarsysteme
 
-S1 beschreibt die Schnittstellen zwischen THMarket und externen Nachbarsystemen. Nach aktuellem Projektstand werden drei externe Dienste verwendet: ein E-Mail-/SMTP-Dienst für die Verifizierung, ein Bildspeicherdienst für Inserat-Bilder sowie ein KI-Beschreibungsdienst zur automatischen Erstellung von Beschreibungsvorschlägen.
+S1 beschreibt die Schnittstellen zwischen THMarket und externen Nachbarsystemen. THMarket greift auf drei externe Dienste zurück, um Kernfunktionen wie E-Mail-Versand, Bildspeicherung und KI-gestützte Beschreibungsvorschläge/Bildmoderation umzusetzen. Diese Dienste sind aus Sicht von THMarket Nachbarsysteme. Das System kommuniziert lose gekoppelt mit ihnen, hat aber keinen Einfluss auf deren Verfügbarkeit oder Weiterentwicklung.
 
-## S1.1 Allgemeine Festlegungen
+### Google Gemini (`@google/genai`)
 
-Der Mailversand wird durch das Backend ausgelöst. Der E-Mail-Dienst wird ereignisgesteuert verwendet:
-
-- bei der Registrierung eines neuen Nutzers,
-- bei einer erneuten Anforderung des Verifizierungslinks.
-
-Verifizierungstokens sollen zeitlich begrenzt und nur für die vorgesehene Verifizierung nutzbar sein. Zugangsdaten zum E-Mail-Dienst dürfen nicht im öffentlich einsehbaren Repository gespeichert werden. Die konkrete Verwaltung der Zugangsdaten wird im weiteren Projektverlauf festgelegt.
-
-## S1.2 NB-01 – E-Mail-/SMTP-Dienst
-
-Der externe E-Mail-/SMTP-Dienst dient dem Versand von Bestätigungs-E-Mails. Über den enthaltenen Verifizierungslink bestätigt der Nutzer seine THM-E-Mail-Adresse. Erst nach erfolgreicher Verifizierung kann das Konto für die Anmeldung verwendet werden.
-
-| Aspekt | Inhalt |
+| Attribut | Beschreibung |
 |---|---|
-| Nachbarsystem | Externer E-Mail-/SMTP-Dienst |
-| Zweck | Versand von E-Mails zur Verifizierung der THM-E-Mail-Adresse |
-| Kommunikationsrichtung | Ausgehend vom THMarket-Backend zum E-Mail-Dienst |
-| Auslöser | Registrierung oder erneute Anforderung des Verifizierungslinks |
-| Eingaben | Empfängeradresse und Verifizierungslink |
-| Ergebnis | E-Mail wird versendet oder ein Versandfehler wird gemeldet |
-| Betroffener Anwendungsfall | UC02 – Registrierung |
-| Kommunikationsfrequenz | Ereignisgesteuert |
+| **Zweck** | Automatischer Beschreibungsvorschlag beim Erstellen eines Inserats (UC04) sowie Inhaltsprüfung hochgeladener Fotos auf unangemessene Inhalte. |
+| **Zugriffsart** | REST-Aufruf über das offizielle SDK `@google/genai`, ausschließlich serverseitig aus dem NestJS-Backend heraus. |
+| **Datenformat** | JSON-Request mit Titel/Kategorie/Hinweistext sowie Bilddaten. JSON-Response mit generiertem Beschreibungstext bzw. Moderationsergebnis. |
+| **Authentifizierung** | API-Key, serverseitig als Umgebungsvariable verwaltet. |
+| **Fehlerverhalten** | Ist der Dienst nicht erreichbar oder liefert einen Fehler, wird der Upload dennoch zugelassen und der Ausfall im Audit-Log vermerkt, statt das Erstellen von Inseraten zu blockieren. Beim Beschreibungsvorschlag bleibt bei einem Fehlschlag die manuelle Eingabe uneingeschränkt möglich. |
 
-## S1.2b NB-02 – Externer Bildspeicherdienst
+### Cloudinary
 
-Der externe Bildspeicherdienst dient der Speicherung der bei einem Inserat hochgeladenen Bilder. Vor bzw. während der Verarbeitung werden sensible Metadaten (u. a. Standortdaten) aus den Bildern entfernt.
-
-| Aspekt | Inhalt |
+| Attribut | Beschreibung |
 |---|---|
-| Nachbarsystem | Externer Bildspeicherdienst |
-| Zweck | Speicherung der bei einem Inserat hochgeladenen Bilder |
-| Kommunikationsrichtung | Ausgehend vom THMarket-Backend zum Speicherdienst |
-| Auslöser | Hochladen eines oder mehrerer Bilder beim Erstellen eines Inserats |
-| Eingaben | Bilddatei(en) |
-| Ergebnis | Bild wird gespeichert, URL wird zurückgegeben, oder ein Fehler wird gemeldet |
-| Betroffener Anwendungsfall | UC03 – Inserat erstellen |
-| Kommunikationsfrequenz | Ereignisgesteuert |
+| **Zweck** | Persistente Speicherung und Auslieferung von Inseratbildern (UC04, UC05). |
+| **Zugriffsart** | REST-Upload über das offizielle Cloudinary-Node-SDK, ausschließlich serverseitig, der Client lädt nie direkt zu Cloudinary hoch. |
+| **Datenformat** | `multipart/form-data` beim Upload. JSON-Response mit der dauerhaften Bild-URL, die im Feld `LISTING.images` gespeichert wird. |
+| **Authentifizierung** | API-Key und API-Secret, serverseitig verwaltet. |
+| **Fehlerverhalten** | Schlägt der Upload fehl, wird das Inserat nicht gespeichert, da `images` ein Pflichtfeld mit 1–6 Einträgen ist, daher wird dem Nutzer eine Fehlermeldung angezeigt. |
 
-## S1.2c NB-03 – Externer KI-Beschreibungsdienst
+### Gmail SMTP
 
-Der externe KI-Beschreibungsdienst erzeugt aus den hochgeladenen Bildern einen Vorschlag für Titel, Beschreibung und Kategorie eines Inserats. Ist der Dienst nicht erreichbar, bleibt die manuelle Eingabe weiterhin möglich.
-
-| Aspekt | Inhalt |
+| Attribut | Beschreibung |
 |---|---|
-| Nachbarsystem | Externer KI-Beschreibungsdienst |
-| Zweck | Automatische Erzeugung eines Vorschlags für Titel, Beschreibung und Kategorie |
-| Kommunikationsrichtung | Ausgehend vom THMarket-Backend zum KI-Dienst |
-| Auslöser | Anforderung eines Beschreibungsvorschlags beim Erstellen eines Inserats |
-| Eingaben | Bilddatei(en) |
-| Ergebnis | Vorschlag wird zurückgegeben, oder ein Fehler wird gemeldet |
-| Betroffener Anwendungsfall | UC03 – Inserat erstellen |
-| Kommunikationsfrequenz | Ereignisgesteuert |
-
-## S1.3 Fehlerbehandlung und Sicherheit
-
-Für die Anbindung gelten nach aktuellem Projektstand folgende Anforderungen:
-
-- Ist der E-Mail-Dienst nicht erreichbar, darf die Anwendung nicht abstürzen.
-- Der Nutzer soll eine verständliche Fehlermeldung erhalten.
-- Ein Benutzerkonto bleibt unverifiziert, bis der Verifizierungslink erfolgreich aufgerufen wurde.
-- Kann eine E-Mail nicht zugestellt werden oder ist der Link nicht mehr gültig, soll ein neuer Verifizierungslink angefordert werden können.
-- Verifizierungstokens sollen zeitlich begrenzt sein.
-- Zugangsdaten zum E-Mail-Dienst dürfen nicht im öffentlichen Repository gespeichert werden.
-- An den E-Mail-Dienst sollen nur die für den Versand erforderlichen Daten übermittelt werden.
-
-## S1.4 Abgrenzung der Chat-Kommunikation
-
-Die Echtzeit-Kommunikation des Chats wird über Socket.io realisiert. Dabei handelt es sich um eine bidirektionale und ereignisgesteuerte Verbindung zwischen dem React-Frontend und dem Backend.
-
-Socket.io ist kein externes Nachbarsystem, da sowohl das Frontend als auch das Backend Bestandteile von THMarket sind. Die Verbindung wird hier nur zur Abgrenzung erwähnt. Die konkrete technische Ausgestaltung gehört zur Architektur der Anwendung.
-
-Bei einem Verbindungsabbruch soll der Nutzer informiert werden. Außerdem ist ein automatischer Wiederverbindungsversuch vorgesehen. Nachrichten werden entsprechend der Spezifikation in der PostgreSQL-Datenbank gespeichert und bleiben dadurch auch nach einem erneuten Aufruf des Chats verfügbar.
-
-## S1.5 Nicht Bestandteil von S1
-
-Weitere externe Nachbarsysteme sind für die derzeit beschriebene Version von THMarket nicht vorgesehen.
-
-Insbesondere sind nicht Bestandteil von THMarket:
-
-- Anbindung an einen echten Zahlungsdienstleister (der Kauf wird lediglich simuliert),
-- Versand- oder Logistikanbindung.
-
-## S1.6 Querverweise
-
-- UC02 – Registrierung
-- UC07 – Chat mit Nutzer führen
-- P2 – Architekturüberblick
-- N1 – Nichtfunktionale Anforderungen
+| **Zweck** | Versand von Verifizierungs-E-Mails (UC01) und Passwort-Reset-E-Mails (UC03). |
+| **Zugriffsart** | SMTP-Protokoll mit App-Passwort-Authentifizierung, angesteuert aus dem Backend über `nodemailer`. |
+| **Datenformat** | Inhalte werden serverseitig aus Textbausteinen zusammengesetzt. |
+| **Authentifizierung** | Google-App-Passwort, serverseitig als Umgebungsvariable hinterlegt. |
+| **Fehlerverhalten** | Der Datenbankeintrag (neues Konto bei UC01, Reset-Token bei UC03) wird angelegt, bevor der Mailversand ausgelöst wird; schlägt `sendMail` fehl, bricht die Anfrage mit einer Serverfehlermeldung ab, der zuvor angelegte Datensatz bleibt aber bestehen. Ist `GMAIL_USER`/`GMAIL_APP_PASSWORD` nicht gesetzt (z. B. in einer lokalen Entwicklungsumgebung), wird gar keine E-Mail versendet, sondern der Link nur serverseitig geloggt. |
