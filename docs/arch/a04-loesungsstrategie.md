@@ -1,4 +1,4 @@
-# 4. Lösungsstrategie
+# A04. Lösungsstrategie
 
 
 Die wichtigsten Architekturentscheidungen wurden so getroffen, dass sich THMarket im Rahmen eines Einzelprojekts schnell umsetzen lässt, sicher ist, zuverlässig läuft und sich später noch erweitern lässt.
