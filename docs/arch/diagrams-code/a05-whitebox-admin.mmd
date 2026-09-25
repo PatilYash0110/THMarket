@@ -1,0 +1,18 @@
+flowchart TB
+  subgraph ADMWB["Whitebox Admin · Verfeinerungsebene 2"]
+    direction TB
+    REP["Meldungsverwaltung"]:::sub
+    ACT["Maßnahmen (Inserat löschen · Nutzer verwarnen/löschen)"]:::sub
+    AUD["Audit-Log"]:::sub
+  end
+  CHTX["Chat (Meldungskontext)"]:::core
+  DBX[("Datenbank")]:::db
+  REP -->|liest Chat-Verlauf über| CHTX
+  REP --> ACT
+  ACT -->|protokolliert in| AUD
+  ACT --> DBX
+  AUD --> DBX
+  REP --> DBX
+  classDef sub fill:#e7f5ff,stroke:#4dabf7,color:#0b3a66
+  classDef core fill:#d0ebff,stroke:#1971c2,color:#0b3a66
+  classDef db fill:#1d2b53,stroke:#101a3a,color:#ffffff
