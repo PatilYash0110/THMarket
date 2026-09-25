@@ -1,4 +1,4 @@
-# 3.1 Datenmodell (ER-Diagramm)
+# D1 Datenmodell
 
 Zentrale Entität ist USER. Jeder Nutzer kann mehrere Inserate als Verkäufer anlegen (sellerId) und nach einem Kauf als Käufer referenziert werden (buyerId). Favoriten bilden die n:m-Beziehung zwischen Nutzer und Inserat ab. Meldungen (REPORT) referenzieren wahlweise ein Inserat oder einen Nutzer als Ziel und protokollieren zusätzlich einen Snapshot des gemeldeten Namens/Titels, damit die Meldung auch nach einer späteren Löschung noch lesbar bleibt. Für den Chat wird pro Inserat und Interessent eine CONVERSATION angelegt, die mehrere MESSAGE-Einträge enthält. Jede Admin-Aktion wird als AUDITLOGENTRY protokolliert. Ändert ein Nutzer sein Passwort, wird USER.passwordChangedAt gesetzt — alle zuvor ausgestellten Sitzungstoken (JWTs) werden dadurch serverseitig ungültig.
 
@@ -6,7 +6,7 @@ Die meisten Fremdschlüssel-Beziehungen sind bewusst nullable und nutzen SET NUL
 
 Es gibt bewusst keine eigenständigen Entitäten für Bilder, Kategorien, Transaktionen oder Bewertungen. Bilder sind eine einfache URL-Liste direkt am Inserat, die Kategorie ist ein Textfeld mit fester Werteliste, ein Kauf wird durch das Setzen von status/buyerId am Inserat selbst abgebildet.
 
-*Abbildung 2: Datenmodell von THMarket (ER-Diagramm)*
+*Abbildung 1: Datenmodell von THMarket (ER-Diagramm)*
 
 <details>
 <summary>Diagramm anzeigen</summary>
