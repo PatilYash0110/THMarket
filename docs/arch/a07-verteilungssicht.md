@@ -8,7 +8,7 @@ Die Softwarebausteine werden auf verschiedene Infrastruktur-Komponenten verteilt
 <details>
 <summary>📊 Diagramm anzeigen</summary>
 
-![Verteilungssicht](diagram_png/15-registrierung-verifizierung.png)
+![Verteilungssicht](diagram_images/15-registrierung-verifizierung.png)
 
 </details>
 
