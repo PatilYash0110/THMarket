@@ -17,9 +17,9 @@ Das Grundmuster gilt für die meisten Anfragen: Der Nutzer löst im Frontend ein
 *Abbildung 9: Laufzeitsicht — Allgemeiner Ablauf*
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary>Diagramm anzeigen</summary>
 
-![Laufzeitsicht — Allgemeiner Ablauf](diagram_images/09-ebene2-whitebox-listings.png)
+![Laufzeitsicht — Allgemeiner Ablauf](diagram_images/10-allgemeiner-ablauf.png)
 
 </details>
 
@@ -38,9 +38,9 @@ Das Grundmuster gilt für die meisten Anfragen: Der Nutzer löst im Frontend ein
 *Abbildung 10: Laufzeitsicht — Registrierung & Verifizierung*
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary>Diagramm anzeigen</summary>
 
-![Laufzeitsicht — Registrierung & Verifizierung](diagram_images/10-allgemeiner-ablauf.png)
+![Laufzeitsicht — Registrierung & Verifizierung](diagram_images/15-registrierung-verifizierung.png)
 
 </details>
 
@@ -60,9 +60,9 @@ Das Grundmuster gilt für die meisten Anfragen: Der Nutzer löst im Frontend ein
 *Abbildung 11: Laufzeitsicht — Inserat mit KI-Beschreibung*
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary>Diagramm anzeigen</summary>
 
-![Laufzeitsicht — Inserat mit KI-Beschreibung](diagram_images/11-echtzeit-chat.png)
+![Laufzeitsicht — Inserat mit KI-Beschreibung](diagram_images/12-inserat-ki-beschreibung.png)
 
 </details>
 
@@ -80,9 +80,9 @@ Das Grundmuster gilt für die meisten Anfragen: Der Nutzer löst im Frontend ein
 *Abbildung 12: Laufzeitsicht — Echtzeit-Chat*
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary>Diagramm anzeigen</summary>
 
-![Laufzeitsicht — Echtzeit-Chat](diagram_images/12-inserat-ki-beschreibung.png)
+![Laufzeitsicht — Echtzeit-Chat](diagram_images/11-echtzeit-chat.png)
 
 </details>
 
@@ -100,9 +100,9 @@ Das Grundmuster gilt für die meisten Anfragen: Der Nutzer löst im Frontend ein
 *Abbildung 13: Laufzeitsicht — Mock-Kauf*
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary>Diagramm anzeigen</summary>
 
-![Laufzeitsicht — Mock-Kauf](diagram_images/13-meldung.png)
+![Laufzeitsicht — Mock-Kauf](diagram_images/14-mock-kauf.png)
 
 </details>
 
@@ -119,8 +119,8 @@ Das Grundmuster gilt für die meisten Anfragen: Der Nutzer löst im Frontend ein
 *Abbildung 14: Laufzeitsicht — Meldung*
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary>Diagramm anzeigen</summary>
 
-![Laufzeitsicht — Meldung](diagram_images/14-mock-kauf.png)
+![Laufzeitsicht — Meldung](diagram_images/13-meldung.png)
 
 </details>
