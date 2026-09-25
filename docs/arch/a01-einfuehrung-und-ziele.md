@@ -1,10 +1,10 @@
-# 1. Einführung und Ziele
+# A01. Einführung und Ziele
 
 THMarket ist eine reine Webanwendung, die ausschließlich Studierenden der Technischen Hochschule Mittelhessen (THM) einen campusinternen Marktplatz für gebrauchte Artikel bietet.
 
 Nur Nutzer mit einer gültigen `@thm.de`-Adresse und anschließender E-Mail-Verifizierung erhalten Zugang zur Plattform. Verifizierte Nutzer können Inserate anlegen, Bilder hochladen, sich mithilfe von KI einen Beschreibungsentwurf erzeugen lassen, Artikel durchsuchen und filtern, Inserate favorisieren, über einen Chat kommunizieren und Käufe über eine simulierte Zahlungsfunktion abwickeln. Ein Melde- und Admin-System unterstützt die Moderation der Plattform.
 
-## 1.1 Anforderungsübersicht
+## A01.1 Anforderungsübersicht
 
 Verifizierte THM-Nutzer können Inserate erstellen und verwalten. Ein Inserat enthält Titel, Beschreibungstext, Kategorie (aus einer festen Werteliste), Preis, ein bis sechs Fotos und die Option, ob ein Sofortkauf möglich ist oder nur eine Kontaktaufnahme. Die Beschreibung kann optional mithilfe von Google Gemini aus den hochgeladenen Fotos und durch den User gegebenen Hinweis vorgeschlagen werden.
 
@@ -20,7 +20,7 @@ THMarket umfasst nach aktuellem Projektstand nicht:
 
 Die KI unterstützt ausschließlich die Generierung eines Beschreibungsvorschlags sowie die Inhaltsmoderation hochgeladener Fotos.
 
-## 1.2 Qualitätsziele
+## A01.2 Qualitätsziele
 
 | Prio | Ziel | Messkriterium | Nutzen |
 |---|---|---|---|
@@ -32,7 +32,7 @@ Die KI unterstützt ausschließlich die Generierung eines Beschreibungsvorschlag
 
 *Qualitätsziele im Überblick*
 
-## 1.3 Stakeholder
+## A01.3 Stakeholder
 
 **Nutzende Stakeholder**
 
