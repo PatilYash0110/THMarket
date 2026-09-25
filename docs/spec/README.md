@@ -45,7 +45,7 @@
 | Baustein | Titel | Status | Datei |
 |---|---|---|---|
 | S1 | Nachbarsysteme | ✅ | [`S1-nachbarsysteme.md`](S1-nachbarsysteme.md) |
-| S2 | Datenmigration | ⛔ | — |
+| S2 | Datenmigration | ✅ | [`S2-datenmigration.md`](S2-datenmigration.md) |
 | S3 | Inbetriebnahme | ✅ | [`S3-inbetriebnahme.md`](S3-inbetriebnahme.md) |
 
 ### 6. Querschnittliche Aspekte
@@ -53,14 +53,14 @@
 | Baustein | Titel | Status | Datei |
 |---|---|---|---|
 | N1 | Nichtfunktionale Anforderungen | ✅ | [`N1-nichtfunktional.md`](N1-nichtfunktional.md) |
-| N2 | Querschnittskonzepte | ✅ | [`N2-querschnittskonzepte.md`](N2-querschnittsknozepte.md) |
+| N2 | Querschnittskonzepte | ✅ | [`N2-querschnittskonzepte.md`](N2-querschnittskonzepte.md) |
 
 ### 7. Ergänzende Bausteine
 
 | Baustein | Titel | Status | Datei |
 |---|---|---|---|
 | E1 | Leitfaden zum Lesen | ✅ | Diese Readme File |
-| E2 | Glossar | 🛠 | `` |
+| E2 | Glossar | 🛠 | [`E2-Glossar.md`](E2-glossar.md) |
 
 ## Nicht anwendbare Bausteine
 
