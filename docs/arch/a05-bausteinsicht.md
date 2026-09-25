@@ -100,7 +100,7 @@ Besteht aus drei Teilen: **Konversationsverwaltung**, **Nachrichtenversand** und
 Der Nachrichtenversand übergibt jede einzelne Nachricht in Echtzeit an die Nachrichten Persistenz, die sie dauerhaft in der Datenbank ablegt.
 Auch die Konversationsverwaltung greift eigenständig auf die Datenbank zu, um Konversationen anzulegen und Teilnehmer zuzuordnen.
  
-![Whitebox Kommunikation](diagram_images/a05-bausteinsicht_whitebox_kommunikation.png)
+![Whitebox Kommunikation](diagram_images/08-ebene2-whitebox-chat.png)
  
 *(Quelltext: `diagrams-code/a05-bausteinsicht_whitebox_kommunikation.plantuml`)*
  
