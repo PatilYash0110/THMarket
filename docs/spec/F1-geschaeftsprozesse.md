@@ -2,68 +2,49 @@
 
 THMarket unterstützt den Verkauf und die Vermietung von Gegenständen zwischen Studierenden der THM. Der zentrale Geschäftsprozess beginnt mit der Registrierung eines Nutzers und reicht über die Nutzung des Marktplatzes bis zur Kontaktaufnahme zwischen Interessent und Anbieter. Zusätzlich gibt es Verwaltungs- und Moderationsprozesse, die durch einen Administrator durchgeführt werden.
 
-### Beteiligte Akteure
+## 2.1 Akteure
 
-In THMarket gibt es vier verschiedene Arten von Akteuren. Jede Rolle hat eigene Rechte, Aufgaben und Verantwortlichkeiten und bildet die Grundlage für die im Use-Case-Diagramm dargestellten Anwendungsfälle.
+In THMarket gibt es vier Akteure. Jeder hat eigene Rechte und typische Aktionen und bildet die Grundlage für die in [Kapitel 2.3–2.16](#23-uc01--registrieren) beschriebenen Use Cases.
 
-#### 1. Gast
+### 1. Gast
 
-Der Gast ist ein nicht eingeloggter Besucher von THMarket. Da die Plattform geschlossen ist, kann er ausschließlich die Login- und Registrierungsseite sehen. Inserate, der Marktplatz und alle personalisierten Inhalte sind für ihn nicht zugänglich.
+Der Gast ist ein Besucher ohne aktive Sitzung. Er sieht ausschließlich die Landingpage, das Impressum sowie Registrierung und Login — keine Inserate, keine Nutzerdaten.
 
-Typische Aktionen:
+**Typische Aktionen:**
+- Registrierung durchführen (UC01)
+- Login starten (UC02)
+- Passwort-zurücksetzen-Vorgang starten (UC03)
 
-- Registrierung mit THM-E-Mail starten
-- Login starten
+### 2. Registrierter Nutzer
 
-#### 2. User (registrierter Nutzer)
+Der registrierte Nutzer hat ein Konto angelegt, dessen E-Mail-Adresse aber noch nicht über den Bestätigungslink verifiziert wurde. Er kann sich noch nicht anmelden; die einzige mögliche Aktion ist, den Verifizierungslink zu öffnen oder einen neuen anzufordern.
 
-Der User ist ein registrierter Nutzer, dessen THM-E-Mail-Adresse bereits verifiziert wurde. Er kann sich anmelden und wird nach dem Login zum „eingeloggten Nutzer“. Diese Rolle beschreibt den registrierten Zustand ohne aktive Sitzung.
+**Typische Aktionen:**
+- Verifizierungslink öffnen (Teil von UC01)
+- Neuen Verifizierungslink anfordern (Teil von UC01)
 
-Typische Aktionen:
+### 3. Student (angemeldet)
 
-- Login starten
+Der Student ist die aktive Form eines verifizierten Nutzers nach erfolgreichem Login (Rolle `STUDENT`). Er hat Zugriff auf sämtliche Marktplatzfunktionen: Inserate durchsuchen, erstellen und verwalten, chatten, kaufen, sein In-App-Guthaben verwalten sowie Inserate und Nutzer melden.
 
-#### 3. Eingeloggter Nutzer
+**Typische Aktionen:**
+- Inserate durchsuchen und favorisieren (UC06)
+- Inserat erstellen und verwalten (UC04, UC05)
+- Anbieter kontaktieren / chatten (UC07)
+- Kauf abschließen (UC08)
+- Guthaben aufladen und auszahlen (UC09, UC10)
+- Inserat oder Nutzer melden (UC11, UC12)
 
-Der eingeloggte Nutzer ist die aktive Form des Users nach erfolgreicher Anmeldung. Er hat Zugriff auf alle Kernfunktionen der Plattform. Er kann sowohl als Anbieter (Inserate erstellen und verwalten) als auch als Interessent (Inserate suchen, Favoriten speichern, Kontakt aufnehmen) auftreten – beide Rollen werden durch denselben Nutzer wahrgenommen.
+### 4. Administrator
 
-Typische Aktionen:
+Der Administrator ist ein spezieller Akteur mit Rolle `ADMIN`, angelegt über ein Seed-Skript. Er meldet sich über denselben Login-Dialog an wie ein Student, sieht nach dem Login aber eine eigene, rollenbasierte Oberfläche statt des Marktplatzes. Er nutzt selbst keine Marktplatzfunktionen und kann insbesondere keine eigenen Inserate erstellen.
 
-- Inserat erstellen (mit Bildern)
-- Inserate durchsuchen und filtern
-- Inseratdetails ansehen
-- Favorit speichern
-- Chat mit anderen Nutzern führen
-- Inserat melden
-- Inserat kaufen
-- Verkäufer bewerten
-- Eigene Inserate verwalten (bearbeiten/löschen)
-
-#### 4. Admin
-
-Der Admin ist ein spezieller Akteur mit erweiterten Verwaltungs- und Kontrollrechten. Er kümmert sich um die Pflege der Nutzerkonten sowie die Bearbeitung von Meldungen und unangemessenen Inseraten. Die Marktplatzfunktionen selbst nutzt er im Rahmen seiner Rolle nicht.
-
-Typische Aktionen:
-
-- Nutzerkonten verwalten (bearbeiten, sperren, löschen)
-- Gemeldete Inserate prüfen und Maßnahmen ergreifen (Verwarnung, Ausblenden, Sperre)
-- Meldungen bearbeiten
-- Logs/Aktivitäten einsehen
-
-![Use-Case-Diagramm der THMarket-Anwendung](diagram_images/f1-use-case-diagramm.png)
-
-*Abbildung 3: Use-Case-Diagramm der THMarket-Anwendung*
+**Typische Aktionen:**
+- Meldungen bearbeiten (UC13)
+- Nutzerkonten verwalten, insbesondere löschen (UC14)
+- Inserate verwalten, insbesondere löschen (UC14)
+- Audit-Log einsehen (UC14)
 
 ### Typischer Geschäftsprozess
 
-Der typische Ablauf beginnt mit dem Aufruf der Anwendung und der Weiterleitung auf die Login-Seite. Dort meldet sich der Nutzer entweder mit bestehenden Zugangsdaten an oder legt über die Registrierung ein neues Konto an, das anschließend per E-Mail-Verifizierung bestätigt werden muss. Nach erfolgreichem Login gelangt der Nutzer auf den Marktplatz, auf dem Inserate angezeigt, durchsucht und geöffnet werden können. Von dort sind alle weiteren Kernfunktionen wie Inserat erstellen, Favorit speichern, Chat, Kaufen und Melden erreichbar.
-
-Kommt ein Kauf zustande, schließt der Käufer diesen über den simulierten Kauf-Dialog ab; eine Anbindung an einen echten Zahlungsdienstleister gibt es nicht. Die eigentliche Übergabe des Gegenstands klären Interessent und Anbieter über den integrierten Chat und regeln sie außerhalb des Systems.
-
-Gemeldete Inserate werden im Adminbereich angezeigt. Ein Administrator prüft die Meldung und kann eine Verwarnung aussprechen, das Inserat ausblenden oder den Nutzer sperren.
-
-![Aktivitätsdiagramm zur Marktplatznutzung nach dem Login](diagram_images/f1-aktivitaetsdiagramm-marktplatznutzung.png)
-
-*Abbildung 4: Aktivitätsdiagramm „Marktplatznutzung nach Login beim App-Start“*
-
-Neben dem typischen Ablauf der Marktplatznutzung gibt es einen Moderationsprozess für gemeldete Inserate sowie Verwaltungsprozesse für Nutzerkonten. Diese Abläufe werden in F2 genauer beschrieben.
+Der typische Lebenszyklus eines Nutzers durchläuft folgende Stationen, die in den Use Cases UC01–UC14 im Detail beschrieben sind:
