@@ -4,7 +4,7 @@ THMarket unterstützt den Verkauf und die Vermietung von Gegenständen zwischen 
 
 ## F1.1 Akteure
 
-In THMarket gibt es vier Akteure. Jeder hat eigene Rechte und typische Aktionen und bildet die Grundlage für die in [Kapitel 2.3–2.16](#23-uc01--registrieren) beschriebenen Use Cases.
+In THMarket gibt es vier Akteure. Jeder hat eigene Rechte und typische Aktionen und bildet die Grundlage für die in Kapitel F2 beschriebenen Use Cases.
 
 <br>
 
@@ -70,7 +70,7 @@ Der Administrator ist ein spezieller Akteur mit Rolle `ADMIN`, angelegt über ei
 
 Der typische Lebenszyklus eines Nutzers durchläuft folgende Stationen, die in den Use Cases UC01–UC14 im Detail beschrieben sind:
 
-*Abbildung 4: Geschäftsprozessüberblick von THMarket (gestrichelt = optionaler Pfad, grau = Admin-Pfad)*
+*Abbildung 1: Geschäftsprozessüberblick von THMarket (gestrichelt = optionaler Pfad, grau = Admin-Pfad)*
 
 <details>
 <summary>Diagramm anzeigen</summary>
