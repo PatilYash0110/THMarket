@@ -25,6 +25,61 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 
 *Tabelle: Use Case UC01 – Registrieren*
 
+#### Sequenzdiagramm UC01 – Registrieren
+
+<details>
+<summary>Diagramm anzeigen</summary>
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Gast as Gast (Student)
+    participant System as THMarket
+    participant DB as Datenbank
+    participant Mail as Gmail SMTP
+
+    Gast->>System: Öffnet Registrierung, gibt Name, THM-E-Mail und Passwort ein
+    System->>System: Prüft Format (@thm.de, Passwortstärke)
+
+    alt Format ungültig
+        System-->>Gast: Zeigt Feldfehler an
+    else Format gültig
+        System->>DB: Prüft, ob E-Mail bereits registriert ist
+        DB-->>System: Ergebnis
+
+        alt E-Mail bereits vergeben
+            System-->>Gast: Zeigt Fehler: Konto existiert bereits, bitte melde dich an (ggf. zuerst E-Mail bestätigen)
+        else E-Mail noch frei
+            System->>DB: Legt unverifiziertes Konto an, erzeugt Bestätigungslink (24 Stunden gültig)
+            System->>Mail: Löst Verifizierungs-E-Mail aus
+            Mail-->>Gast: E-Mail kommt an
+            System-->>Gast: Zeigt Erfolgsmeldung
+
+            Gast->>System: Öffnet Bestätigungslink aus der E-Mail
+            System->>DB: Prüft Link auf Gültigkeit
+            DB-->>System: Ergebnis
+
+            alt Link unbekannt oder abgelaufen
+                System-->>Gast: Zeigt Fehlermeldung
+                opt Link erneut anfordern (höchstens alle 60 Sekunden)
+                    Gast->>System: Fordert neuen Link an
+                    System->>Mail: Versendet neuen Bestätigungslink
+                    System-->>Gast: Zeigt Erfolgsmeldung an
+                end
+            else Konto bereits verifiziert
+                System-->>Gast: Zeigt Erfolg an
+            else Link gültig, noch nicht verifiziert
+                System->>DB: Setzt Konto auf verifiziert
+                System-->>Gast: Zeigt Erfolg
+            end
+        end
+    end
+```
+
+</details>
+
+*(Mermaid-Quelldatei: [`diagrams-code/f2-uc01-register.mermaid`](diagrams-code/f2-uc01-register.mermaid))*
+
 ## 2.4 UC02 – Anmelden
 
 | Abschnitt | Inhalt / Erläuterung |
@@ -47,6 +102,52 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 | **Qualitäten** | Der Anmeldevorgang benötigt nur einen einzigen Datenbankzugriff. Passwörter werden nie im Klartext verglichen, sondern als Hash geprüft (NFA-02). |
 
 *Tabelle: Use Case UC02 – Anmelden*
+
+#### Sequenzdiagramm UC02 – Anmelden
+
+<details>
+<summary>Diagramm anzeigen</summary>
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Nutzer as Registrierter Nutzer
+    participant System as THMarket
+    participant DB as Datenbank
+
+    Nutzer->>System: Gibt E-Mail-Adresse und Passwort ein
+    System->>DB: Sucht Konto zur E-Mail-Adresse
+    DB-->>System: Kontodaten
+
+    alt Kein Konto gefunden
+        System-->>Nutzer: Zeigt Fehlermeldung
+    else Konto gefunden
+        System->>System: Prüft Verifizierungsstatus
+
+        alt Konto nicht verifiziert
+            System-->>Nutzer: Zeigt Hinweis zur Verifizierung
+        else Konto verifiziert
+            System->>System: Prüft Passwort
+
+            alt Passwort falsch
+                System-->>Nutzer: Zeigt Fehlermeldung
+            else Passwort korrekt
+                System->>System: Erstellt Sitzung
+                System-->>Nutzer: Weiterleitung zum Marktplatz
+            end
+        end
+    end
+
+    Nutzer->>System: Verwendet die Plattform
+
+    Nutzer->>System: Klickt „Abmelden"
+    System->>System: Beendet Sitzung
+    System-->>Nutzer: Weiterleitung zur Login-Seite
+```
+
+</details>
+
+*(Mermaid-Quelldatei: [`diagrams-code/f2-uc02-login.mermaid`](diagrams-code/f2-uc02-login.mermaid))*
 
 ## 2.5 UC03 – Passwort zurücksetzen
 
@@ -71,6 +172,50 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 
 *Tabelle: Use Case UC03 – Passwort zurücksetzen*
 
+#### Sequenzdiagramm UC03 – Passwort zurücksetzen
+
+<details>
+<summary>Diagramm anzeigen</summary>
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Nutzer as Nutzer (Passwort vergessen)
+    participant System as THMarket
+    participant DB as Datenbank
+    participant Mail as Gmail SMTP
+
+    Nutzer->>System: Klickt „Passwort vergessen?", gibt E-Mail-Adresse ein
+    System->>DB: Sucht Konto zur E-Mail-Adresse
+    DB-->>System: Kontodaten (falls vorhanden)
+
+    alt Konto existiert, aber unverifiziert
+        System-->>Nutzer: Zeigt Hinweis zur Verifizierung
+    else Konto existiert nicht ODER existiert und ist verifiziert
+        opt Nur falls Konto tatsächlich existiert und verifiziert ist
+            System->>DB: Erstellt Reset-Link
+            System->>Mail: Versendet Reset-E-Mail
+        end
+        System-->>Nutzer: Zeigt Hinweis zur Sendung der E-Mail
+        Mail-->>Nutzer: Sendung der E-Mail
+    end
+
+    Nutzer->>System: Öffnet Reset-Link aus der E-Mail, gibt neues Passwort ein
+    System->>DB: Prüft Link (gültig, nicht abgelaufen)
+    DB-->>System: Ergebnis
+
+    alt Link ungültig oder abgelaufen
+        System-->>Nutzer: Zeigt Fehlermeldung
+    else Link gültig
+        System->>DB: Setzt neues Passwort
+        System-->>Nutzer: Zeigt Erfolg an
+    end
+```
+
+</details>
+
+*(Mermaid-Quelldatei: [`diagrams-code/f2-uc03-passwort_zuruecksetzen.mermaid`](diagrams-code/f2-uc03-passwort_zuruecksetzen.mermaid))*
+
 ## 2.6 UC04 – Inserat erstellen
 
 | Abschnitt | Inhalt / Erläuterung |
@@ -93,6 +238,44 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 | **Qualitäten** | – |
 
 *Tabelle: Use Case UC04 – Inserat erstellen*
+
+#### Sequenzdiagramm UC04 – Inserat erstellen
+
+<details>
+<summary>📊 Diagramm anzeigen</summary>
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Student as Student
+    participant System as THMarket
+    participant KI as Gemini (KI)
+    participant Bilder as Cloudinary
+    participant DB as Datenbank
+
+    Student->>System: Öffnet „Inserat erstellen"
+    Student->>System: Gibt Details ein
+    Student->>System: Wählt Fotos aus
+
+    opt KI-Beschreibung generieren
+        System->>KI: Sendet Details
+        KI-->>System: Liefert Beschreibung
+    end
+
+    Student->>System: Klickt „Inserat veröffentlichen"
+    System->>System: Prüft Pflichtfelder
+
+        alt Prüfung fehlgeschlagen
+            System-->>Student: Zeigt Feldfehler an
+        else Prüfung erfolgreich
+            System->>DB: Speichert Inserat
+            System-->>Student: Zeigt Erfolg an, Inserat ist veröffentlicht
+    end
+```
+
+</details>
+
+*(Mermaid-Quelldatei: [`diagrams-code/f2-uc04-inserat_erstellen.mermaid`](diagrams-code/f2-uc04-inserat_erstellen.mermaid))*
 
 ## 2.7 UC05 – Inserat verwalten
 
@@ -117,6 +300,47 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 
 *Tabelle: Use Case UC05 – Inserat verwalten*
 
+#### Sequenzdiagramm UC05 – Inserat verwalten
+
+<details>
+<summary>Diagramm anzeigen</summary>
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Verkaeufer as Verkäufer (Eigentümer)
+    participant System as THMarket
+    participant DB as Datenbank
+
+    Verkaeufer->>System: Öffnet Profil, klickt auf ein eigenes aktives Inserat
+    System-->>Verkaeufer: Zeigt Inserat-Detailseite
+    Verkaeufer->>System: Klickt „Bearbeiten"
+    System-->>Verkaeufer: Zeigt Bearbeiten-Seite
+
+    alt Bearbeiten
+    Verkaeufer->>System: Ändert Felder, speichert
+    System->>DB: Speichert Änderungen
+    System-->>Verkaeufer: Bestätigt Änderung
+
+
+    else Als verkauft markieren
+        System-->>Verkaeufer: Schickt Warnung
+        Verkaeufer->>System: Bestätigt Meldung
+        System->>DB: Setzt Status aufverkauft
+        System-->>Verkaeufer: Bestätigt Statusänderung
+
+    else Löschen
+            System-->>Verkaeufer: Schickt Warnung
+            Verkaeufer->>System: Bestätigt Löschung
+            System->>DB: Entfernt Inserat
+            System-->>Verkaeufer: Bestätigt Löschung
+    end
+```
+
+</details>
+
+*(Mermaid-Quelldatei: [`diagrams-code/f2-uc05-inserate_verwalten.mermaid`](diagrams-code/f2-uc05-inserate_verwalten.mermaid))*
+
 ## 2.8 UC06 – Inserat durchsuchen und favorisieren
 
 | Abschnitt | Inhalt / Erläuterung |
@@ -139,6 +363,46 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 | **Qualitäten** | Suche, Filter und Sortierung laufen vollständig clientseitig auf der bereits geladenen Liste. |
 
 *Tabelle: Use Case UC06 – Inserat durchsuchen und favorisieren*
+
+#### Sequenzdiagramm UC06 – Inserat durchsuchen und favorisieren
+
+<details>
+<summary>Diagramm anzeigen</summary>
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Nutzer as Eingeloggter Nutzer
+    participant System as THMarket
+    participant DB as Datenbank
+
+    Nutzer->>System: Öffnet Startseite
+    System->>DB: Lädt einmalig alle Inserate
+    DB-->>System: Inseratliste
+    System-->>Nutzer: Zeigt Inserate an
+
+    loop Suche/Filter/Sortierung
+        Nutzer->>System: Gibt Suchbegriff ein / wählt Filter / ändert Sortierung
+        System-->>Nutzer: Aktualisiert Anzeige sofort
+    end
+
+    Nutzer->>System: Klickt auf ein Inserat
+    System-->>Nutzer: Zeigt Detailansicht
+
+    opt Favorisieren
+        alt Eigentümer
+            System-->>Nutzer: Merken-Button nicht verfügbar
+        else Nicht Eigentümer
+                Nutzer->>System: Klickt Herz-Symbol
+                System->>DB: Merkt/entmerkt Inserat
+                System-->>Nutzer: Aktualisiert Favoritenliste
+        end
+    end
+```
+
+</details>
+
+*(Mermaid-Quelldatei: [`diagrams-code/f2-uc06-inserat_durchsuchen.mermaid`](diagrams-code/f2-uc06-inserat_durchsuchen.mermaid))*
 
 ## 2.9 UC07 – Chat mit Nutzer führen
 
@@ -163,6 +427,60 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 
 *Tabelle: Use Case UC07 – Chat mit Nutzer führen*
 
+#### Sequenzdiagramm UC07 – Chat mit Nutzer führen
+
+<details>
+<summary>Diagramm anzeigen</summary>
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Interessent as Interessent
+    participant System as THMarket
+    participant DB as Datenbank
+    participant Socket as Socket.IO (Echtzeit-Zustellung)
+    actor Anbieter as Anbieter (Empfänger)
+
+    Interessent->>System: Öffnet Inseratseite
+
+    alt Eigenes Inserat oder bereits verkauft
+        System-->>Interessent: Button „Anbieter kontaktieren" nicht verfügbar
+    else Fremdes, noch aktives Inserat
+        Interessent->>System: Klickt „Anbieter kontaktieren"
+        System->>DB: Prüft, ob Unterhaltung zu diesem Inserat bereits existiert
+        DB-->>System: Ergebnis
+        alt Existiert bereits
+            System-->>Interessent: Öffnet bestehende Unterhaltung
+        else Existiert noch nicht
+            System->>DB: Legt neue Unterhaltung an
+            System-->>Interessent: Öffnet neue Unterhaltung
+        end
+
+        loop Nachrichten senden
+            Interessent->>System: Schreibt und sendet Nachricht
+            System->>DB: Prüft Teilnehmerschaft
+            DB-->>System: Ergebnis
+
+            alt Eine Prüfung schlägt fehl
+                System-->>Interessent: Zeigt passenden Fehler an
+            else Alle Prüfungen bestanden
+                System->>DB: Speichert Nachricht
+                System->>Socket: Gibt Nachricht zur Zustellung weiter
+
+                alt Empfänger hat Unterhaltung gerade offen
+                    Socket-->>Anbieter: Nachricht erscheint und gilt als gelesen
+                else Empfänger nicht in der Unterhaltung
+                    Socket-->>Anbieter: Benachrichtigung, Unterhaltung springt nach oben
+                end
+            end
+        end
+    end
+```
+
+</details>
+
+*(Mermaid-Quelldatei: [`diagrams-code/f2-uc07-nachrichten_verschicken.mermaid`](diagrams-code/f2-uc07-nachrichten_verschicken.mermaid))*
+
 ## 2.10 UC08 – Kauf abschließen
 
 | Abschnitt | Inhalt / Erläuterung |
@@ -185,6 +503,53 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 | **Qualitäten** | Es findet keine echte Zahlungsabwicklung statt. |
 
 *Tabelle: Use Case UC08 – Kauf abschließen*
+
+#### Sequenzdiagramm UC08 – Kauf abschließen
+
+<details>
+<summary>Diagramm anzeigen</summary>
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Kaeufer as Student (Käufer)
+    participant System as THMarket
+    participant DB as Datenbank
+
+    Kaeufer->>System: Öffnet Inseratseite
+
+    alt Admin, eigenes Inserat, bereits verkauft oder Sofortkauf deaktiviert
+        System-->>Kaeufer: „Kaufen"-Button nicht verfügbar
+    else Kaufbar
+        Kaeufer->>System: Klickt „Kaufen"
+        Kaeufer->>System: Wählt Zahlungsmodus
+
+        alt Simulation gewählt
+            Kaeufer->>System: Gibt Testkartendaten ein
+            System->>System: Validiert Testkarte
+            alt Karte ungültig
+                System-->>Kaeufer: Zeigt Fehlermeldung
+            else Karte gültig
+                System->>DB: Markiert Inserat als verkauft
+                System-->>Kaeufer: Zeigt Erfolgsmeldung an
+            end
+        else Guthaben gewählt
+            Kaeufer->>System: Bestätigt Kauf mit vorhandenem Guthaben
+            System->>DB: Prüft, ob Guthaben ausreicht
+            DB-->>System: Ergebnis
+            alt Nicht genug Guthaben
+                System-->>Kaeufer: Zeigt Fehlermeldung
+            else Genug Guthaben
+                System->>DB: Bucht Betrag vom Käufer ab, gutschreibt dem Verkäufer, markiert Inserat als verkauft
+                System-->>Kaeufer: Zeigt Erfolgsmeldung an
+            end
+        end
+    end
+```
+
+</details>
+
+*(Mermaid-Quelldatei: [`diagrams-code/f2-uc08-kauf_abschliessen.mermaid`](diagrams-code/f2-uc08-kauf_abschliessen.mermaid))*
 
 ## 2.11 UC09 – Guthaben aufladen
 
@@ -211,6 +576,43 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 
 > **Hinweis:** Gültiger Bereich: 5 € bis 500 € pro Aufladung.
 
+#### Sequenzdiagramm UC09 – Guthaben aufladen
+
+<details>
+<summary>Diagramm anzeigen</summary>
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Nutzer as Eingeloggter Nutzer
+    participant System as THMarket
+    participant DB as Datenbank
+
+    Nutzer->>System: Öffnet Profil, klickt „Aufladen"
+    System-->>Nutzer: Zeigt Eingabefeld
+    Nutzer->>System: Gibt Betrag ein
+    System->>System: Prüft Betragsgrenzen
+
+    alt Betrag außerhalb des gültigen Bereichs
+        System-->>Nutzer: Zeigt Fehlermeldung
+    else Betrag gültig
+        Nutzer->>System: Gibt Testkartendaten ein
+        System->>System: Validiert Testkarte
+
+        alt Karte ungültig
+            System-->>Nutzer: Zeigt Fehlermeldung
+        else Karte gültig
+            System->>DB: Erhöht Guthaben um den Betrag
+            DB-->>System: Neuer Kontostand
+            System-->>Nutzer: Zeigt neues Guthaben an
+        end
+    end
+```
+
+</details>
+
+*(Mermaid-Quelldatei: [`diagrams-code/f2-uc09-guthaben_aufladen.mermaid`](diagrams-code/f2-uc09-guthaben_aufladen.mermaid))*
+
 ## 2.12 UC10 – Guthaben auszahlen
 
 | Abschnitt | Inhalt / Erläuterung |
@@ -233,6 +635,53 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 | **Qualitäten** | Es findet keine echte Zahlungsabwicklung statt. |
 
 *Tabelle: Use Case UC10 – Guthaben auszahlen*
+
+#### Sequenzdiagramm UC10 – Guthaben auszahlen
+
+<details>
+<summary>Diagramm anzeigen</summary>
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Nutzer as Eingeloggter Nutzer
+    participant System as THMarket
+    participant DB as Datenbank
+
+    Nutzer->>System: Öffnet Profil, klickt „Auszahlen"
+
+    alt Kein Guthaben vorhanden
+        System-->>Nutzer: Zeigt Fehlermeldung
+    else Guthaben vorhanden
+        System-->>Nutzer: Zeigt Eingabefeld
+        Nutzer->>System: Gibt Betrag ein
+        System->>System: Prüft Betrag gültig und im Rahmen
+
+        alt Betrag ungültig oder über verfügbarem Guthaben
+            System-->>Nutzer: Zeigt Fehlermeldung
+        else Betrag gültig
+            Nutzer->>System: Gibt Testkartendaten ein
+            System->>System: Validiert Testkarte
+
+            alt Karte ungültig
+                System-->>Nutzer: Zeigt Fehlermeldung
+            else Karte gültig
+                System->>DB: Prüft Guthaben erneut und verringert es um den Betrag
+                DB-->>System: Ergebnis
+
+                alt Nicht genug Guthaben
+                    System-->>Nutzer: Zeigt Fehlermeldung
+                else Genug Guthaben
+                    System-->>Nutzer: Zeigt neues Guthaben an
+                end
+            end
+        end
+    end
+```
+
+</details>
+
+*(Mermaid-Quelldatei: [`diagrams-code/f2-uc10-guthaben_auszahlen.mermaid`](diagrams-code/f2-uc10-guthaben_auszahlen.mermaid))*
 
 ## 2.13 UC11 – Inserat melden
 
@@ -257,6 +706,44 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 
 *Tabelle: Use Case UC11 – Inserat melden*
 
+#### Sequenzdiagramm UC11 – Inserat melden
+
+<details>
+<summary>Diagramm anzeigen</summary>
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Student as Student
+    participant System as THMarket
+    participant DB as Datenbank
+
+    Student->>System: Öffnet Inserat Detailseite
+
+    alt Admin oder eigenes Inserat
+        System-->>Student: „Inserat melden" Button nicht verfügbar
+    else Fremdes Inserat, als Student
+        Student->>System: Klickt „Inserat melden", wählt Grund
+        Student->>System: Klickt „Melden"
+
+        System->>DB: Prüft, ob Inserat existiert und ob bereits eine offene eigene Meldung dazu vorliegt
+        DB-->>System: Ergebnis
+
+        alt Inserat nicht gefunden
+            System-->>Student: Zeigt Fehlermeldung
+        else Bereits offene Meldung vorhanden
+            System-->>Student: Zeigt Fehlermeldung
+        else Alles in Ordnung
+            System->>DB: Speichert Meldung
+            System-->>Student: Zeigt Bestätigung
+        end
+    end
+```
+
+</details>
+
+*(Mermaid-Quelldatei: [`diagrams-code/f2-uc11-inserat_melden.mermaid`](diagrams-code/f2-uc11-inserat_melden.mermaid))*
+
 ## 2.14 UC12 – Nutzer melden
 
 | Abschnitt | Inhalt / Erläuterung |
@@ -279,6 +766,39 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 | **Qualitäten** | Die Meldung wird zusätzlich mit dem Konversationskontext verknüpft, damit ein Admin den Chatverlauf einsehen kann (siehe UC13). |
 
 *Tabelle: Use Case UC12 – Nutzer melden*
+
+#### Sequenzdiagramm UC12 – Nutzer melden
+
+<details>
+<summary>Diagramm anzeigen</summary>
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Student as Student
+    participant System as THMarket
+    participant DB as Datenbank
+
+    Student->>System: Klickt „Melden" im Chat
+    Student->>System: Wählt Grund
+    Student->>System: Klickt „Melden"
+
+    System->>DB: Prüft, ob gemeldeter Nutzer existiert und ob bereits eine offene eigene Meldung gegen ihn vorliegt
+    DB-->>System: Ergebnis
+
+    alt Nutzer nicht gefunden
+        System-->>Student: Zeigt Fehlermeldung
+    else Bereits offene Meldung vorhanden
+        System-->>Student: Zeigt Fehlermeldung
+    else Alles in Ordnung
+        System->>DB: Prüft Unterhaltungs Kontext und speichert Meldung
+        System-->>Student: Zeigt Bestätigung
+    end
+```
+
+</details>
+
+*(Mermaid-Quelldatei: [`diagrams-code/f2-uc12-nutzer_melden.mermaid`](diagrams-code/f2-uc12-nutzer_melden.mermaid))*
 
 ## 2.15 UC13 – Meldungen bearbeiten (Admin)
 
@@ -305,6 +825,55 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 
 > **Hinweis:** Welche Maßnahme zulässig ist, hängt vom Meldungstyp ab — bei einer Inserat-Meldung ist nur „löschen" oder „ohne Maßnahme schließen" möglich, bei einer Nutzer-Meldung nur „verwarnen", „löschen" oder „ohne Maßnahme schließen".
 
+#### Sequenzdiagramm UC13 – Meldungen bearbeiten
+
+<details>
+<summary>Diagramm anzeigen</summary>
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin as Administrator
+    participant System as THMarket
+    participant DB as Datenbank
+
+    Admin->>System: Öffnet Meldungen Tab
+    System->>DB: Lädt Meldungen
+    DB-->>System: Meldungsliste
+    System-->>Admin: Zeigt Meldungen an
+    Admin->>System: Wählt eine offene Meldung
+
+    opt Kontext prüfen
+        alt Meldung hat Inserat-Kontext
+            Admin->>System: Öffnet verlinktes Inserat
+        end
+        alt Meldung hat Chat-Kontext
+            Admin->>System: Klappt Chat-Verlauf ein
+            System->>DB: Lädt Nachrichten der Unterhaltung
+            DB-->>System: Nachrichten
+            System-->>Admin: Zeigt Nachrichten
+        end
+    end
+
+    Admin->>System: Trifft Entscheidung
+
+    alt Ohne Maßnahme schließen
+        System->>DB: Schließt Meldung
+    else Meldungstyp = Inserat: löschen
+        System->>DB: Löscht Inserat, schließt Meldung
+    else Meldungstyp = Nutzer: verwarnen
+        System->>DB: Setzt Warnhinweis auf Konto, schließt Meldung
+    else Meldungstyp = Nutzer: löschen
+        System->>DB: Löscht Konto, schließt Meldung
+    end
+
+    System-->>Admin: Bestätigt Ausführung
+```
+
+</details>
+
+*(Mermaid-Quelldatei: [`diagrams-code/f2-uc13-meldungen_verwalten.mermaid`](diagrams-code/f2-uc13-meldungen_verwalten.mermaid))*
+
 ## 2.16 UC14 – Admin-Verwaltung (Nutzer, Inserate, Audit-Log)
 
 | Abschnitt | Inhalt / Erläuterung |
@@ -327,3 +896,52 @@ In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Ca
 | **Qualitäten** | Nur autorisierte Administratoren haben Zugriff. Änderungen sind sofort wirksam und werden protokolliert (Audit-Log). |
 
 *Tabelle: Use Case UC14 – Admin-Verwaltung (Nutzer, Inserate, Audit-Log)*
+
+#### Sequenzdiagramm UC14 – Admin-Verwaltung
+
+<details>
+<summary>Diagramm anzeigen</summary>
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin as Administrator
+    participant System as THMarket
+    participant DB as Datenbank
+
+    alt Tab „Nutzer"
+        Admin->>System: Öffnet Nutzer-Tab
+        System->>DB: Lädt alle Nutzerkonten
+        DB-->>System: Nutzerliste
+        System-->>Admin: Zeigt alle Nutzerkonten an
+        Admin->>System: Klickt „Löschen" bei einem Konto
+        System->>DB: Prüft: kein eigenes/anderes Admin-Konto, keine aktiven Inserate mehr vorhanden
+        DB-->>System: Ergebnis
+
+        alt Nicht löschbar
+            System-->>Admin: Zeigt Fehlermeldung
+        else Löschbar
+            System->>DB: Löscht Konto
+            System-->>Admin: Bestätigt Löschung
+        end
+
+    else Tab „Inserate"
+        Admin->>System: Öffnet Inserate-Tab
+        System->>DB: Lädt alle Inserate
+        DB-->>System: Inseratliste
+        System-->>Admin: Zeigt alle Inserate an
+        Admin->>System: Klickt „Löschen" bei einem Inserat
+        System->>DB: Löscht Inserat
+        System-->>Admin: Bestätigt Löschung
+
+    else Tab „Audit-Log"
+        Admin->>System: Öffnet Audit-Log-Tab
+        System->>DB: Lädt chronologische Liste aller Admin-Aktionen
+        DB-->>System: Log-Einträge
+        System-->>Admin: Zeigt Audit-Log an
+    end
+```
+
+</details>
+
+*(Mermaid-Quelldatei: [`diagrams-code/f2-uc14-admin_nutzerkonten_verwalten.mermaid`](diagrams-code/f2-uc14-admin_nutzerkonten_verwalten.mermaid))*
