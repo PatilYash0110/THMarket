@@ -1,114 +1,93 @@
 # 3.2 Datentypenverzeichnis
 
-### Entität: Benutzer
+### USER
 
-| Attribut | Datentyp | Beschreibung |
-|---|---|---|
-| id | INTEGER | Eindeutige Identifikation für jeden Benutzer (Primärschlüssel) |
-| email | TEXT | THM-E-Mail-Adresse des Benutzers, eindeutig |
-| username | TEXT | Anzeigename des Benutzers |
-| password_hash | TEXT/HASH | Gehashtes und gesalzenes Passwort |
-| verifiziert | BOOLEAN | Gibt an, ob die E-Mail-Adresse bestätigt wurde |
-| rolle | TEXT | Rolle des Benutzers (z. B. „user" oder „admin") |
-| guthaben | NUMERIC | In-App-Guthaben des Benutzers für Mock-Zahlungen |
-| erstellt_am | TIMESTAMP | Zeitpunkt der Registrierung |
+| Feld | Typ | Pflicht/Nullable | Beschreibung |
+|---|---|---|---|
+| `id` | string | PK | Eindeutige Kennung für jeden Benutzer (Primärschlüssel) |
+| `email` | string | UK, Pflicht | Nur `@thm.de` (inkl. Subdomains) (Eindeutiger Schlüssel) |
+| `name` | string | Pflicht | Anzeigename |
+| `passwordHash` | string | Pflicht | bcrypt-Hash, nie an das Frontend gesendet |
+| `role` | enum (`STUDENT`, `ADMIN`) | Pflicht | Steuert die sichtbare Oberfläche |
+| `verified` | boolean | Pflicht | Muss `true` sein, damit ein Login möglich ist |
+| `emailVerificationToken` | string | UK, nullable | Nur während der Verifizierung gesetzt (Eindeutiger Schlüssel) |
+| `passwordResetToken` | string | UK, nullable | Nur während eines aktiven Reset-Vorgangs gesetzt (Eindeutiger Schlüssel) |
+| `balanceCents` | int | Pflicht | In-App-Guthaben in Cent |
+| `warningMessage` | string | nullable | Admin-Verwarnung, sichtbar nur im eigenen Profil |
+| `createdAt` / `updatedAt` | datetime | Pflicht | Zeitstempel |
 
-### Entität: Inserat
+### LISTING
 
-| Attribut | Datentyp | Beschreibung |
-|---|---|---|
-| id | INTEGER | Eindeutige ID des Inserats (Primärschlüssel) |
-| user_id | INTEGER | Fremdschlüssel auf Benutzer (Anbieter) |
-| kategorie_id | INTEGER | Fremdschlüssel auf Kategorie |
-| titel | TEXT | Titel des Inserats |
-| beschreibung | TEXT | Beschreibung des Artikels |
-| preis | NUMERIC | Preis bzw. Mietpreis |
-| typ | TEXT | Angebotstyp: „Verkauf" oder „Miete" |
-| zustand | TEXT | Zustand des Artikels (z. B. neu, gebraucht) |
-| campus | TEXT | Campus-Standort des Inserats (Gießen, Friedberg, Wetzlar) |
-| status | TEXT | Status des Inserats (z. B. aktiv, abgeschlossen) |
-| erstellt_am | TIMESTAMP | Zeitpunkt der Erstellung |
+| Feld | Typ | Pflicht/Nullable | Beschreibung |
+|---|---|---|---|
+| `id` | string | PK | Eindeutige Kennung des Inserats (Primärschlüssel) |
+| `title` | string | Pflicht | Titel des Inserats |
+| `description` | string | Pflicht | Beschreibungstext (manuell oder KI-generiert) |
+| `priceCents` | int | Pflicht | Preis in Cent |
+| `category` | enum (6 Werte) | Pflicht | Elektronik, Bücher & Skripte, Möbel, Fahrräder, Kleidung, Sonstiges |
+| `images` | string[] | Pflicht (1–6) | Cloudinary-URLs |
+| `sofortkaufMoeglich` | boolean | Pflicht | Steuert, ob „Kaufen" oder nur „Anbieter kontaktieren" angezeigt wird |
+| `status` | enum (`AKTIV`, `VERKAUFT`) | Pflicht | Wird bei Kaufabschluss auf `VERKAUFT` gesetzt |
+| `sellerId` | string (FK → USER) | nullable | Fremdschlüssel (FK) auf `USER.id`. Kennzeichnet den Verkäufer. Wird bei Konto-Löschung des Nutzers auf `NULL` gesetzt. |
+| `buyerId` | string (FK → USER) | nullable | Fremdschlüssel (FK) auf `USER.id`; kennzeichnet den Käufer (wird erst bei Kaufabschluss gesetzt). Wird bei Konto-Löschung des Nutzers auf `NULL` gesetzt. |
+| `createdAt` / `updatedAt` | datetime | Pflicht | Zeitstempel |
 
-### Entität: Bild
+### FAVORITE
 
-| Attribut | Datentyp | Beschreibung |
-|---|---|---|
-| id | INTEGER | Eindeutige ID des Bildes (Primärschlüssel) |
-| inserat_id | INTEGER | Fremdschlüssel auf Inserat |
-| pfad | TEXT | Speicherort bzw. Referenz der Bilddatei |
-| reihenfolge | INTEGER | Anzeigereihenfolge der Bilder eines Inserats |
+| Feld | Typ | Pflicht/Nullable | Beschreibung |
+|---|---|---|---|
+| `id` | string | PK | Eindeutige Kennung des Favoriten (Primärschlüssel) |
+| `userId` | string (FK → USER) | Pflicht | Fremdschlüssel (FK) auf `USER.id`. Kennzeichnet den Nutzer, der den Favoriten gesetzt hat. Wird beim Löschen des Nutzers automatisch mitgelöscht. |
+| `listingId` | string (FK → LISTING) | Pflicht | Fremdschlüssel (FK) auf `LISTING.id`. Kennzeichnet das favorisierte Inserat. Wird beim Löschen des Inserats automatisch mitgelöscht. |
+| `createdAt` | datetime | Pflicht | Zeitpunkt der Favorisierung |
 
-### Entität: Kategorie
+### REPORT
 
-| Attribut | Datentyp | Beschreibung |
-|---|---|---|
-| id | INTEGER | Eindeutige ID der Kategorie (Primärschlüssel) |
-| name | TEXT | Name der Kategorie, eindeutig (z. B. Elektronik, Möbel) |
+| Feld | Typ | Pflicht/Nullable | Beschreibung |
+|---|---|---|---|
+| `id` | string | PK | Eindeutige Kennung der Meldung (Primärschlüssel) |
+| `targetType` | enum (`LISTING`, `USER`) | Pflicht | Typ des gemeldeten Ziels |
+| `reason` | string | Pflicht | Ausgewählter Grund für die Meldung |
+| `message` | string | optional | Zusätzliche Beschreibung |
+| `status` | enum (`OFFEN`, `GESCHLOSSEN`) | Pflicht | Bearbeitungsstatus |
+| `targetLabel` | string | Pflicht | Snapshot von Titel/Name, bleibt nach Löschung lesbar |
+| `reporterId` | string (FK → USER) | nullable, SetNull | Fremdschlüssel (FK) auf `USER.id`. Kennzeichnet den meldenden Nutzer. Wird bei Konto-Löschung auf `NULL` gesetzt. |
+| `listingId` | string (FK → LISTING) | nullable | Fremdschlüssel (FK) auf `LISTING.id`. Verweist auf das gemeldete Inserat bzw. den Inseratskontext. Wird bei Löschung des Inserats auf `NULL` gesetzt. |
+| `reportedUserId` | string (FK → USER) | nullable, SetNull | Fremdschlüssel (FK) auf `USER.id`. Verweist auf den gemeldeten Nutzer. Wird bei Konto-Löschung auf `NULL` gesetzt. |
+| `conversationId` | string (FK → CONVERSATION) | nullable | Fremdschlüssel (FK) auf `CONVERSATION.id`. Verweist auf den Chatverlauf (nur bei Meldungen aus dem Chat heraus). Wird bei Löschung des Chats auf `NULL` gesetzt. |
+| `createdAt` | datetime | Pflicht | Zeitpunkt der Meldung |
+| `resolvedAt` | datetime | nullable | Zeitpunkt der Bearbeitung |
 
-### Entität: Favorit
+### AUDITLOGENTRY
 
-| Attribut | Datentyp | Beschreibung |
-|---|---|---|
-| user_id | INTEGER | Fremdschlüssel auf Benutzer (Teil des Primärschlüssels) |
-| inserat_id | INTEGER | Fremdschlüssel auf Inserat (Teil des Primärschlüssels) |
-| erstellt_am | TIMESTAMP | Zeitpunkt der Favorisierung |
+| Feld | Typ | Pflicht/Nullable | Beschreibung |
+|---|---|---|---|
+| `id` | string | PK | Eindeutige Kennung des Protokolleintrags (Primärschlüssel) |
+| `actorId` | string (FK → USER) | — | Fremdschlüssel (FK) auf `USER.id`. Kennzeichnet den ausführenden Admin. Wird bei Konto-Löschung des Admins auf `NULL` gesetzt. |
+| `action` | string | Pflicht | Freitext-Beschreibung der Aktion |
+| `targetType` | string | nullable | Betroffener Objekttyp. Kein Fremdschlüssel (rein informativ für Audit-Zwecke). |
+| `targetId` | string | nullable | Kein Live-Fremdschlüssel, rein informativ |
+| `createdAt` | datetime | Pflicht | Zeitpunkt der Aktion |
 
-### Entität: Konversation
+### CONVERSATION
 
-| Attribut | Datentyp | Beschreibung |
-|---|---|---|
-| id | INTEGER | Eindeutige ID der Konversation (Primärschlüssel) |
-| inserat_id | INTEGER | Fremdschlüssel auf das betreffende Inserat |
-| kaeufer_id | INTEGER | Fremdschlüssel auf Benutzer (Interessent) |
-| verkaeufer_id | INTEGER | Fremdschlüssel auf Benutzer (Anbieter) |
-| erstellt_am | TIMESTAMP | Zeitpunkt des ersten Kontakts |
+| Feld | Typ | Pflicht/Nullable | Beschreibung |
+|---|---|---|---|
+| `id` | string | PK | Eindeutige Kennung der Konversation (Primärschlüssel) |
+| `listingId` | string (FK → LISTING) | nullable, SetNull | Fremdschlüssel (FK) auf `LISTING.id`. Verweist auf das Bezugsinserat. Wird bei Löschung des Inserats auf `NULL` gesetzt. |
+| `listingTitle` | string | nullable | Snapshot des Inserattitels |
+| `buyerId` | string (FK → USER) | nullable, SetNull | Fremdschlüssel (FK) auf `USER.id`. Kennzeichnet den Kaufinteressenten. Wird bei Konto-Löschung des Käufers auf `NULL` gesetzt. |
+| `sellerId` | string (FK → USER) | nullable, SetNull | Fremdschlüssel (FK) auf `USER.id`. Kennzeichnet den Anbieter/Verkäufer. Wird bei Konto-Löschung des Verkäufers auf `NULL` gesetzt. |
+| `buyerLastReadAt` | datetime | nullable | Für Ungelesen-Zähler |
+| `sellerLastReadAt` | datetime | nullable | Für Ungelesen-Zähler |
+| `createdAt` | datetime | Pflicht | Zeitpunkt der Erstellung |
 
-### Entität: Nachricht
+### MESSAGE
 
-| Attribut | Datentyp | Beschreibung |
-|---|---|---|
-| id | INTEGER | Eindeutige ID der Nachricht (Primärschlüssel) |
-| konversation_id | INTEGER | Fremdschlüssel auf Konversation |
-| sender_id | INTEGER | Fremdschlüssel auf Benutzer (Absender) |
-| inhalt | TEXT | Textinhalt der Nachricht |
-| gesendet_am | TIMESTAMP | Zeitpunkt des Versands |
-| gelesen | BOOLEAN | Gibt an, ob die Nachricht gelesen wurde |
-
-### Entität: Meldung
-
-| Attribut | Datentyp | Beschreibung |
-|---|---|---|
-| id | INTEGER | Eindeutige ID der Meldung (Primärschlüssel) |
-| inserat_id | INTEGER | Fremdschlüssel auf das gemeldete Inserat |
-| gemeldeter_nutzer_id | INTEGER | Fremdschlüssel auf Benutzer (nur bei Meldung eines Nutzers) |
-| konversation_id | INTEGER | Fremdschlüssel auf Konversation (nur bei Meldung mit Einwilligung) |
-| melder_id | INTEGER | Fremdschlüssel auf Benutzer (Melder) |
-| grund | TEXT | Grund der Meldung |
-| beschreibung | TEXT | Optionale nähere Beschreibung |
-| status | TEXT | Bearbeitungsstatus (offen, bearbeitet, abgelehnt) |
-| erstellt_am | TIMESTAMP | Zeitpunkt der Meldung |
-
-### Entität: Transaktion
-
-| Attribut | Datentyp | Beschreibung |
-|---|---|---|
-| id | INTEGER | Eindeutige ID der Transaktion (Primärschlüssel) |
-| inserat_id | INTEGER | Fremdschlüssel auf das gekaufte Inserat |
-| kaeufer_id | INTEGER | Fremdschlüssel auf Benutzer (Käufer) |
-| verkaeufer_id | INTEGER | Fremdschlüssel auf Benutzer (Verkäufer) |
-| zahlungsmodus | TEXT | Simulation oder In-App-Guthaben |
-| erstellt_am | TIMESTAMP | Zeitpunkt des Kaufabschlusses |
-
-### Entität: Bewertung
-
-| Attribut | Datentyp | Beschreibung |
-|---|---|---|
-| id | INTEGER | Eindeutige ID der Bewertung (Primärschlüssel) |
-| transaktion_id | INTEGER | Fremdschlüssel auf die zugehörige Transaktion |
-| bewertender_id | INTEGER | Fremdschlüssel auf Benutzer (bewertende Person) |
-| bewerteter_id | INTEGER | Fremdschlüssel auf Benutzer (bewertete Person) |
-| sterne | INTEGER | Bewertung von 1 bis 5 Sternen |
-| kommentar | TEXT | Optionaler Kommentar zur Bewertung |
-| erstellt_am | TIMESTAMP | Zeitpunkt der Bewertung |
-
-Mit diesem Datentypenverzeichnis sind alle für das System relevanten Attribute klar definiert. Es stellt sicher, dass die Daten konsistent, validierbar und entsprechend den funktionalen Anforderungen verarbeitet werden können.
+| Feld | Typ | Pflicht/Nullable | Beschreibung |
+|---|---|---|---|
+| `id` | string | PK | Eindeutige Kennung der Nachricht (Primärschlüssel) |
+| `conversationId` | string (FK → CONVERSATION) | Pflicht | Fremdschlüssel (FK) auf `CONVERSATION.id`. Verweist auf die zugehörige Konversation. Wird beim Löschen der Konversation automatisch mitgelöscht. |
+| `senderId` | string (FK → USER) | nullable, SetNull | Fremdschlüssel (FK) auf `USER.id`. Kennzeichnet den Absender der Nachricht. Wird bei Konto-Löschung des Absenders auf `NULL` gesetzt. |
+| `text` | string | Pflicht | Nachrichtentext |
+| `createdAt` | datetime | Pflicht | Zeitpunkt des Versands |
