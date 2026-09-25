@@ -1,20 +1,33 @@
-%% Abbildung 13: Laufzeitsicht - Inserat mit KI-Beschreibung
 sequenceDiagram
+    autonumber
     actor S as THM-Student
     participant FE as Frontend
     participant L as ListingsController
-    participant C as Cloudinary
-    participant AI as AiService
-    participant G as Google Gemini
+    participant CloudSvc as CloudinaryService
+    participant Cloud as Cloudinary
+    participant GemSvc as GeminiService
+    participant Gem as Google Gemini
     participant DB as Datenbank
-    S->>FE: Bilder hochladen
-    FE->>L: POST /listings/images
-    L->>C: Bilder speichern (EXIF entfernt)
-    C-->>L: Bild-URLs
-    L->>AI: generateDescription(urls)
-    AI->>G: Bilder -> Titel/Beschreibung/Kategorie
-    G-->>AI: JSON-Entwurf
-    AI-->>FE: Entwurf (editierbar)
-    S->>FE: anpassen & veroeffentlichen
+
+    S->>FE: Fotos auswaehlen (clientseitig komprimiert)
+    FE->>L: POST /listings/upload
+    L->>CloudSvc: uploadImages(files)
+    CloudSvc->>Cloud: Bilder hochladen
+    Cloud-->>CloudSvc: Bild-URLs
+    CloudSvc-->>L: Bild-URLs
+    L-->>FE: Bild-URLs
+
+    opt KI-Beschreibung anfordern
+        FE->>L: POST /listings/generate-description
+        L->>GemSvc: generateDescription(bilder, hinweis, kontext)
+        GemSvc->>Gem: Bilder + Titel/Kategorie/Hinweis
+        Gem-->>GemSvc: Beschreibungstext
+        GemSvc-->>L: Entwurf
+        L-->>FE: Entwurf (editierbar)
+    end
+
+    S->>FE: Entwurf anpassen, veroeffentlichen
     FE->>L: POST /listings
     L->>DB: Inserat speichern (Status = AKTIV)
+    DB-->>L: Bestaetigung
+    L-->>FE: Inserat veroeffentlicht
