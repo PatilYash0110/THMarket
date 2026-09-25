@@ -195,7 +195,7 @@ sequenceDiagram
 
 *Abbildung 16: Laufzeitsicht — Meldung*
 
-![Meldung](diagram_images/a06-laufzeitdiagramm_Meldung.png)
+![Meldung](diagram_images/13-meldung.png)
 *(Quelltext: `diagrams-code/a06-laufzeitdiagramm_Meldung.mmd`)*
 
 ## 6.7 Zusammenfassung
