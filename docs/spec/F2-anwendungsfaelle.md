@@ -2,7 +2,7 @@
 
 In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Cases) im Detail beschrieben. Jeder Use Case ist nach einem einheitlichen Schema dokumentiert, das Auslöser, Akteure, Vor- und Nachbedingungen, Haupt- und Alternativszenarien sowie Qualitätsanforderungen umfasst.
 
-## 2.3 UC01 – Registrieren
+## F2.1 UC01 – Registrieren
 
 | Abschnitt | Inhalt / Erläuterung |
 |---|---|
@@ -80,7 +80,7 @@ sequenceDiagram
 
 *(Mermaid-Quelldatei: [`diagrams-code/f2-uc01-register.mermaid`](diagrams-code/f2-uc01-register.mermaid))*
 
-## 2.4 UC02 – Anmelden
+## F2.2 UC02 – Anmelden
 
 | Abschnitt | Inhalt / Erläuterung |
 |---|---|
@@ -149,7 +149,7 @@ sequenceDiagram
 
 *(Mermaid-Quelldatei: [`diagrams-code/f2-uc02-login.mermaid`](diagrams-code/f2-uc02-login.mermaid))*
 
-## 2.5 UC03 – Passwort zurücksetzen
+## F2.3 UC03 – Passwort zurücksetzen
 
 | Abschnitt | Inhalt / Erläuterung |
 |---|---|
@@ -216,7 +216,7 @@ sequenceDiagram
 
 *(Mermaid-Quelldatei: [`diagrams-code/f2-uc03-passwort_zuruecksetzen.mermaid`](diagrams-code/f2-uc03-passwort_zuruecksetzen.mermaid))*
 
-## 2.6 UC04 – Inserat erstellen
+## F2.4 UC04 – Inserat erstellen
 
 | Abschnitt | Inhalt / Erläuterung |
 |---|---|
@@ -277,7 +277,7 @@ sequenceDiagram
 
 *(Mermaid-Quelldatei: [`diagrams-code/f2-uc04-inserat_erstellen.mermaid`](diagrams-code/f2-uc04-inserat_erstellen.mermaid))*
 
-## 2.7 UC05 – Inserat verwalten
+## F2.5 UC05 – Inserat verwalten
 
 | Abschnitt | Inhalt / Erläuterung |
 |---|---|
@@ -341,7 +341,7 @@ sequenceDiagram
 
 *(Mermaid-Quelldatei: [`diagrams-code/f2-uc05-inserate_verwalten.mermaid`](diagrams-code/f2-uc05-inserate_verwalten.mermaid))*
 
-## 2.8 UC06 – Inserat durchsuchen und favorisieren
+## F2.6 UC06 – Inserat durchsuchen und favorisieren
 
 | Abschnitt | Inhalt / Erläuterung |
 |---|---|
@@ -404,7 +404,7 @@ sequenceDiagram
 
 *(Mermaid-Quelldatei: [`diagrams-code/f2-uc06-inserat_durchsuchen.mermaid`](diagrams-code/f2-uc06-inserat_durchsuchen.mermaid))*
 
-## 2.9 UC07 – Chat mit Nutzer führen
+## F2.7 UC07 – Chat mit Nutzer führen
 
 | Abschnitt | Inhalt / Erläuterung |
 |---|---|
@@ -481,7 +481,7 @@ sequenceDiagram
 
 *(Mermaid-Quelldatei: [`diagrams-code/f2-uc07-nachrichten_verschicken.mermaid`](diagrams-code/f2-uc07-nachrichten_verschicken.mermaid))*
 
-## 2.10 UC08 – Kauf abschließen
+## F2.8 UC08 – Kauf abschließen
 
 | Abschnitt | Inhalt / Erläuterung |
 |---|---|
@@ -551,7 +551,7 @@ sequenceDiagram
 
 *(Mermaid-Quelldatei: [`diagrams-code/f2-uc08-kauf_abschliessen.mermaid`](diagrams-code/f2-uc08-kauf_abschliessen.mermaid))*
 
-## 2.11 UC09 – Guthaben aufladen
+## F2.9 UC09 – Guthaben aufladen
 
 | Abschnitt | Inhalt / Erläuterung |
 |---|---|
@@ -613,7 +613,7 @@ sequenceDiagram
 
 *(Mermaid-Quelldatei: [`diagrams-code/f2-uc09-guthaben_aufladen.mermaid`](diagrams-code/f2-uc09-guthaben_aufladen.mermaid))*
 
-## 2.12 UC10 – Guthaben auszahlen
+## F2.10 UC10 – Guthaben auszahlen
 
 | Abschnitt | Inhalt / Erläuterung |
 |---|---|
@@ -683,7 +683,7 @@ sequenceDiagram
 
 *(Mermaid-Quelldatei: [`diagrams-code/f2-uc10-guthaben_auszahlen.mermaid`](diagrams-code/f2-uc10-guthaben_auszahlen.mermaid))*
 
-## 2.13 UC11 – Inserat melden
+## F2.11 UC11 – Inserat melden
 
 | Abschnitt | Inhalt / Erläuterung |
 |---|---|
@@ -744,7 +744,7 @@ sequenceDiagram
 
 *(Mermaid-Quelldatei: [`diagrams-code/f2-uc11-inserat_melden.mermaid`](diagrams-code/f2-uc11-inserat_melden.mermaid))*
 
-## 2.14 UC12 – Nutzer melden
+## F2.12 UC12 – Nutzer melden
 
 | Abschnitt | Inhalt / Erläuterung |
 |---|---|
@@ -800,7 +800,7 @@ sequenceDiagram
 
 *(Mermaid-Quelldatei: [`diagrams-code/f2-uc12-nutzer_melden.mermaid`](diagrams-code/f2-uc12-nutzer_melden.mermaid))*
 
-## 2.15 UC13 – Meldungen bearbeiten (Admin)
+## F2.13 UC13 – Meldungen bearbeiten (Admin)
 
 | Abschnitt | Inhalt / Erläuterung |
 |---|---|
@@ -873,7 +873,7 @@ sequenceDiagram
 
 *(Mermaid-Quelldatei: [`diagrams-code/f2-uc13-meldungen_verwalten.mermaid`](diagrams-code/f2-uc13-meldungen_verwalten.mermaid))*
 
-## 2.16 UC14 – Admin-Verwaltung (Nutzer, Inserate, Audit-Log)
+## F2.14 UC14 – Admin-Verwaltung (Nutzer, Inserate, Audit-Log)
 
 | Abschnitt | Inhalt / Erläuterung |
 |---|---|
