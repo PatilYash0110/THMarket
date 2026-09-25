@@ -1,13 +1,26 @@
-%% Abbildung 16: Laufzeitsicht - Meldung
 sequenceDiagram
+    autonumber
     actor U as Nutzer
     actor Adm as Administrator
-    participant R as Melde-/Admin-Modul
+    participant R as AdminController
     participant DB as Datenbank
-    U->>R: Inserat/Nutzer melden (+ ggf. Chat, mit Einwilligung)
-    R->>DB: Meldung speichern (Status = offen)
-    Adm->>R: Admin Panel öffnen
-    R->>DB: Meldungen (Warteschlange)
-    Adm->>R: Maßnahme wählen (Verwarnung / ausblenden / Sperre)
-    R->>DB: Massnahme ausführen + Audit Log
-    R->>DB: Meldung = erledigt
+
+    U->>R: POST /admin/reports (Inserat, Nutzer<br/>oder - mit Einwilligung - Chat-Kontext)
+    R->>DB: Meldung speichern (status = OFFEN)
+
+    Adm->>R: GET /admin/reports
+    R->>DB: offene Meldungen laden
+    DB-->>R: Meldungsliste
+    R-->>Adm: Warteschlange anzeigen
+
+    opt Chat-Kontext vorhanden
+        Adm->>R: GET /admin/conversations/:id/messages
+        R->>DB: Nachrichten der Konversation laden
+        DB-->>R: Nachrichten
+    end
+
+    Adm->>R: PATCH /admin/reports/:id/resolve<br/>(LISTING_DELETED / USER_WARNED / USER_DELETED)
+    R->>DB: Massnahme ausfuehren + Audit-Log-Eintrag
+    R->>DB: Meldung = GESCHLOSSEN
+    DB-->>R: Bestaetigung
+    R-->>Adm: Erfolg anzeigen
