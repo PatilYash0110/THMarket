@@ -2,7 +2,7 @@
 
 Querschnittskonzepte (Siedersleben, Kap. 4.7): einheitliche Strategien für Belange, die das System als Ganzes betreffen und von mehreren Bausteinen referenziert, aber nie dort definiert werden. Die Strategie eines Belangs zu ändern ist eine einzige Bearbeitung hier.
 
-## Konzepte
+## N2.1 Konzepte
 
 | ID | Konzept | Strategie (Kurzfassung) | Betrifft |
 |----|---------|-------------------------|----------|
