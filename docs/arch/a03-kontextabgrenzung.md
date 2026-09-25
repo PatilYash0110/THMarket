@@ -1,11 +1,11 @@
-# 3. Kontextabgrenzung
+# A03. Kontextabgrenzung
 
 
 ---
 
 THMarket wird in diesem Kapitel als Blackbox betrachtet. Die Kontextabgrenzung zeigt seine Beziehungen zu Nutzern, Administratoren und externen technischen Diensten.
 
-## 3.1 Fachlicher Kontext
+## A03.1 Fachlicher Kontext
 
 *Abbildung 1: Fachlicher Kontext der THMarket-Anwendung*
 
@@ -34,7 +34,7 @@ Der Administrator ist für Moderation und Betrieb zuständig: Bearbeitung von Me
 
 Nicht Teil von THMarket sind: Cloudinary, Google Gemini, Gmail SMTP, reale Zahlungsanbieter sowie die Endgeräte und Browser der Nutzer. Die dargestellte Zahlung ist lediglich eine Simulation.
 
-## 3.2 Technischer Kontext
+## A03.2 Technischer Kontext
 
 *Abbildung 2: Technischer Kontext der THMarket-Anwendung*
 
