@@ -48,3 +48,54 @@ Der Administrator ist ein spezieller Akteur mit Rolle `ADMIN`, angelegt über ei
 ## 2.2 Typischer Geschäftsprozess
 
 Der typische Lebenszyklus eines Nutzers durchläuft folgende Stationen, die in den Use Cases UC01–UC14 im Detail beschrieben sind:
+
+*Abbildung 4: Geschäftsprozessüberblick von THMarket (gestrichelt = optionaler Pfad, grau = Admin-Pfad)*
+
+<details>
+<summary>Diagramm anzeigen</summary>
+
+```mermaid
+flowchart TD
+    Start(["Start"]) --> UC01["UC01\nRegistrieren"]
+    Start --> UC02["UC02\nAnmelden"]
+    UC01 --> Verif["E-Mail bestätigen"]
+    Verif --> UC02
+    UC02 -. "Passwort vergessen?" .-> UC03["UC03\nPasswort zurücksetzen"]
+    UC03 -.-> UC02
+
+    UC02 --> UC06["UC06\nInserate durchsuchen\nund favorisieren"]
+
+    UC06 --> Wahl{"eigenes oder\nfremdes Inserat?"}
+    Wahl -- "eigenes" --> UC04["UC04\nInserat erstellen"]
+    UC04 --> UC05["UC05\nInserat verwalten"]
+    Wahl -- "eigenes (bestehend)" --> UC05
+
+    Wahl -- "fremdes" --> Aktion{"direkt kaufen\noder erst fragen?"}
+    Aktion -- "Sofortkauf" --> UC08["UC08\nKauf abschließen"]
+    Aktion -- "Frage / Verhandlung" --> UC07["UC07\nAnbieter kontaktieren\n(Chat)"]
+    UC07 --> UC08
+
+    UC09["UC09\nGuthaben aufladen"] -. " Kauf mit Guthaben" .-> UC08
+    UC02 -. "bei Bedarf" .-> UC09
+    UC08 == "Verkäufer erhält Guthaben" ==> UC10["UC10\nGuthaben auszahlen"]
+
+    UC06 -. "bei Bedarf" .-> UC11["UC11\nInserat melden"]
+    UC07 -. "bei Bedarf" .-> UC12["UC12\nNutzer melden"]
+
+    subgraph AdminPfad["Admin-Pfad"]
+        direction TB
+        UC13["UC13\nMeldungen bearbeiten"] --> UC14["UC14\nAdmin-Verwaltung\n(Nutzer / Inserate / Audit-Log)"]
+    end
+    UC02 -. "als Admin" .-> UC13
+    UC11 -.-> UC13
+    UC12 -.-> UC13
+
+    classDef optional stroke-dasharray: 4 3
+    class UC03,UC11,UC12 optional
+    classDef admin fill:#6b7280,stroke:#6b7280,color:#ffffff
+    class UC13,UC14 admin
+```
+
+</details>
+
+*(Mermaid-Quelldatei: [`diagrams-code/f1-geschaeftsprozess.mermaid`](diagrams-code/f1-geschaeftsprozess.mermaid))*
