@@ -1,4 +1,4 @@
-# 5. Bausteinsicht
+# A05. Bausteinsicht
 
 
 Die Bausteinsicht zeigt, wie THMarket von innen aufgebaut ist. Die Zerlegung erfolgt in drei Verfeinerungsebenen: Ebene 0 betrachtet das System als Blackbox im Systemkontext, Ebene 1 öffnet es in seine fachlichen Kern- und Integrationsmodule, und Ebene 2 verfeinert die vier zentralen Kernmodule in ihre inneren Bausteine.
@@ -16,7 +16,7 @@ Die folgende Zerlegungsübersicht stellt alle drei Ebenen gestapelt dar, die ges
 
 *Farben: Blau = fachliche Kernmodule, Violett = Integrationsmodule, Navy = Datenbank, Grau = externe Nachbarsysteme.*
 
-## 5.1 Whitebox „System THMarket" (Ebene 1)
+## A05.1 Whitebox „System THMarket" (Ebene 1)
 
 Auf Ebene 1 besteht THMarket aus fünf fachlichen Kernmodulen (Auth, Listings, Wallet, Chat, Admin) und drei Integrationsmodulen (Mail, Cloudinary-Anbindung, Gemini-Anbindung), die jeweils genau ein externes Nachbarsystem kapseln, sowie der über Prisma angesprochenen Datenbank.
 
@@ -130,7 +130,7 @@ Auf Ebene 1 besteht THMarket aus fünf fachlichen Kernmodulen (Auth, Listings, W
 | **Erfüllte Anforderungen** | Querschnittliche Grundlage für alle Use Cases UC01–UC14. |
 | **Variabilität** | Datenbank-Host austauschbar, solange PostgreSQL-kompatibel. |
 
-## 5.2 Verfeinerungsebene 2
+## A05.2 Verfeinerungsebene 2
 
 Die vier zentralen Kernmodule werden nun in ihre inneren Bausteine zerlegt. Für jedes Modul zeigt eine Whitebox-Abbildung die Bausteine samt Beziehungen, gefolgt von einer Whitebox-Tabelle und einer Kurzbeschreibung jedes Bausteins mit dem zugehörigen Use Case. Das Wallet-Modul hat keine weitere interne Verfeinerung und wird daher nicht erneut aufgeteilt.
 
@@ -212,7 +212,7 @@ Die vier zentralen Kernmodule werden nun in ihre inneren Bausteine zerlegt. Für
 | **Erfüllte Anforderungen** | Sicherheitsgrundlage für UC02–UC14 (jede geschützte Aktion). |
 | **Variabilität** | Token-Quelle (Cookie / Bearer) und Rollenmodell erweiterbar. |
 
-### 5.2.2 Whitebox „Listings"
+### A05.2.2 Whitebox „Listings"
 
 *Abbildung 6: Whitebox „Listings" (Verfeinerungsebene 2)*
 
@@ -280,7 +280,7 @@ Die vier zentralen Kernmodule werden nun in ihre inneren Bausteine zerlegt. Für
 | **Erfüllte Anforderungen** | UC08 (Kauf abschließen). |
 | **Variabilität** | Zahlungsmodi erweiterbar; echte Zahlung bewusst nicht angebunden (ADR-006). |
 
-### 5.2.3 Whitebox „Chat"
+### A05.2.3 Whitebox „Chat"
 
 *Abbildung 7: Whitebox „Chat" (Verfeinerungsebene 2)*
 
@@ -328,7 +328,7 @@ Die vier zentralen Kernmodule werden nun in ihre inneren Bausteine zerlegt. Für
 | **Erfüllte Anforderungen** | Teil von UC07 (Chat mit Nutzer führen). |
 | **Variabilität** | Nachrichten-Längenlimit (2000 Zeichen) konfigurierbar. |
 
-### 5.2.4 Whitebox „Admin"
+### A05.2.4 Whitebox „Admin"
 
 *Abbildung 8: Whitebox „Admin" (Verfeinerungsebene 2)*
 
