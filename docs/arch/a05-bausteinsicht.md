@@ -141,7 +141,7 @@ Die vier zentralen Kernmodule werden nun in ihre inneren Bausteine zerlegt. Für
 <details>
 <summary>📊 Diagramm anzeigen</summary>
 
-![Whitebox „Auth"](diagram_images/05-ebene2-kernmodule-band.png)
+![Whitebox „Auth"](diagram_images/07-ebene2-whitebox-auth.png)
 
 </details>
 
@@ -217,9 +217,9 @@ Die vier zentralen Kernmodule werden nun in ihre inneren Bausteine zerlegt. Für
 *Abbildung 6: Whitebox „Listings" (Verfeinerungsebene 2)*
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary> Diagramm anzeigen</summary>
 
-![Whitebox „Listings"](diagram_images/06-ebene2-whitebox-admin.png)
+![Whitebox „Listings"](diagram_images/09-ebene2-whitebox-listings.png)
 
 </details>
 
@@ -285,9 +285,9 @@ Die vier zentralen Kernmodule werden nun in ihre inneren Bausteine zerlegt. Für
 *Abbildung 7: Whitebox „Chat" (Verfeinerungsebene 2)*
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary> Diagramm anzeigen</summary>
 
-![Whitebox „Chat"](diagram_images/07-ebene2-whitebox-auth.png)
+![Whitebox „Chat"](diagram_images/08-ebene2-whitebox-chat.png)
 
 </details>
 
@@ -333,9 +333,9 @@ Die vier zentralen Kernmodule werden nun in ihre inneren Bausteine zerlegt. Für
 *Abbildung 8: Whitebox „Admin" (Verfeinerungsebene 2)*
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary> Diagramm anzeigen</summary>
 
-![Whitebox „Admin"](diagram_images/08-ebene2-whitebox-chat.png)
+![Whitebox „Admin"](diagram_images/06-ebene2-whitebox-admin.png)
 
 </details>
 
