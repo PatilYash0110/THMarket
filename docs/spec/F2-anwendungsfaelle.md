@@ -2,286 +2,328 @@
 
 In den folgenden Abschnitten werden die identifizierten Anwendungsfälle (Use Cases) im Detail beschrieben. Jeder Use Case ist nach einem einheitlichen Schema dokumentiert, das Auslöser, Akteure, Vor- und Nachbedingungen, Haupt- und Alternativszenarien sowie Qualitätsanforderungen umfasst.
 
-### UC01 – Login
+## 2.3 UC01 – Registrieren
 
-| Nr. | Abschnitt | Inhalt / Erläuterung |
-| --- | --- | --- |
-| 01 | Bezeichner | UC01 |
-| 02 | Name | Login |
-| 03 | Autoren | Projektteam |
-| 04 | Priorität | Hoch. Voraussetzung für jede Nutzung der Plattform. |
-| 05 | Kritikalität | Sehr hoch. Ohne Login ist keine Nutzung möglich. |
-| 06 | Verantwortlicher | Backend-Team (Nutzerverwaltung), Frontend-Team (Formulare, UI) |
-| 07 | Beschreibung | Beim Aufruf der Webseite wird sofort die Login-Maske angezeigt. Die Anmeldung erfolgt über die THM-E-Mail-Adresse und ein Passwort. Nur verifizierte Konten können sich anmelden. |
-| 08 | Auslösendes Ereignis | Der Nutzer ruft die Webseite auf. |
-| 09 | Akteure | Registrierte Nutzer, die den Marktplatz nutzen möchten. |
-| 10 | Vorbedingung | Die Webseite ist aufrufbar; der Nutzer hat sich bereits registriert und seine THM-E-Mail-Adresse verifiziert. |
-| 11 | Nachbedingung | Der Nutzer ist eingeloggt und wird auf den Marktplatz weitergeleitet. |
-| 12 | Ergebnis | Der Nutzer ist angemeldet und hat Zugriff auf alle Marktplatzfunktionen. |
-| 13 | Hauptszenario | 1. Nutzer öffnet die Webseite. 2. Die Login-Maske erscheint sofort. 3. Nutzer gibt E-Mail-Adresse und Passwort ein. 4. System prüft die Eingaben und den Verifizierungsstatus. 5. Bei Erfolg wird der Nutzer zum Marktplatz weitergeleitet. |
-| 14 | Alternativszenarien | Bei falschen Zugangsdaten wird eine Fehlermeldung angezeigt. Ist das Konto noch nicht verifiziert, erhält der Nutzer einen entsprechenden Hinweis. |
-| 15 | Ausnahme Szenario | Backend oder Datenbank nicht erreichbar – es wird eine Fehlermeldung angezeigt. |
-| 16 | Qualitäten | Der Anmeldevorgang soll in maximal 5 Sekunden abgeschlossen sein. Nutzer erhalten visuelles Feedback bei Erfolg oder Fehler. |
+| Abschnitt | Inhalt / Erläuterung |
+|---|---|
+| **Bezeichner** | UC01 |
+| **Name** | Registrieren |
+| **Autoren** | Projektteam |
+| **Priorität** | Hoch. Voraussetzung für jede Nutzung der Plattform. |
+| **Kritikalität** | Hoch. Ohne Registrierung ist keine Teilnahme am Marktplatz möglich. |
+| **Verantwortlicher** | Backend (Nutzerverwaltung, Mailversand), Frontend (Formular, UI) |
+| **Beschreibung** | Ein Gast legt ein Konto an, indem er seinen Namen, eine THM-E-Mail-Adresse und ein selbstgewähltes Passwort angibt. Das System prüft Format und Domain, legt bei Erfolg ein unverifiziertes Konto an und versendet eine Bestätigungs-E-Mail mit einem 24 Stunden gültigen Verifizierungslink. Erst nach Klick auf den Link ist das Konto anmeldebereit. |
+| **Auslösendes Ereignis** | Der Gast klickt auf „Jetzt registrieren". |
+| **Akteure** | Gast (Student mit THM-E-Mail-Adresse). |
+| **Vorbedingung** | Der Gast besitzt eine gültige `@thm.de`-Adresse (inkl. Subdomains wie `@mnd.thm.de`). |
+| **Nachbedingung** | Ein neues, verifiziertes Konto ist angelegt und anmeldebereit. |
+| **Ergebnis** | Der Gast kann sich mit seinen neuen Zugangsdaten anmelden (UC02). |
+| **Hauptszenario** | 1. Gast öffnet die Registrierung und gibt Name, THM-E-Mail-Adresse und Passwort ein. 2. System prüft Format (Domain, Passwortstärke). 3. System prüft, ob die E-Mail-Adresse bereits registriert ist. 4. System legt ein unverifiziertes Konto an und erzeugt einen 24 Stunden gültigen Bestätigungslink. 5. System löst den Versand der Bestätigungs-E-Mail aus und zeigt eine Erfolgsmeldung. 6. Gast öffnet den Bestätigungslink aus der E-Mail. 7. System prüft den Link auf Gültigkeit und setzt das Konto bei Erfolg auf verifiziert. |
+| **Alternativszenarien** | Ist der Bestätigungslink abgelaufen oder unbekannt, kann höchstens alle 60 Sekunden ein neuer Link angefordert werden. |
+| **Ausnahmeszenario** | Ist die Datenbank oder der E-Mail-Dienst nicht erreichbar, wird die Registrierung abgebrochen und eine Fehlermeldung angezeigt. |
+| **Qualitäten** | Das Passwort wird ausschließlich als bcrypt-Hash gespeichert (NFA-02). Nur `@thm.de`-Adressen werden akzeptiert (NFA-03). Der Bestätigungslink ist zeitlich begrenzt gültig. |
 
-*Tabelle 2: Use Case UC01 – Login*
+*Tabelle: Use Case UC01 – Registrieren*
 
-### UC02 – Registrierung
+## 2.4 UC02 – Anmelden
 
-| Nr. | Abschnitt | Inhalt / Erläuterung |
-| --- | --- | --- |
-| 01 | Bezeichner | UC02 |
-| 02 | Name | Registrierung |
-| 03 | Autoren | Projektteam |
-| 04 | Priorität | Hoch. Ermöglicht die Nutzung der geschlossenen Plattform. |
-| 05 | Kritikalität | Hoch. Notwendig für den Zugang und die Eingrenzung auf THM-Studierende. |
-| 06 | Verantwortlicher | Backend-Team (Nutzerverwaltung, Mailversand), Frontend-Team (Formulare, UI) |
-| 07 | Beschreibung | Nutzer legen ein Konto an, indem sie ihre THM-E-Mail-Adresse, einen Benutzernamen und ein selbstgewähltes Passwort angeben. Das System prüft, ob es sich um eine gültige THM-Adresse handelt, und versendet eine Bestätigungs-E-Mail mit einem Verifizierungslink. Erst nach Klick auf den Link ist das Konto aktiv. |
-| 08 | Auslösendes Ereignis | Der Nutzer klickt auf „Jetzt registrieren“. |
-| 09 | Akteure | Studierende der THM, die ein Konto erstellen möchten. |
-| 10 | Vorbedingung | Die Webseite ist aufrufbar; der Nutzer besitzt eine gültige THM-E-Mail-Adresse. |
-| 11 | Nachbedingung | Ein neues, noch nicht verifiziertes Konto ist angelegt und eine Bestätigungs-E-Mail wurde versendet. Nach Klick auf den Link ist das Konto verifiziert. |
-| 12 | Ergebnis | Ein verifiziertes Benutzerkonto steht für die Anmeldung bereit. |
-| 13 | Hauptszenario | 1. Der Nutzer klickt auf „Jetzt registrieren“. 2. Ein Formular wird angezeigt. 3. Der Nutzer gibt THM-E-Mail-Adresse, Benutzername und Passwort ein. 4. Das System prüft die Eingaben und die THM-Domain und legt ein unverifiziertes Konto an. 5. Eine Bestätigungs-E-Mail mit Verifizierungslink wird versendet. 6. Der Nutzer öffnet den Link und das Konto wird verifiziert; anschließend erfolgt die Weiterleitung zum Login (UC01). |
-| 14 | Alternativszenarien | Ist die E-Mail-Adresse bereits vergeben, wird der Nutzer darauf hingewiesen. Bei einer Nicht-THM-Adresse wird die Registrierung abgelehnt. Wurde die Bestätigungs-E-Mail nicht zugestellt oder ist der Link abgelaufen, kann der Nutzer einen neuen Verifizierungslink anfordern. |
-| 15 | Ausnahme Szenario | Datenbank oder E-Mail-Dienst nicht erreichbar – es erscheint eine Meldung, dass aktuell keine Registrierung möglich ist. |
-| 16 | Qualitäten | Formulare validieren Eingaben client- und serverseitig. Das Passwort wird ausschließlich als Hash (mit Salt) gespeichert. Der Verifizierungslink ist zeitlich begrenzt gültig. |
+| Abschnitt | Inhalt / Erläuterung |
+|---|---|
+| **Bezeichner** | UC02 |
+| **Name** | Anmelden |
+| **Autoren** | Projektteam |
+| **Priorität** | Hoch. Voraussetzung für jede Nutzung der Plattform. |
+| **Kritikalität** | Sehr hoch. Ohne Login ist keine Nutzung möglich. |
+| **Verantwortlicher** | Backend (Nutzerverwaltung, Sitzungsverwaltung), Frontend (Formular, UI) |
+| **Beschreibung** | Ein registrierter Nutzer meldet sich mit E-Mail-Adresse und Passwort an. Das System sucht das Konto in einem einzigen Datenbankzugriff, prüft anschließend den Verifizierungsstatus und das Passwort gegen die bereits geladenen Kontodaten. Bei Erfolg wird eine Sitzung erstellt und der Nutzer entsprechend seiner Rolle weitergeleitet. |
+| **Auslösendes Ereignis** | Der Nutzer ruft die Login-Seite auf und gibt seine Zugangsdaten ein. |
+| **Akteure** | Registrierter Nutzer (Student oder Administrator). |
+| **Vorbedingung** | Das Konto existiert und ist verifiziert. |
+| **Nachbedingung** | Eine Sitzung ist erstellt und der Nutzer ist angemeldet. |
+| **Ergebnis** | Student wird zum Marktplatz, Administrator zum Admin-Bereich weitergeleitet. |
+| **Hauptszenario** | 1. Nutzer gibt E-Mail-Adresse und Passwort ein. 2. System sucht das Konto zur E-Mail-Adresse. 3. System prüft den Verifizierungsstatus. 4. System prüft das Passwort. 5. System erstellt eine Sitzung und leitet zum Marktplatz bzw. Admin-Bereich weiter. |
+| **Alternativszenarien** | Existiert kein Konto zur E-Mail-Adresse oder ist das Passwort falsch, wird eine Fehlermeldung angezeigt. Ist das Konto noch nicht verifiziert, erscheint stattdessen ein Hinweis zur Verifizierung. |
+| **Ausnahmeszenario** | Ist die Datenbank nicht erreichbar, wird eine Fehlermeldung angezeigt. |
+| **Qualitäten** | Der Anmeldevorgang benötigt nur einen einzigen Datenbankzugriff. Passwörter werden nie im Klartext verglichen, sondern als Hash geprüft (NFA-02). |
 
-*Tabelle 3: Use Case UC02 – Registrierung*
+*Tabelle: Use Case UC02 – Anmelden*
 
-![Aktivitätsdiagramm zur Registrierung](diagram_images/f2-aktivitaetsdiagramm-registrierung.jpg)
+## 2.5 UC03 – Passwort zurücksetzen
 
-*Abbildung 5: Verfeinerung der Aktivität „Registrierung durchführen“*
+| Abschnitt | Inhalt / Erläuterung |
+|---|---|
+| **Bezeichner** | UC03 |
+| **Name** | Passwort zurücksetzen |
+| **Autoren** | Projektteam |
+| **Priorität** | Mittel. Wichtig für die Kontowiederherstellung, aber kein täglicher Ablauf. |
+| **Kritikalität** | Mittel. Ohne diese Funktion wäre ein vergessenes Passwort ein endgültiger Kontoverlust. |
+| **Verantwortlicher** | Backend (Nutzerverwaltung, Mailversand), Frontend (Formular, UI) |
+| **Beschreibung** | Ein Nutzer, der sein Passwort vergessen hat, fordert über seine E-Mail-Adresse einen Reset-Link an. Über den zeitlich begrenzten Link kann anschließend ein neues Passwort gesetzt werden. |
+| **Auslösendes Ereignis** | Der Nutzer klickt auf „Passwort vergessen". |
+| **Akteure** | Nutzer, der sein Passwort vergessen hat. |
+| **Vorbedingung** | Der Nutzer kennt seine registrierte E-Mail-Adresse. |
+| **Nachbedingung** | Bei gültigem Link ist ein neues Passwort gesetzt. |
+| **Ergebnis** | Der Nutzer kann sich mit dem neuen Passwort anmelden (UC02). |
+| **Hauptszenario** | 1. Nutzer gibt seine E-Mail-Adresse ein. 2. System sucht das Konto und erstellt bei einem verifizierten Treffer einen Reset-Link. 3. System zeigt in jedem Fall denselben Hinweis zur Sendung der E-Mail. 4. Nutzer öffnet den Reset-Link und gibt ein neues Passwort ein. 5. System prüft den Link auf Gültigkeit und setzt bei Erfolg das neue Passwort. |
+| **Alternativszenarien** | Ist das Konto zur Adresse zwar vorhanden, aber unverifiziert, erhält der Nutzer einen Hinweis zur Verifizierung statt eines Reset-Links. |
+| **Ausnahmeszenario** | Ist der Reset-Link ungültig oder abgelaufen, wird eine Fehlermeldung angezeigt und kein Passwort gesetzt. |
+| **Qualitäten** | Der Reset-Link ist zeitlich begrenzt gültig. |
 
-### UC03 – Inserat erstellen
+*Tabelle: Use Case UC03 – Passwort zurücksetzen*
 
-| Nr. | Abschnitt | Inhalt / Erläuterung |
-| --- | --- | --- |
-| 01 | Bezeichner | UC03 |
-| 02 | Name | Inserat erstellen |
-| 03 | Autoren | Projektteam |
-| 04 | Priorität | Hoch. Kernfunktion der Plattform. |
-| 05 | Kritikalität | Hoch. Ohne Inserate hat der Marktplatz keinen Inhalt. |
-| 06 | Verantwortlicher | Frontend-Team (Formular, Bild-Upload), Backend-Team (Speicherung) |
-| 07 | Beschreibung | Der eingeloggte Nutzer kann ein neues Inserat anlegen. Dazu gibt er Titel, Beschreibung, Kategorie, Angebotstyp (Verkauf oder Miete) und Preis an und lädt ein oder mehrere Bilder hoch. Die Bilddateien werden gespeichert; ihre Zuordnung zum Inserat und der jeweilige Speicherpfad werden in der Datenbank hinterlegt. |
-| 08 | Auslösendes Ereignis | Der Nutzer klickt auf „Inserat erstellen“. |
-| 09 | Akteure | Eingeloggte Nutzer (als Anbieter). |
-| 10 | Vorbedingung | Der Nutzer ist eingeloggt. |
-| 11 | Nachbedingung | Das Inserat und die Zuordnungen zu den gespeicherten Bildern sind dauerhaft gespeichert; das Inserat ist auf dem Marktplatz sichtbar. |
-| 12 | Ergebnis | Ein neues Inserat ist veröffentlicht und für andere Nutzer auffindbar. |
-| 13 | Hauptszenario | 1. Der Nutzer klickt auf „Inserat erstellen“. 2. Das Inserat-Formular wird angezeigt. 3. Der Nutzer füllt Titel, Beschreibung, Kategorie, Typ und Preis aus. 4. Der Nutzer lädt ein oder mehrere Bilder hoch. 5. Das System validiert die Eingaben und Bilder. 6. Das Inserat wird gespeichert und der Nutzer erhält eine Erfolgsmeldung. |
-| 14 | Alternativszenarien | Bei fehlenden Pflichtfeldern oder ungültigen Bildern (Format/Größe) wird eine Fehlermeldung angezeigt. Der Nutzer kann den Vorgang abbrechen. |
-| 15 | Ausnahme Szenario | Datenbank nicht erreichbar – das Inserat wird nicht gespeichert und eine Fehlermeldung wird angezeigt. |
-| 16 | Qualitäten | Bilder werden auf Format und Größe geprüft. Das Speichern soll in maximal 5 Sekunden erfolgen. Nutzer erhalten visuelles Feedback bei Erfolg oder Fehler. |
+## 2.6 UC04 – Inserat erstellen
 
-*Tabelle 4: Use Case UC03 – Inserat erstellen*
+| Abschnitt | Inhalt / Erläuterung |
+|---|---|
+| **Bezeichner** | UC04 |
+| **Name** | Inserat erstellen |
+| **Autoren** | Projektteam |
+| **Priorität** | Hoch. Kernfunktion der Plattform. |
+| **Kritikalität** | Hoch. Ohne Inserate hat der Marktplatz keinen Inhalt. |
+| **Verantwortlicher** | Frontend (Formular, Bild-Upload), Backend (Speicherung), externe Dienste (Cloudinary, Gemini) |
+| **Beschreibung** | Ein angemeldeter Student legt ein neues Inserat an. Er gibt Titel, Beschreibung, Kategorie, Preis und Sofortkauf-Option ein und wählt mindestens ein Foto aus. Optional kann er sich von Gemini einen Beschreibungsvorschlag generieren lassen. Nach Validierung wird das Inserat gespeichert und ist sofort im Marktplatz sichtbar. |
+| **Auslösendes Ereignis** | Der Student klickt auf „Inserat erstellen". |
+| **Akteure** | Student (als Anbieter). |
+| **Vorbedingung** | Der Nutzer ist angemeldet. |
+| **Nachbedingung** | Das Inserat und die zugehörigen Bild-URLs sind dauerhaft gespeichert. |
+| **Ergebnis** | Ein neues Inserat ist veröffentlicht und für andere Nutzer im Marktplatz auffindbar (UC06). |
+| **Hauptszenario** | 1. Student öffnet „Inserat erstellen". 2. Student gibt Titel, Kategorie, Preis, Sofortkauf-Option und Beschreibung ein. 3. Student wählt ein oder mehrere Fotos aus. 4. Optional: System sendet Details an Gemini und übernimmt den gelieferten Beschreibungsvorschlag. 5. Student klickt „Inserat veröffentlichen". 6. System prüft die Pflichtfelder. 7. Bei Erfolg speichert das System das Inserat und zeigt eine Erfolgsmeldung. |
+| **Alternativszenarien** | Fehlen Pflichtfelder oder Fotos, zeigt das System Feldfehler an und speichert nicht. Schlägt der KI-Vorschlag fehl, bleibt die manuelle Eingabe der Beschreibung uneingeschränkt möglich (NFA-06). |
+| **Ausnahmeszenario** | Ist die Datenbank nicht erreichbar, wird das Inserat nicht gespeichert und eine Fehlermeldung angezeigt. |
+| **Qualitäten** | – |
 
-### UC04 – Inserate durchsuchen und filtern
+*Tabelle: Use Case UC04 – Inserat erstellen*
 
-| Nr. | Abschnitt | Inhalt / Erläuterung |
-| --- | --- | --- |
-| 01 | Bezeichner | UC04 |
-| 02 | Name | Inserate durchsuchen und filtern |
-| 03 | Autoren | Projektteam |
-| 04 | Priorität | Hoch. Zentral für das Auffinden von Angeboten. |
-| 05 | Kritikalität | Mittel. Wichtig für die Nutzerfreundlichkeit, aber nicht sicherheitsrelevant. |
-| 06 | Verantwortlicher | Frontend-Team, Backend-Team (Suchlogik) |
-| 07 | Beschreibung | Der eingeloggte Nutzer kann den Marktplatz durchsuchen. Über ein Suchfeld sowie Filter (z. B. Kategorie, Angebotstyp, Preisbereich) kann er die angezeigten Inserate eingrenzen. Die Ergebnisse werden als Liste bzw. Kachelübersicht dargestellt. |
-| 08 | Auslösendes Ereignis | Der Nutzer gibt einen Suchbegriff ein oder wählt einen Filter. |
-| 09 | Akteure | Eingeloggte Nutzer (als Interessent). |
-| 10 | Vorbedingung | Der Nutzer ist eingeloggt und befindet sich auf dem Marktplatz. |
-| 11 | Nachbedingung | Die zur Suche/Filterung passenden Inserate werden angezeigt. |
-| 12 | Ergebnis | Der Nutzer sieht eine gefilterte Liste relevanter Inserate. |
-| 13 | Hauptszenario | 1. Der Nutzer befindet sich auf dem Marktplatz. 2. Der Nutzer gibt einen Suchbegriff ein und/oder wählt Filter (Kategorie, Typ, Preis). 3. Das System übernimmt und prüft die Eingaben. 4. Die passenden Inserate werden aus der Datenbank abgerufen. 5. Die Ergebnisse werden im Hauptbereich angezeigt. |
-| 14 | Alternativszenarien | Liefert die Suche keine Treffer, wird ein entsprechender Hinweis angezeigt. |
-| 15 | Ausnahme Szenario | Datenbank nicht erreichbar – es wird eine Fehlermeldung angezeigt. |
-| 16 | Qualitäten | Die Ergebnisanzeige soll maximal zwei Sekunden nach der Eingabe erfolgen. Die Darstellung erfolgt in konsistenter Struktur. |
+## 2.7 UC05 – Inserat verwalten
 
-*Tabelle 5: Use Case UC04 – Inserate durchsuchen und filtern*
+| Abschnitt | Inhalt / Erläuterung |
+|---|---|
+| **Bezeichner** | UC05 |
+| **Name** | Inserat verwalten |
+| **Autoren** | Projektteam |
+| **Priorität** | Mittel bis hoch. Wichtig für die Pflege eigener Angebote. |
+| **Kritikalität** | Mittel. Betrifft nur die eigenen Daten des Nutzers. |
+| **Verantwortlicher** | Frontend (UI), Backend (Logik, Speicherung) |
+| **Beschreibung** | Der Verkäufer öffnet über sein Profil ein eigenes Inserat und kann es von dort bearbeiten, manuell als verkauft markieren oder löschen. Bearbeiten führt zum selben Formular wie beim Erstellen (UC04), vorbefüllt mit den bestehenden Werten. |
+| **Auslösendes Ereignis** | Der Verkäufer klickt im Profil auf ein eigenes aktives Inserat und wählt eine Aktion. |
+| **Akteure** | Verkäufer (Eigentümer eines Inserats). |
+| **Vorbedingung** | Der Nutzer ist angemeldet und besitzt mindestens ein eigenes Inserat. |
+| **Nachbedingung** | Das Inserat ist geändert, als verkauft markiert oder entfernt. |
+| **Ergebnis** | Die eigenen Inserate sind aktuell. |
+| **Hauptszenario** | 1. Verkäufer öffnet Profil und klickt auf ein eigenes aktives Inserat. 2. System zeigt die Inserat-Detailseite. 3. Verkäufer klickt „Bearbeiten". 4. System zeigt die vorbefüllte Bearbeiten-Seite. 5a. Bearbeiten: Verkäufer ändert Felder und speichert, System speichert die Änderungen. 5b. Als verkauft markieren: System zeigt eine Warnung, Verkäufer bestätigt, System setzt den Status. 5c. Löschen: System zeigt eine Warnung, Verkäufer bestätigt, System entfernt das Inserat. |
+| **Alternativszenarien** | Bei „Als verkauft markieren" und „Löschen" muss der Verkäufer die vorangehende Warnung explizit bestätigen, bevor die Aktion ausgeführt wird. |
+| **Ausnahmeszenario** | Kann die Änderung wegen eines Server- oder Datenbankfehlers nicht gespeichert werden, erscheint eine Fehlermeldung. |
+| **Qualitäten** | Nur der Eigentümer darf sein Inserat bearbeiten, als verkauft markieren oder löschen. |
 
-### UC05 – Inseratdetails ansehen
+*Tabelle: Use Case UC05 – Inserat verwalten*
 
-| Nr. | Abschnitt | Inhalt / Erläuterung |
-| --- | --- | --- |
-| 01 | Bezeichner | UC05 |
-| 02 | Name | Inseratdetails ansehen |
-| 03 | Autoren | Projektteam |
-| 04 | Priorität | Hoch. Grundlage für Kontaktaufnahme und Favorisierung. |
-| 05 | Kritikalität | Niedrig. Funktional wichtig, aber nicht systemkritisch. |
-| 06 | Verantwortlicher | Frontend-Team, Backend-Team (Datenabruf) |
-| 07 | Beschreibung | Der Nutzer öffnet ein Inserat, um alle Details einzusehen: Titel, Beschreibung, Bilder, Preis, Angebotstyp, Kategorie und Angaben zum Anbieter. Von der Detailansicht aus kann der Nutzer das Inserat favorisieren, den Anbieter kontaktieren oder das Inserat melden. |
-| 08 | Auslösendes Ereignis | Der Nutzer klickt in der Übersicht auf ein Inserat. |
-| 09 | Akteure | Eingeloggte Nutzer (als Interessent). |
-| 10 | Vorbedingung | Der Nutzer ist eingeloggt; das Inserat existiert. |
-| 11 | Nachbedingung | Die Detailansicht des Inserats wird angezeigt. |
-| 12 | Ergebnis | Der Nutzer sieht alle Informationen zum Inserat und mögliche Folgeaktionen. |
-| 13 | Hauptszenario | 1. Der Nutzer klickt in der Übersicht auf ein Inserat. 2. Das System ruft die Detaildaten inklusive Bilder ab. 3. Die Detailansicht wird angezeigt. 4. Dem Nutzer werden die Aktionen Favorisieren, Kontaktieren und Melden angeboten. |
-| 14 | Alternativszenarien | Wurde das Inserat zwischenzeitlich gelöscht, wird ein entsprechender Hinweis angezeigt. |
-| 15 | Ausnahme Szenario | Datenbank nicht erreichbar – es wird eine Fehlermeldung angezeigt. |
-| 16 | Qualitäten | Die Detailansicht soll innerhalb von zwei Sekunden geladen werden. Bilder werden in konsistenter Qualität dargestellt. |
+## 2.8 UC06 – Inserat durchsuchen und favorisieren
 
-*Tabelle 6: Use Case UC05 – Inseratdetails ansehen*
+| Abschnitt | Inhalt / Erläuterung |
+|---|---|
+| **Bezeichner** | UC06 |
+| **Name** | Inserat durchsuchen und favorisieren |
+| **Autoren** | Projektteam |
+| **Priorität** | Hoch. Zentral für das Auffinden von Angeboten. |
+| **Kritikalität** | Mittel. Wichtig für die Nutzerfreundlichkeit, nicht sicherheitsrelevant. |
+| **Verantwortlicher** | Frontend (Such-/Filterlogik, Detailansicht) |
+| **Beschreibung** | Der angemeldete Nutzer sieht beim Öffnen der Startseite alle aktiven Inserate. Über Suchfeld, Kategorie-Filter und Sortierung kann er die Anzeige eingrenzen, ohne dass dafür erneute Serveranfragen nötig sind. Aus der Detailansicht heraus kann er ein fremdes Inserat favorisieren. |
+| **Auslösendes Ereignis** | Der Nutzer öffnet die Startseite bzw. gibt einen Suchbegriff ein/wählt einen Filter. |
+| **Akteure** | Eingeloggter Nutzer (als Interessent). |
+| **Vorbedingung** | Der Nutzer ist angemeldet. |
+| **Nachbedingung** | Die passenden Inserate werden angezeigt; ein Favorit ist gesetzt oder entfernt. |
+| **Ergebnis** | Der Nutzer sieht eine gefilterte Liste relevanter Inserate bzw. hat ein Inserat favorisiert. |
+| **Hauptszenario** | 1. Nutzer öffnet die Startseite. 2. System lädt einmalig alle aktiven Inserate. 3. Nutzer gibt einen Suchbegriff ein, wählt einen Kategorie-Filter oder ändert die Sortierung; die Anzeige aktualisiert sich sofort. 4. Nutzer klickt auf ein Inserat und sieht die Detailansicht. 5. Ist der Nutzer nicht Eigentümer, kann er über das Herz-Symbol das Inserat favorisieren oder entfavorisieren. |
+| **Alternativszenarien** | Liefert die Suche keinen Treffer, erscheint der Hinweis „Keine Inserate gefunden". Ist der Nutzer Eigentümer des betrachteten Inserats, ist der Merken-Button nicht verfügbar. |
+| **Ausnahmeszenario** | Ist die Datenbank beim initialen Laden nicht erreichbar, wird eine Fehlermeldung angezeigt. |
+| **Qualitäten** | Suche, Filter und Sortierung laufen vollständig clientseitig auf der bereits geladenen Liste. |
 
-### UC06 – Favorit speichern
+*Tabelle: Use Case UC06 – Inserat durchsuchen und favorisieren*
 
-| Nr. | Abschnitt | Inhalt / Erläuterung |
-| --- | --- | --- |
-| 01 | Bezeichner | UC06 |
-| 02 | Name | Favorit speichern |
-| 03 | Autoren | Projektteam |
-| 04 | Priorität | Mittel bis hoch. Erhöht den Komfort bei wiederholter Nutzung. |
-| 05 | Kritikalität | Niedrig. Funktional nützlich, aber für das System nicht kritisch. |
-| 06 | Verantwortlicher | Frontend-Team (Nutzerinteraktion), Backend-Team (Datenbankzugriff) |
-| 07 | Beschreibung | Nutzer können Inserate, die sie im Auge behalten möchten, als Favorit markieren. Die Favoriten werden serverseitig im Nutzerprofil gespeichert und sind über eine eigene Favoritenliste erreichbar. |
-| 08 | Auslösendes Ereignis | Der Nutzer klickt bei einem Inserat auf „Favorit speichern“. |
-| 09 | Akteure | Eingeloggte Nutzer. |
-| 10 | Vorbedingung | Der Nutzer ist eingeloggt und betrachtet ein Inserat. |
-| 11 | Nachbedingung | Das Inserat ist als Favorit markiert und erscheint in der Favoritenliste des Nutzers. |
-| 12 | Ergebnis | Das favorisierte Inserat ist beim nächsten Besuch direkt abrufbar. |
-| 13 | Hauptszenario | 1. Der Nutzer ruft ein Inserat auf. 2. Der Nutzer klickt auf „Favorit speichern“. 3. Das System speichert die Zuordnung im Nutzerprofil. 4. Die Favoritenliste wird sofort aktualisiert. |
-| 14 | Alternativszenarien | Ist das Inserat bereits favorisiert, kann der Nutzer es durch erneutes Klicken wieder entfernen. |
-| 15 | Ausnahme Szenario | Datenbank temporär nicht erreichbar – der Vorgang wird abgebrochen und das Inserat nicht gespeichert. |
-| 16 | Qualitäten | Favoriten sollen mit einem Klick speicherbar sein. Die Daten werden sicher im Nutzerprofil abgelegt. |
+## 2.9 UC07 – Chat mit Nutzer führen
 
-*Tabelle 7: Use Case UC06 – Favorit speichern*
+| Abschnitt | Inhalt / Erläuterung |
+|---|---|
+| **Bezeichner** | UC07 |
+| **Name** | Chat mit Nutzer führen |
+| **Autoren** | Projektteam |
+| **Priorität** | Hoch. Zentrale Funktion für die Kontaktaufnahme; wichtigstes Feature der Plattform. |
+| **Kritikalität** | Mittel. Wichtig für den Handel, nicht systemkritisch. |
+| **Verantwortlicher** | Frontend (Chat-UI), Backend (Socket.io, Speicherung) |
+| **Beschreibung** | Interessent und Anbieter tauschen zu einem Inserat Nachrichten in Echtzeit aus. Beim ersten Kontakt zu einem Inserat wird eine Konversation angelegt bzw. eine bestehende geöffnet. Jede Nachricht wird zunächst gespeichert und danach über Socket.io zugestellt. |
+| **Auslösendes Ereignis** | Der Interessent klickt bei einem Inserat auf „Anbieter kontaktieren" oder öffnet eine bestehende Konversation. |
+| **Akteure** | Interessent (Chat-Initiator), Anbieter (Empfänger). |
+| **Vorbedingung** | Beide Nutzer sind registriert und angemeldet; das Inserat ist nicht das eigene und noch nicht verkauft. |
+| **Nachbedingung** | Die Nachricht ist zugestellt und gespeichert; die Konversation ist für beide Nutzer sichtbar. |
+| **Ergebnis** | Interessent und Anbieter können in Echtzeit kommunizieren. |
+| **Hauptszenario** | 1. Interessent klickt bei einem Inserat auf „Anbieter kontaktieren". 2. System prüft, ob bereits eine Unterhaltung zu diesem Inserat existiert, und öffnet sie oder legt eine neue an. 3. Interessent schreibt und sendet eine Nachricht. 4. System prüft die Teilnehmerschaft. 5. System speichert die Nachricht und stellt sie über Socket.io zu; ist die Konversation beim Empfänger gerade geöffnet, erscheint sie sofort als gelesen, sonst als Benachrichtigung mit Sprung nach oben in der Liste. |
+| **Alternativszenarien** | Ist das Inserat das eigene oder bereits verkauft, ist der Button „Anbieter kontaktieren" nicht verfügbar. Schlägt eine Prüfung fehl, zeigt das System einen passenden Fehler. |
+| **Ausnahmeszenario** | Bei Verbindungsabbruch versucht das System automatisch, die Verbindung wiederherzustellen. |
+| **Qualitäten** | Der Chat ist nur zwischen den beteiligten Nutzern sichtbar. |
 
-### UC07 – Chat mit Nutzer führen
+*Tabelle: Use Case UC07 – Chat mit Nutzer führen*
 
-| Nr. | Abschnitt | Inhalt / Erläuterung |
-| --- | --- | --- |
-| 01 | Bezeichner | UC07 |
-| 02 | Name | Chat mit Nutzer führen |
-| 03 | Autoren | Projektteam |
-| 04 | Priorität | Hoch. Zentrale Funktion für die Kontaktaufnahme. |
-| 05 | Kritikalität | Mittel. Wichtig für den Handel, aber nicht systemkritisch. |
-| 06 | Verantwortlicher | Frontend-Team (Chat-UI), Backend-Team (Socket.io, Speicherung) |
-| 07 | Beschreibung | Über den integrierten Echtzeit-Chat können Interessent und Anbieter zu einem Inserat Nachrichten austauschen. Beim ersten Kontakt zu einem Inserat wird eine Konversation angelegt. Nachrichten werden über Socket.io in Echtzeit übertragen und in der Datenbank gespeichert. |
-| 08 | Auslösendes Ereignis | Der Nutzer klickt in einem Inserat auf „Anbieter kontaktieren“ oder öffnet eine bestehende Konversation. |
-| 09 | Akteure | Eingeloggte Nutzer (Interessent und Anbieter). |
-| 10 | Vorbedingung | Beide Nutzer sind registriert; der Nutzer ist eingeloggt. |
-| 11 | Nachbedingung | Die Nachricht ist zugestellt und gespeichert; die Konversation ist für beide Nutzer sichtbar. |
-| 12 | Ergebnis | Interessent und Anbieter können in Echtzeit kommunizieren. |
-| 13 | Hauptszenario | 1. Der Nutzer klickt bei einem Inserat auf „Anbieter kontaktieren“. 2. Das System öffnet die (ggf. neu angelegte) Konversation. 3. Der Nutzer verfasst eine Nachricht und sendet sie ab. 4. Die Nachricht wird über Socket.io in Echtzeit übertragen und gespeichert. 5. Der Empfänger sieht die Nachricht in seiner Konversationsübersicht. |
-| 14 | Alternativszenarien | Ist der Empfänger offline, wird die Nachricht gespeichert und beim nächsten Aufruf der Konversation angezeigt. Bei einem Verbindungsabbruch versucht das System, die Verbindung erneut herzustellen. Der Nutzer kann das Verfassen abbrechen. |
-| 15 | Ausnahme Szenario | Verbindungsabbruch oder Datenbankfehler – die Nachricht wird nicht zugestellt und eine Fehlermeldung wird angezeigt. |
-| 16 | Qualitäten | Nachrichten sollen bei bestehender Verbindung in unter einer Sekunde zugestellt werden. Der Chat ist nur zwischen den beteiligten Nutzern sichtbar. |
+## 2.10 UC08 – Kauf abschließen
 
-*Tabelle 8: Use Case UC07 – Chat mit Nutzer führen*
+| Abschnitt | Inhalt / Erläuterung |
+|---|---|
+| **Bezeichner** | UC08 |
+| **Name** | Kauf abschließen |
+| **Autoren** | Projektteam |
+| **Priorität** | Hoch. Kernfunktion für den Abschluss eines Handels. |
+| **Kritikalität** | Mittel. Wichtig für den Ablauf, aber ohne echten Geldfluss. |
+| **Verantwortlicher** | Backend (Logik, Guthabenverrechnung), Frontend (Kauf-Formular) |
+| **Beschreibung** | Ein Student schließt den Kauf eines fremden, aktiven Inserats mit aktivierter Sofortkauf-Option ab. Er wählt zwischen zwei simulierten Zahlungsmodi: Simulation (Testkarteneingabe, kein Geldfluss) oder In-App-Guthaben (Verrechnung über den eigenen Kontostand). In beiden Fällen wird das Inserat als verkauft markiert. |
+| **Auslösendes Ereignis** | Der Nutzer klickt bei einem kaufbaren, fremden Inserat auf „Kaufen". |
+| **Akteure** | Student (als Käufer). |
+| **Vorbedingung** | Der Nutzer ist angemeldet, nicht Eigentümer/Admin, das Inserat ist aktiv und Sofortkauf ist aktiviert. |
+| **Nachbedingung** | Das Inserat ist als verkauft markiert; bei Guthaben-Modus wurde der Betrag umgebucht. |
+| **Ergebnis** | Der Kauf ist abgeschlossen. |
+| **Hauptszenario** | 1. Käufer klickt auf „Kaufen". 2. Käufer wählt den Zahlungsmodus. 3a. Simulation: Käufer gibt Testkartendaten ein, System validiert die Karte und markiert bei Erfolg das Inserat als verkauft. 3b. Guthaben: Käufer bestätigt den Kauf, System prüft, ob das Guthaben ausreicht, bucht bei Erfolg den Betrag vom Käufer ab, schreibt ihn dem Verkäufer gut und markiert das Inserat als verkauft. |
+| **Alternativszenarien** | Ist das Inserat für Admins gesperrt, das eigene Inserat, bereits verkauft oder Sofortkauf deaktiviert, ist der „Kaufen"-Button nicht verfügbar. Ist die Testkarte ungültig oder das Guthaben unzureichend, wird eine Fehlermeldung angezeigt und der Kauf nicht durchgeführt. |
+| **Ausnahmeszenario** | Ist die Datenbank nicht erreichbar, wird der Kauf nicht gespeichert. |
+| **Qualitäten** | Es findet keine echte Zahlungsabwicklung statt. |
 
-![Aktivitätsdiagramm zum Senden einer Chat-Nachricht](diagram_images/f2-aktivitaetsdiagramm-chat.jpg)
+*Tabelle: Use Case UC08 – Kauf abschließen*
 
-*Abbildung 6: Verfeinerung der Aktivität „Nachricht im Chat senden“*
+## 2.11 UC09 – Guthaben aufladen
 
-### UC08 – Inserat melden
+| Abschnitt | Inhalt / Erläuterung |
+|---|---|
+| **Bezeichner** | UC09 |
+| **Name** | Guthaben aufladen |
+| **Autoren** | Projektteam |
+| **Priorität** | Mittel. Voraussetzung für den Zahlungsmodus „Guthaben" in UC08. |
+| **Kritikalität** | Niedrig. Funktional wichtig, nicht systemkritisch. |
+| **Verantwortlicher** | Frontend (Formular), Backend (Guthabenverwaltung) |
+| **Beschreibung** | Der Nutzer lädt über sein Profil sein In-App-Guthaben mit einem simulierten Betrag zwischen 5 € und 500 € auf. Nach Eingabe einer Testkarte wird der Betrag dem Kontostand gutgeschrieben. |
+| **Auslösendes Ereignis** | Der Nutzer öffnet sein Profil und klickt auf „Aufladen". |
+| **Akteure** | Eingeloggter Nutzer. |
+| **Vorbedingung** | Der Nutzer ist angemeldet. |
+| **Nachbedingung** | Das Guthaben ist um den eingezahlten Betrag erhöht. |
+| **Ergebnis** | Der neue Kontostand wird angezeigt. |
+| **Hauptszenario** | 1. Nutzer öffnet Profil, klickt „Aufladen". 2. System zeigt das Eingabefeld. 3. Nutzer gibt einen Betrag ein. 4. System prüft die Betragsgrenzen (5–500 €). 5. Nutzer gibt Testkartendaten ein. 6. System validiert die Testkarte und erhöht bei Erfolg das Guthaben. |
+| **Alternativszenarien** | Liegt der Betrag außerhalb von 5–500 € oder ist die Testkarte ungültig, wird eine Fehlermeldung angezeigt und das Guthaben nicht verändert. |
+| **Ausnahmeszenario** | Ein Server- oder Datenbankfehler beim Speichern wird als Fehlermeldung angezeigt. |
+| **Qualitäten** | Es findet keine echte Zahlungsabwicklung statt. Der gültige Betragsbereich ist fest auf 5–500 € begrenzt. |
 
-| Nr. | Abschnitt | Inhalt / Erläuterung |
-| --- | --- | --- |
-| 01 | Bezeichner | UC08 |
-| 02 | Name | Inserat melden |
-| 03 | Autoren | Projektteam |
-| 04 | Priorität | Mittel. Wichtig für die Sicherheit und Qualität der Plattform. |
-| 05 | Kritikalität | Mittel. Nicht systemkritisch, aber betriebsrelevant. |
-| 06 | Verantwortlicher | Frontend-Team (UI), Backend-Team (Speicherung, Routing an Admin) |
-| 07 | Beschreibung | Nutzer können unangemessene oder verdächtige Inserate melden (z. B. verbotene Ware, Betrugsverdacht). Die Meldung wird mit Grund und optionaler Beschreibung gespeichert und im Adminbereich zur Bearbeitung angezeigt. |
-| 08 | Auslösendes Ereignis | Der Nutzer klickt bei einem Inserat auf „Melden“. |
-| 09 | Akteure | Eingeloggte Nutzer. |
-| 10 | Vorbedingung | Der Nutzer ist eingeloggt und betrachtet ein Inserat. |
-| 11 | Nachbedingung | Die Meldung ist gespeichert und im Adminbereich zur Bearbeitung verfügbar. |
-| 12 | Ergebnis | Die Meldung wird im Adminbereich angezeigt und kann dort bearbeitet werden. |
-| 13 | Hauptszenario | 1. Der Nutzer klickt bei einem Inserat auf „Melden“. 2. Ein Meldeformular mit Auswahl des Grundes wird eingeblendet. 3. Der Nutzer wählt einen Grund und gibt optional eine Beschreibung an. 4. Das System validiert und speichert die Meldung. 5. Dem Nutzer wird eine Bestätigung angezeigt. |
-| 14 | Alternativszenarien | Der Nutzer bricht das Formular ab – keine Speicherung. Bei ungültiger Eingabe wird eine Fehlermeldung angezeigt. |
-| 15 | Ausnahme Szenario | Datenbank nicht erreichbar – die Meldung wird nicht gespeichert und eine Fehlermeldung wird angezeigt. |
-| 16 | Qualitäten | Das Meldeformular ist klar strukturiert. Eingaben werden validiert. Die Übermittlung erfolgt in maximal drei Sekunden. |
+*Tabelle: Use Case UC09 – Guthaben aufladen*
 
-*Tabelle 9: Use Case UC08 – Inserat melden*
+> **Hinweis:** Gültiger Bereich: 5 € bis 500 € pro Aufladung.
 
-### UC09 – Eigene Inserate verwalten
+## 2.12 UC10 – Guthaben auszahlen
 
-| Nr. | Abschnitt | Inhalt / Erläuterung |
-| --- | --- | --- |
-| 01 | Bezeichner | UC09 |
-| 02 | Name | Eigene Inserate verwalten |
-| 03 | Autoren | Projektteam |
-| 04 | Priorität | Mittel bis hoch. Wichtig für die Pflege eigener Angebote. |
-| 05 | Kritikalität | Mittel. Betrifft die eigenen Daten des Nutzers. |
-| 06 | Verantwortlicher | Frontend-Team (UI), Backend-Team (Logik, Speicherung) |
-| 07 | Beschreibung | Der eingeloggte Nutzer kann seine eigenen Inserate einsehen, bearbeiten (z. B. Preis, Beschreibung, Bilder ändern) oder löschen. Verkaufte bzw. vermietete Artikel können als abgeschlossen markiert oder entfernt werden. |
-| 08 | Auslösendes Ereignis | Der Nutzer öffnet den Bereich „Meine Inserate“. |
-| 09 | Akteure | Eingeloggte Nutzer (als Anbieter). |
-| 10 | Vorbedingung | Der Nutzer ist eingeloggt. |
-| 11 | Nachbedingung | Das betroffene Inserat wurde wie gewünscht geändert oder entfernt. |
-| 12 | Ergebnis | Die eigenen Inserate sind aktuell und korrekt. |
-| 13 | Hauptszenario | 1. Der Nutzer öffnet „Meine Inserate“. 2. Der Nutzer wählt ein Inserat. 3. Der Nutzer bearbeitet die Angaben oder löscht das Inserat. 4. Das System validiert und speichert die Änderung. |
-| 14 | Alternativszenarien | Der Nutzer bricht den Vorgang ab, ohne zu speichern. Besitzt der Nutzer noch keine eigenen Inserate, zeigt das System einen entsprechenden Hinweis an. |
-| 15 | Ausnahme Szenario | Die Änderung kann aufgrund eines Server- oder Datenbankfehlers nicht gespeichert werden. |
-| 16 | Qualitäten | Nur der Ersteller darf sein Inserat bearbeiten oder löschen. Änderungen sind sofort wirksam und dauerhaft gespeichert. |
+| Abschnitt | Inhalt / Erläuterung |
+|---|---|
+| **Bezeichner** | UC10 |
+| **Name** | Guthaben auszahlen |
+| **Autoren** | Projektteam |
+| **Priorität** | Mittel. Ergänzt UC09 um den Gegenvorgang. |
+| **Kritikalität** | Niedrig. Funktional wichtig, nicht systemkritisch. |
+| **Verantwortlicher** | Frontend (Formular), Backend (Guthabenverwaltung) |
+| **Beschreibung** | Der Nutzer zahlt über sein Profil einen Teil oder sein gesamtes In-App-Guthaben simuliert aus. |
+| **Auslösendes Ereignis** | Der Nutzer öffnet sein Profil und klickt auf „Auszahlen". |
+| **Akteure** | Eingeloggter Nutzer. |
+| **Vorbedingung** | Der Nutzer ist angemeldet. |
+| **Nachbedingung** | Das Guthaben ist um den ausgezahlten Betrag verringert. |
+| **Ergebnis** | Der neue Kontostand wird angezeigt. |
+| **Hauptszenario** | 1. Nutzer öffnet Profil, klickt „Auszahlen". 2. System prüft, ob Guthaben vorhanden ist, und zeigt das Eingabefeld. 3. Nutzer gibt einen Betrag ein. 4. System prüft, ob der Betrag gültig und innerhalb des verfügbaren Guthabens liegt. 5. Nutzer gibt Testkartendaten ein. 6. System validiert die Testkarte, prüft das Guthaben ein zweites Mal und verringert es bei Erfolg um den Betrag. |
+| **Alternativszenarien** | Ist kein Guthaben vorhanden, erscheint sofort „Kein Guthaben zum Auszahlen vorhanden". Ist der Betrag ungültig, über dem verfügbaren Guthaben oder die Testkarte ungültig, wird eine Fehlermeldung angezeigt. |
+| **Ausnahmeszenario** | Das Guthaben wird unmittelbar vor der Verrechnung ein zweites Mal serverseitig geprüft, um ein zwischenzeitlich verändertes Guthaben abzufangen. |
+| **Qualitäten** | Es findet keine echte Zahlungsabwicklung statt. |
 
-*Tabelle 10: Use Case UC09 – Eigene Inserate verwalten*
+*Tabelle: Use Case UC10 – Guthaben auszahlen*
 
-### UC10 – Nutzerkonten verwalten (Admin)
+## 2.13 UC11 – Inserat melden
 
-| Nr. | Abschnitt | Inhalt / Erläuterung |
-| --- | --- | --- |
-| 01 | Bezeichner | UC10 |
-| 02 | Name | Nutzerkonten verwalten (Admin) |
-| 03 | Autoren | Projektteam |
-| 04 | Priorität | Hoch. Notwendig zur Pflege der Nutzerbasis. |
-| 05 | Kritikalität | Hoch. Systempflege, sicherheitsrelevant. |
-| 06 | Verantwortlicher | Backend-Team (Logik), Frontend-Team (Admin-Oberfläche) |
-| 07 | Beschreibung | Der Administrator kann über die Adminoberfläche Nutzerkonten einsehen, bearbeiten, sperren oder löschen. Zusätzlich kann er Logs und Aktivitäten einsehen. |
-| 08 | Auslösendes Ereignis | Der Admin öffnet den Bereich „Benutzerverwaltung“ oder „Logs / Aktivitäten“. |
-| 09 | Akteure | Administrator. |
-| 10 | Vorbedingung | Der Admin ist erfolgreich eingeloggt. |
-| 11 | Nachbedingung | Das betroffene Nutzerkonto wurde wie gewünscht geändert; beim reinen Einsehen von Logs werden keine Daten verändert. |
-| 12 | Ergebnis | Das Nutzerkonto ist aktuell, z. B. gesperrt, gelöscht oder bearbeitet, oder die ausgewählten Logs wurden angezeigt. |
-| 13 | Hauptszenario | 1. Der Admin loggt sich in den Adminbereich ein. 2. Der Admin öffnet die Benutzerübersicht. 3. Der Admin wählt ein Konto. 4. Der Admin nimmt die gewünschte Änderung vor. |
-| 14 | Alternativszenarien | Der Admin bricht den Vorgang ab, ohne Änderungen zu speichern. Alternativ öffnet er den Bereich „Logs / Aktivitäten“, um protokollierte Systemereignisse einzusehen. |
-| 15 | Ausnahme Szenario | Die Änderungen können aufgrund eines Server- oder Datenbankfehlers nicht gespeichert werden. |
-| 16 | Qualitäten | Nur autorisierte Administratoren haben Zugriff. Änderungen sind sofort wirksam und dauerhaft gespeichert. |
+| Abschnitt | Inhalt / Erläuterung |
+|---|---|
+| **Bezeichner** | UC11 |
+| **Name** | Inserat melden |
+| **Autoren** | Projektteam |
+| **Priorität** | Mittel. Wichtig für Sicherheit und Qualität der Plattform. |
+| **Kritikalität** | Mittel. Nicht systemkritisch, aber betriebsrelevant. |
+| **Verantwortlicher** | Frontend (Meldeformular), Backend (Speicherung, Routing an Admin) |
+| **Beschreibung** | Ein Student kann ein fremdes Inserat wegen unangemessener Inhalte oder Betrugsverdacht melden. Die Meldung wird mit Grund gespeichert und erscheint im Admin-Bereich zur Bearbeitung (UC13). |
+| **Auslösendes Ereignis** | Der Student klickt bei einem Inserat auf „Inserat melden". |
+| **Akteure** | Student. |
+| **Vorbedingung** | Der Nutzer betrachtet ein fremdes Inserat und ist nicht Admin. |
+| **Nachbedingung** | Die Meldung ist gespeichert und im Admin-Bereich sichtbar. |
+| **Ergebnis** | Die Meldung kann von einem Admin bearbeitet werden. |
+| **Hauptszenario** | 1. Student öffnet die Inserat-Detailseite. 2. Student klickt „Inserat melden" und wählt einen Grund. 3. Student klickt „Melden". 4. System prüft, ob das Inserat existiert und ob bereits eine offene eigene Meldung dazu vorliegt. 5. Bei Erfolg speichert das System die Meldung und zeigt eine Bestätigung. |
+| **Alternativszenarien** | Ist der Nutzer Admin oder Eigentümer des Inserats, ist der Button „Inserat melden" nicht verfügbar. Liegt bereits eine offene eigene Meldung vor oder existiert das Inserat nicht mehr, wird eine Fehlermeldung angezeigt. |
+| **Ausnahmeszenario** | Ist die Datenbank nicht erreichbar, wird die Meldung nicht gespeichert. |
+| **Qualitäten** | Pro Nutzer und Inserat ist immer nur eine offene Meldung gleichzeitig möglich. |
 
-*Tabelle 11: Use Case UC10 – Nutzerkonten verwalten (Admin)*
+*Tabelle: Use Case UC11 – Inserat melden*
 
-### UC11 – Meldungen & Inserate moderieren (Admin)
+## 2.14 UC12 – Nutzer melden
 
-| Nr. | Abschnitt | Inhalt / Erläuterung |
-| --- | --- | --- |
-| 01 | Bezeichner | UC11 |
-| 02 | Name | Meldungen & Inserate moderieren (Admin) |
-| 03 | Autoren | Projektteam |
-| 04 | Priorität | Mittel bis hoch. Wichtig für die Qualität der Plattform. |
-| 05 | Kritikalität | Mittel. Nicht systemkritisch, aber betriebsrelevant. |
-| 06 | Verantwortlicher | Backend-Team (Logik), Frontend-Team (Admin-Oberfläche) |
-| 07 | Beschreibung | Der Administrator sieht im Adminbereich offene Meldungen zu Inseraten und kann diese prüfen. Er kann eine Verwarnung aussprechen, das Inserat ausblenden oder den Nutzer sperren. |
-| 08 | Auslösendes Ereignis | Der Admin öffnet den Bereich „Meldungen“. |
-| 09 | Akteure | Administrator. |
-| 10 | Vorbedingung | Der Admin ist eingeloggt und hat Berechtigung zur Bearbeitung von Meldungen. |
-| 11 | Nachbedingung | Die betroffene Meldung ist bearbeitet; die Maßnahme (Verwarnung, Ausblenden oder Sperre) wurde umgesetzt. |
-| 12 | Ergebnis | Die Meldung wurde verarbeitet und der Zustand der Plattform aktualisiert. |
-| 13 | Hauptszenario | 1. Der Admin öffnet die Meldungsübersicht. 2. Der Admin wählt eine Meldung. 3. Der Admin prüft das gemeldete Inserat. 4. Der Admin trifft eine Entscheidung (Verwarnung / ausblenden / Sperre). 5. Die Entscheidung wird gespeichert. |
-| 14 | Alternativszenarien | Der Admin schließt den Vorgang ohne Entscheidung. |
-| 15 | Ausnahme Szenario | Die Datenbank ist nicht erreichbar. Die Meldung kann nicht bearbeitet werden; eine Fehlermeldung wird angezeigt. |
-| 16 | Qualitäten | Nur berechtigte Admins dürfen Zugriff haben. Entscheidungen sind sofort wirksam und werden protokolliert. |
+| Abschnitt | Inhalt / Erläuterung |
+|---|---|
+| **Bezeichner** | UC12 |
+| **Name** | Nutzer melden |
+| **Autoren** | Projektteam |
+| **Priorität** | Mittel. Wichtig für Sicherheit und Qualität der Plattform. |
+| **Kritikalität** | Mittel. Nicht systemkritisch, aber betriebsrelevant. |
+| **Verantwortlicher** | Frontend (Meldeformular), Backend (Speicherung, Routing an Admin) |
+| **Beschreibung** | Ein Student kann aus einer laufenden Chat-Konversation heraus den anderen beteiligten Nutzer melden. Die Meldung wird mit dem Konversationskontext gespeichert und erscheint im Admin-Bereich zur Bearbeitung (UC13). |
+| **Auslösendes Ereignis** | Der Student klickt im Chat auf „Melden". |
+| **Akteure** | Student. |
+| **Vorbedingung** | Der Nutzer befindet sich in einer Konversation mit dem zu meldenden Nutzer. |
+| **Nachbedingung** | Die Meldung ist gespeichert und im Admin-Bereich sichtbar. |
+| **Ergebnis** | Die Meldung kann von einem Admin bearbeitet werden. |
+| **Hauptszenario** | 1. Student klickt im Chat auf „Melden". 2. Student wählt einen Grund. 3. Student klickt „Melden". 4. System prüft, ob der gemeldete Nutzer existiert und ob bereits eine offene eigene Meldung gegen ihn vorliegt. 5. Bei Erfolg prüft das System den Konversationskontext, speichert die Meldung und zeigt eine Bestätigung. |
+| **Alternativszenarien** | Existiert der gemeldete Nutzer nicht mehr oder liegt bereits eine offene eigene Meldung gegen denselben Nutzer vor, wird eine Fehlermeldung angezeigt. |
+| **Ausnahmeszenario** | Ist die Datenbank nicht erreichbar, wird die Meldung nicht gespeichert. |
+| **Qualitäten** | Die Meldung wird zusätzlich mit dem Konversationskontext verknüpft, damit ein Admin den Chatverlauf einsehen kann (siehe UC13). |
 
-*Tabelle 12: Use Case UC11 – Meldungen & Inserate moderieren (Admin)*
+*Tabelle: Use Case UC12 – Nutzer melden*
 
-### UC12 – Kauf abschließen
+## 2.15 UC13 – Meldungen bearbeiten (Admin)
 
-| Nr. | Abschnitt | Inhalt / Erläuterung |
-| --- | --- | --- |
-| 01 | Bezeichner | UC12 |
-| 02 | Name | Kauf abschließen |
-| 03 | Autoren | Projektteam |
-| 04 | Priorität | Hoch. Kernfunktion für den Abschluss eines Handels. |
-| 05 | Kritikalität | Mittel. Wichtig für den Ablauf, aber ohne echten Geldfluss. |
-| 06 | Verantwortlicher | Backend-Team (Logik, Speicherung), Frontend-Team (Kauf- und Bewertungsformular) |
-| 07 | Beschreibung | Ein eingeloggter Nutzer schließt den Kauf eines fremden Inserats ab. Er wählt einen Zahlungsmodus (Simulation oder In-App-Guthaben). Das System speichert die Transaktion und markiert das Inserat als verkauft. Im Anschluss kann der Käufer den Verkäufer bewerten. |
-| 08 | Auslösendes Ereignis | Der Nutzer klickt bei einem fremden Inserat auf „Kaufen“. |
-| 09 | Akteure | Eingeloggte Nutzer (als Käufer). |
-| 10 | Vorbedingung | Der Nutzer ist eingeloggt und betrachtet ein Inserat, dessen Anbieter er nicht selbst ist. |
-| 11 | Nachbedingung | Die Transaktion ist gespeichert, das Inserat ist als verkauft markiert; bei Nutzung des In-App-Guthabens wurde der Betrag verrechnet. |
-| 12 | Ergebnis | Der Kauf ist abgeschlossen; optional wurde eine Bewertung abgegeben. |
-| 13 | Hauptszenario | 1. Der Nutzer klickt bei einem Inserat auf „Kaufen“. 2. Der Kauf-Dialog öffnet sich. 3. Der Nutzer wählt einen Zahlungsmodus. 4. Der Nutzer bestätigt den Kauf. 5. Das System speichert die Transaktion und markiert das Inserat als verkauft. 6. Der Nutzer kann optional eine Bewertung abgeben. |
-| 14 | Alternativszenarien | Der Nutzer bricht den Kauf ab – keine Speicherung. Er verzichtet auf die Bewertung – der Kauf bleibt trotzdem gültig. |
-| 15 | Ausnahme Szenario | Datenbank nicht erreichbar – der Kauf wird nicht gespeichert und eine Fehlermeldung wird angezeigt. |
-| 16 | Qualitäten | Es findet keine echte Zahlungsabwicklung statt. Der Kaufabschluss soll in maximal drei Sekunden erfolgen. |
+| Abschnitt | Inhalt / Erläuterung |
+|---|---|
+| **Bezeichner** | UC13 |
+| **Name** | Meldungen bearbeiten (Admin) |
+| **Autoren** | Projektteam |
+| **Priorität** | Mittel bis hoch. Wichtig für die Qualität der Plattform. |
+| **Kritikalität** | Mittel. Nicht systemkritisch, aber betriebsrelevant. |
+| **Verantwortlicher** | Backend (Logik, Audit-Log), Frontend (Admin-Oberfläche) |
+| **Beschreibung** | Der Administrator sieht im Admin-Bereich alle offenen Meldungen zu Inseraten und Nutzern. Er kann bei Bedarf den Kontext prüfen (verlinktes Inserat bzw. Chat-Verlauf) und anschließend eine Maßnahme umsetzen. Welche Maßnahme zulässig ist, hängt vom Meldungstyp ab. |
+| **Auslösendes Ereignis** | Der Admin öffnet den Tab „Meldungen". |
+| **Akteure** | Administrator. |
+| **Vorbedingung** | Der Admin ist angemeldet. |
+| **Nachbedingung** | Die Meldung ist geschlossen; die gewählte Maßnahme wurde umgesetzt. |
+| **Ergebnis** | Die Meldung ist bearbeitet und der Zustand der Plattform ggf. aktualisiert. |
+| **Hauptszenario** | 1. Admin öffnet die Meldungsübersicht. 2. Admin wählt eine offene Meldung. 3. Optional: Admin öffnet das verlinkte Inserat bzw. klappt den Chat-Verlauf ein. 4. Admin trifft eine Entscheidung. 5. Bei Inserat-Meldung: System schließt die Meldung ohne Maßnahme oder löscht das Inserat. 6. Bei Nutzer-Meldung: System schließt die Meldung ohne Maßnahme, setzt einen Warnhinweis auf das Konto oder löscht das Konto. |
+| **Alternativszenarien** | Der Admin kann die Meldung jederzeit ohne Maßnahme schließen. |
+| **Ausnahmeszenario** | Ist die Datenbank nicht erreichbar, kann die Meldung nicht bearbeitet werden. |
+| **Qualitäten** | Nur berechtigte Admins haben Zugriff. |
 
-*Tabelle 13: Use Case UC12 – Kauf abschließen*
+*Tabelle: Use Case UC13 – Meldungen bearbeiten (Admin)*
+
+> **Hinweis:** Welche Maßnahme zulässig ist, hängt vom Meldungstyp ab — bei einer Inserat-Meldung ist nur „löschen" oder „ohne Maßnahme schließen" möglich, bei einer Nutzer-Meldung nur „verwarnen", „löschen" oder „ohne Maßnahme schließen".
+
+## 2.16 UC14 – Admin-Verwaltung (Nutzer, Inserate, Audit-Log)
+
+| Abschnitt | Inhalt / Erläuterung |
+|---|---|
+| **Bezeichner** | UC14 |
+| **Name** | Admin-Verwaltung (Nutzer, Inserate, Audit-Log) |
+| **Autoren** | Projektteam |
+| **Priorität** | Hoch. Notwendig zur Pflege der Nutzer- und Inseratbasis. |
+| **Kritikalität** | Hoch. Systempflege, sicherheitsrelevant. |
+| **Verantwortlicher** | Backend (Logik, Löschregeln), Frontend (Admin-Oberfläche) |
+| **Beschreibung** | Der Administrator kann über drei weitere Tabs alle Nutzerkonten und Inserate einsehen und löschen sowie das chronologische Audit-Log aller Admin-Aktionen einsehen. |
+| **Auslösendes Ereignis** | Der Admin öffnet den Tab „Nutzer", „Inserate" oder „Audit-Log". |
+| **Akteure** | Administrator. |
+| **Vorbedingung** | Der Admin ist angemeldet. |
+| **Nachbedingung** | Das betroffene Konto/Inserat ist gelöscht; beim reinen Einsehen des Audit-Logs werden keine Daten verändert. |
+| **Ergebnis** | Der Nutzer-/Inseratbestand ist aktuell, bzw. die Log-Einträge wurden angezeigt. |
+| **Hauptszenario** | 1a. Tab „Nutzer": Admin öffnet den Tab, System lädt und zeigt alle Nutzerkonten. Admin klickt „Löschen" bei einem Konto. System prüft, dass es kein eigenes oder anderes Admin-Konto ist und keine aktiven Inserate mehr vorhanden sind, und löscht bei Erfolg das Konto. 1b. Tab „Inserate": Admin öffnet den Tab, System lädt und zeigt alle Inserate. Admin klickt „Löschen" bei einem Inserat, System löscht es. 1c. Tab „Audit-Log": Admin öffnet den Tab, System lädt und zeigt die chronologische Liste aller Admin-Aktionen. |
+| **Alternativszenarien** | Ist ein Konto nicht löschbar, zeigt das System eine Fehlermeldung und lehnt die Löschung ab. |
+| **Ausnahmeszenario** | Ist die Datenbank nicht erreichbar, kann die Änderung nicht gespeichert werden. |
+| **Qualitäten** | Nur autorisierte Administratoren haben Zugriff. Änderungen sind sofort wirksam und werden protokolliert (Audit-Log). |
+
+*Tabelle: Use Case UC14 – Admin-Verwaltung (Nutzer, Inserate, Audit-Log)*
