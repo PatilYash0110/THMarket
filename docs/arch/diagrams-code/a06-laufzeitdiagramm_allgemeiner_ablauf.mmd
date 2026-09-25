@@ -1,14 +1,18 @@
-%% Abbildung 11: Laufzeitsicht - Allgemeiner Ablauf
 sequenceDiagram
+    autonumber
     actor U as Nutzer
     participant FE as Frontend
     participant C as Controller
+    participant S as Service
     U->>FE: Aktion (Button-Klick)
-    FE->>C: REQUEST /endpoint
+    FE->>C: Request an /endpoint
+    C->>S: delegiert an zuständigen Service
     alt Erfolg
+        S-->>C: Ergebnis
         C-->>FE: Response OK
         FE-->>U: Ergebnis anzeigen
     else Fehler
-        C-->>FE: Response Fehler
+        S-->>C: Exception
+        C-->>FE: Response Fehler (4xx/5xx)
         FE-->>U: Fehlermeldung anzeigen
     end
