@@ -242,7 +242,7 @@ sequenceDiagram
 #### Sequenzdiagramm UC04 – Inserat erstellen
 
 <details>
-<summary>📊 Diagramm anzeigen</summary>
+<summary> Diagramm anzeigen</summary>
 
 ```mermaid
 sequenceDiagram
