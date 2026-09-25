@@ -1,6 +1,6 @@
 # F3 Anwendungsfunktionen
 
-Dieser Abschnitt beschreibt Funktionen, die für den Betrieb von THMarket notwendig sind, aber kein eigenständiges Nutzerziel darstellen. Sie laufen im Hintergrund und unterstützen die in Kapitel 2.3–2.16 beschriebenen Use Cases.
+Dieser Abschnitt beschreibt Funktionen, die für den Betrieb von THMarket notwendig sind, aber kein eigenständiges Nutzerziel darstellen. Sie laufen im Hintergrund und unterstützen die im vorherigen Kapitel beschriebenen Use Cases.
 
 ### 1. E-Mail-Verifizierung
 
