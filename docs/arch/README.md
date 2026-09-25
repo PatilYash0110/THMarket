@@ -23,8 +23,8 @@ Referenz-Template: https://arc42.org/.
 | 5 | Bausteinsicht | ✅ | [`a05-bausteinsicht.md`](a05-bausteinsicht.md) |
 | 6 | Laufzeitsicht | ✅ | [`a06-laufzeitsicht.md`](a06-laufzeitsicht.md) |
 | 7 | Verteilungssicht | ✅ | [`a07-verteilungssicht.md`](a07-verteilungssicht.md) |
-| 8 | Querschnittliche Konzepte | 🛠 | |
-| 9 | Architekturentscheidungen (ADRs) | 🛠 | |
+| 8 | Querschnittliche Konzepte | ✅ | [`a08-querschnittliche-konzepte.md`](a08-querschnittliche-konzepte.md) |
+| 9 | Architekturentscheidungen (ADRs) | ✅ | [`a09-entwurfsentscheidungen.md`](a09-entwurfsentscheidungen.md) |
 | 10 | Qualitätsanforderungen | ✅ | [`a10-qualitaetsanforderungen.md`](a10-qualitaetsanforderungen.md) |
 | 11 | Risiken und technische Schulden | ✅ | [`a11-risiken-und-technische-schulden.md`](a11-risiken-und-technische-schulden.md) |
 | 12 | Glossar | ✅ | [`a12-glossar.md`](a12-glossar.md)  |
