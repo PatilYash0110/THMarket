@@ -141,7 +141,7 @@ Die vier zentralen Kernmodule werden nun in ihre inneren Bausteine zerlegt. Für
 <details>
 <summary>📊 Diagramm anzeigen</summary>
 
-![Whitebox „Auth"](diagrams_images/05-ebene2-kernmodule-band.png)
+![Whitebox „Auth"](diagram_images/05-ebene2-kernmodule-band.png)
 
 </details>
 
@@ -287,7 +287,7 @@ Die vier zentralen Kernmodule werden nun in ihre inneren Bausteine zerlegt. Für
 <details>
 <summary>📊 Diagramm anzeigen</summary>
 
-![Whitebox „Chat"](diagrams_images/07-ebene2-whitebox-auth.png)
+![Whitebox „Chat"](diagram_images/07-ebene2-whitebox-auth.png)
 
 </details>
 
@@ -335,7 +335,7 @@ Die vier zentralen Kernmodule werden nun in ihre inneren Bausteine zerlegt. Für
 <details>
 <summary>📊 Diagramm anzeigen</summary>
 
-![Whitebox „Admin"](diagrams_images/08-ebene2-whitebox-chat.png)
+![Whitebox „Admin"](diagram_images/08-ebene2-whitebox-chat.png)
 
 </details>
 
