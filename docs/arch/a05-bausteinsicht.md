@@ -10,7 +10,7 @@ Die folgende Zerlegungsübersicht stellt alle drei Ebenen gestapelt dar, die ges
 <details>
 <summary>📊 Diagramm anzeigen</summary>
 
-![Bausteinsicht — Zerlegungsübersicht](diagram_images/03-bausteinsicht-zerlegungsuebersicht.png)
+![Bausteinsicht — Zerlegungsübersicht](diagram_images/03-ebene0-1-2-uebersicht.png)
 
 </details>
 
