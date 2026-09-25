@@ -1,98 +1,69 @@
 # N1 Nichtfunktionale Anforderungen
 
-Die nichtfunktionalen Anforderungen definieren die Qualitätsmerkmale von THMarket in Bezug auf Leistung, Sicherheit, Benutzerfreundlichkeit und Wartbarkeit.
+Die nichtfunktionalen Anforderungen definieren die Qualitätsmerkmale von THMarket in Bezug auf Leistung, Sicherheit, Benutzerfreundlichkeit und Ausfallverhalten. Jede Anforderung ist einzeln geprüft und prüfbar formuliert.
 
-### NFA-01: Kurze Ladezeit der Inseratübersicht
+## NFA-01: Kurze Ladezeit der Inseratübersicht
 
-| Eigenschaft | Beschreibung |
-| :--- | :--- |
+| Attribut | Beschreibung |
+|---|---|
 | **Kurzbeschreibung** | Der Marktplatz soll die Inseratübersicht innerhalb von 2 Sekunden anzeigen. |
 | **Quelle** | Nutzererwartung, Entwicklerteam |
-| **Prüfkriterium** | Messung der Zeit vom Aufruf/Filtern bis zur vollständigen Anzeige. Erfolgreich, wenn 95 % der Abrufe ≤ 2 Sekunden benötigen. |
+| **Prüfkriterium** | Messung der Zeit vom Aufruf der Startseite bis zur vollständigen Anzeige. Erfolgreich, wenn 95 % der Abrufe ≤ 2 Sekunden benötigen. |
 | **Priorität** | Hoch |
-| **Abhängigkeiten** | Datenbankleistung, Bildgrößen/-komprimierung |
+| **Abhängigkeiten** | Datenbankleistung, Anzahl und Größe der Bilder |
 | **Konflikte** | Höhere Bildqualität kann die Ladezeit verlängern. |
 
+## NFA-02: Sichere Speicherung von Passwörtern
 
----
-
-### NFA-02: Sichere Speicherung von Passwörtern
-
-| Eigenschaft | Beschreibung |
-| :--- | :--- |
+| Attribut | Beschreibung |
+|---|---|
 | **Kurzbeschreibung** | Nutzerpasswörter müssen gehasht gespeichert werden, um den Zugriff auf Konten zu schützen. |
 | **Quelle** | Entwicklerteam, interne Sicherheitsrichtlinien |
-| **Prüfkriterium** | Überprüfung der Datenbank zeigt, dass Passwörter ausschließlich als Hash mit Salt vorliegen. |
+| **Prüfkriterium** | Überprüfung der Datenbank zeigt, dass Passwörter ausschließlich als bcrypt-Hash vorliegen. |
 | **Priorität** | Sehr hoch |
-| **Abhängigkeiten** | Datenbank- und Backend Implementierung |
-| **Konflikte** | Höhere Sicherheitsmaßnahmen können Registrierung und Login minimal verlangsamen. |
+| **Abhängigkeiten** | Backend-Implementierung (Auth-Modul) |
+| **Konflikte** | Höherer Hash-Aufwand kann Registrierung und Login minimal verlangsamen. |
 
+## NFA-03: Zugangsbeschränkung auf verifizierte THM-Nutzer
 
----
-
-### NFA-03: Zugangsbeschränkung auf verifizierte THM Nutzer
-
-| Eigenschaft | Beschreibung |
-| :--- | :--- |
-| **Kurzbeschreibung** | Nur Nutzer mit verifizierter THM E-Mail-Adresse dürfen die Plattform nutzen. Gäste sehen ausschließlich Login und Registrierung. |
-| **Quelle** | Projektziel, Sicherheitsanforderungen |
-| **Prüfkriterium** | Zugriffsversuche ohne verifiziertes Konto werden abgewiesen. Registrierung mit Nicht THM-Adresse wird abgelehnt. |
+| Attribut | Beschreibung |
+|---|---|
+| **Kurzbeschreibung** | Nur Nutzer mit verifizierter `@thm.de`-Adresse erhalten Zugriff auf die Marktplatzfunktionen. Nicht angemeldete Gäste sehen ausschließlich Landingpage, Login, Registrierung und Impressum. |
+| **Quelle** | Projektziel, Sicherheitsanforderung |
+| **Prüfkriterium** | Registrierung mit Nicht-THM-Adresse wird abgelehnt; Zugriff auf geschützte Routen ohne gültige Sitzung wird verweigert. |
 | **Priorität** | Sehr hoch |
-| **Abhängigkeiten** | E-Mail Verifizierung, Zugriffs-/Sitzungsverwaltung |
-| **Konflikte** | Strikte Zugangskontrolle kann die Einstiegshürde erhöhen. |
+| **Abhängigkeiten** | E-Mail-Verifizierung, Sitzungsverwaltung |
+| **Konflikte** | Strikte Zugangskontrolle erhöht die Einstiegshürde. |
 
+## NFA-04: Echtzeit-Zustellung von Chat-Nachrichten
 
----
-
-### NFA-04: Echtzeit-Zustellung von Chat-Nachrichten
-
-| Eigenschaft | Beschreibung |
-| :--- | :--- |
-| **Kurzbeschreibung** | Chat Nachrichten sollen bei bestehender Verbindung nahezu verzögerungsfrei zugestellt werden. |
+| Attribut | Beschreibung |
+|---|---|
+| **Kurzbeschreibung** | Chat-Nachrichten sollen bei bestehender Verbindung nahezu verzögerungsfrei zugestellt werden. |
 | **Quelle** | Nutzererwartung, Entwicklerteam |
-| **Prüfkriterium** | Bei bestehender Verbindung werden Nachrichten in unter 1 Sekunde zugestellt; bei Ausfall werden sie gespeichert und später zugestellt. |
+| **Prüfkriterium** | Zustellung < 1 Sekunde bei bestehender Verbindung; bei Verbindungsabbruch bleiben Nachrichten gespeichert und werden beim nächsten Öffnen nachgeladen. |
 | **Priorität** | Hoch |
-| **Abhängigkeiten** | Socket.io, Netzwerkverbindung, Backend |
-| **Konflikte** | Persistente Speicherung jeder Nachricht erhöht die Systemlast. |
+| **Abhängigkeiten** | Socket.io, Netzwerkverbindung |
+| **Konflikte** | Persistente Speicherung jeder Nachricht erhöht die Systemlast geringfügig. |
 
+## NFA-05: Sicheres Bild-Handling
 
----
-
-### NFA-05: Sicheres und effizientes Bild-Handling
-
-| Eigenschaft | Beschreibung |
-| :--- | :--- |
-| **Kurzbeschreibung** | Hochgeladene Bilder werden auf Format und Größe geprüft und sicher gespeichert; unzulässige Dateien werden abgewiesen. |
-| **Quelle** | Entwicklerteam, Sicherheitsanforderungen |
-| **Prüfkriterium** | Nur zulässige Bildformate innerhalb der Größenbeschränkung werden gespeichert; andere Dateien werden mit Hinweis abgelehnt. |
+| Attribut | Beschreibung |
+|---|---|
+| **Kurzbeschreibung** | Hochgeladene Bilder werden auf zulässiges Format und Größe geprüft; unzulässige Dateien werden abgewiesen. |
+| **Quelle** | Entwicklerteam, Sicherheitsanforderung |
+| **Prüfkriterium** | Unzulässige Dateien werden mit verständlicher Fehlermeldung abgelehnt, zulässige werden clientseitig komprimiert und bei Cloudinary gespeichert. |
 | **Priorität** | Hoch |
-| **Abhängigkeiten** | Backend-Validierung, Datenbank/Speicher |
-| **Konflikte** | Strengere Prüfung kann den Upload-Vorgang verlängern. |
+| **Abhängigkeiten** | Frontend-Validierung, Cloudinary-Anbindung |
+| **Konflikte** | Strengere Prüfung kann den Upload-Vorgang geringfügig verlängern. |
 
+## NFA-06: Ausfallverhalten des externen KI-Dienstes
 
----
-
-### NFA-06: Standortdaten-Bereinigung bei Bild-Uploads
-
-| Eigenschaft | Beschreibung |
-| :--- | :--- |
-| **Kurzbeschreibung** | Standortdaten (z. B. GPS-Metadaten) werden aus hochgeladenen Bildern entfernt, bevor sie gespeichert werden. |
-| **Quelle** | Datenschutzanforderungen, Architektur |
-| **Prüfkriterium** | Stichprobenprüfung gespeicherter Bilder zeigt keine Standort-Metadaten mehr. |
-| **Priorität** | Hoch |
-| **Abhängigkeiten** | Backend-Verarbeitung, Bildspeicherdienst |
-| **Konflikte** | Zusätzliche Verarbeitung kann den Upload-Vorgang geringfügig verlängern. |
-
-
----
-
-### NFA-07: Ausfallverhalten des externen KI-Beschreibungsdienstes
-
-| Eigenschaft | Beschreibung |
-| :--- | :--- |
-| **Kurzbeschreibung** | Ist der externe KI-Beschreibungsdienst nicht erreichbar, bleibt das Erstellen eines Inserats über die manuelle Eingabe uneingeschränkt möglich. |
-| **Quelle** | Architektur, Robustheitsanforderung |
-| **Prüfkriterium** | Bei simuliertem Ausfall des Dienstes kann ein Inserat ohne Vorschlag vollständig erstellt werden; eine verständliche Fehlermeldung wird angezeigt. |
+| Attribut | Beschreibung |
+|---|---|
+| **Kurzbeschreibung** | Ist Gemini (Beschreibungsvorschlag oder Bildmoderation) nicht erreichbar oder liefert einen Fehler, bleibt das Erstellen eines Inserats über die manuelle Eingabe uneingeschränkt möglich; eine fehlgeschlagene Moderationsprüfung wird zusätzlich im Audit-Log vermerkt. |
+| **Quelle** | Architekturentscheidung, Robustheitsanforderung |
+| **Prüfkriterium** | Bei simuliertem Ausfall kann ein Inserat ohne KI-Vorschlag vollständig erstellt werden; im Audit-Log erscheint ein entsprechender Eintrag. |
 | **Priorität** | Mittel |
-| **Abhängigkeiten** | Externer KI-Beschreibungsdienst, Backend-Fehlerbehandlung |
+| **Abhängigkeiten** | Externer KI-Dienst (Gemini), Audit-Log |
 | **Konflikte** | Kein direkter Konflikt erkennbar. |
