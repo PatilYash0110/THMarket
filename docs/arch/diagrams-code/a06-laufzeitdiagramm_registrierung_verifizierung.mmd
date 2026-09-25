@@ -1,19 +1,34 @@
-%% Abbildung 12: Laufzeitsicht - Registrierung & Verifizierung
 sequenceDiagram
+    autonumber
     actor S as THM-Student
     participant FE as Frontend
     participant API as AuthController
     participant SVC as AuthService
     participant DB as Datenbank
-    participant M as SMTP
-    S->>FE: Formular (E-Mail, Passwort)
+    participant M as Mail-Anbindung (SMTP)
+
+    S->>FE: Formular (Name, THM-E-Mail, Passwort)
     FE->>API: POST /auth/register
     API->>SVC: register(dto)
-    SVC->>SVC: THM-Domain pruefen (.thm.de)
-    SVC->>SVC: Passwort hashen, Token erzeugen
-    SVC->>DB: User anlegen (isVerified = false)
-    SVC->>M: Verifizierungs-E-Mail senden
-    M-->>S: E-Mail mit Bestaetigungslink
-    S->>API: GET /auth/verify?token
-    API->>DB: isVerified = true
-    API-->>FE: Bestaetigung (Pop-up)
+    SVC->>SVC: THM-Domain pruefen (@thm.de), Passwortstaerke pruefen
+    SVC->>DB: Konto existiert bereits?
+    DB-->>SVC: Ergebnis
+    alt E-Mail bereits vergeben
+        SVC-->>API: Fehler (Konto existiert bereits)
+    else E-Mail frei
+        SVC->>SVC: Passwort hashen (bcrypt), Verifizierungs-Token erzeugen
+        SVC->>DB: User anlegen (verified = false)
+        SVC->>M: Verifizierungs-E-Mail ausloesen
+        M-->>S: E-Mail mit Bestaetigungslink
+        SVC-->>API: Erfolg
+    end
+    API-->>FE: Response
+    FE-->>S: Erfolgsmeldung anzeigen
+
+    S->>FE: Oeffnet Bestaetigungslink
+    FE->>API: GET /auth/verify-email?token
+    API->>SVC: verifyEmail(token)
+    SVC->>DB: Token pruefen, verified = true setzen
+    SVC-->>API: Erfolg
+    API-->>FE: Bestaetigung
+    FE-->>S: "E-Mail bestaetigt" anzeigen
