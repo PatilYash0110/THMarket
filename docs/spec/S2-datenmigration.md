@@ -1,4 +1,4 @@
-# S2 – Datenmigration
+# S2 Datenmigration
 
 Nach aktuellem Projektstand ist keine Datenmigration aus einem Vorgängersystem vorgesehen.
 
