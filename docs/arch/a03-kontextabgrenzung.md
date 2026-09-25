@@ -79,7 +79,7 @@ Die innerhalb der Anwendung dargestellte Zahlung ist lediglich eine Simulation u
 Das fachliche Kontextdiagramm wird als Mermaid-Quelltext im Repository abgelegt und zusätzlich als gerenderte Grafik eingebunden.
 
 ## 3.2 Technischer Kontext
-![Technischer Kontext der THMarket-Anwendung](diagram_images/a03-technischer-context.png)
+![Technischer Kontext der THMarket-Anwendung](diagram_images/02-technischer-kontext.png)
 
 Der technische Kontext beschreibt die Kommunikationskanäle zwischen Browser, Backend, Datenbank und externen Diensten.
 
