@@ -1,27 +1,27 @@
 # F3 Anwendungsfunktionen
 
-In diesem Abschnitt werden Funktionen beschrieben, die für den Betrieb von THMarket wesentlich sind, aber keine eigenständigen Benutzerziele darstellen. Sie unterstützen die Anwendungsfälle durch interne Abläufe, automatische Prüfprozesse oder technische Logiken.
+Dieser Abschnitt beschreibt Funktionen, die für den Betrieb von THMarket notwendig sind, aber kein eigenständiges Nutzerziel darstellen. Sie laufen im Hintergrund und unterstützen die in Kapitel 2.3–2.16 beschriebenen Use Cases.
 
 ### 1. E-Mail-Verifizierung
 
-Bei der Registrierung erzeugt das System einen zeitlich begrenzten Verifizierungstoken und versendet über den externen E-Mail-/SMTP-Dienst eine Bestätigungs-E-Mail mit einem Link. Erst nach Aufruf des Links wird das Konto als verifiziert markiert und für die Anmeldung freigeschaltet. Nicht bestätigte Konten bleiben inaktiv. Wurde die E-Mail nicht zugestellt oder ist der Link abgelaufen, kann ein neuer Verifizierungslink angefordert werden.
+Bei der Registrierung (UC01) erzeugt das System einen zeitlich begrenzten Verifizierungslink und löst über den externen SMTP-Dienst eine Bestätigungs-E-Mail aus. Erst nach Aufruf des Links gilt das Konto als verifiziert und ist login-fähig. Läuft der Link ab oder kommt die E-Mail nicht an, kann ein neuer Link angefordert werden. Derselbe Mechanismus wird für den Passwort-Reset-Link in UC03 verwendet.
 
-### 2. Bildverarbeitung und -speicherung
+### 2. Bildverarbeitung
 
-Beim Erstellen eines Inserats werden hochgeladene Bilder auf zulässiges Format und Größe geprüft und gegebenenfalls komprimiert. Die Bilddateien werden im vorgesehenen Speicher abgelegt; ihre Speicherpfade und die Zuordnung zum jeweiligen Inserat werden in der Datenbank gespeichert. Jedem Inserat können mehrere Bilder zugeordnet werden.
+Beim Erstellen oder Bearbeiten eines Inserats (UC04, UC05) werden ausgewählte Fotos vor dem Hochladen clientseitig komprimiert, bevor sie an Cloudinary übertragen werden. Cloudinary liefert die endgültige, dauerhaft nutzbare Bild-URL zurück. Jedes hochgeladene Foto wird zusätzlich einzeln über Gemini auf unangemessene Inhalte geprüft. Ist der Dienst nicht erreichbar oder liefert einen Fehler, wird der Upload dennoch zugelassen und der Ausfall als Eintrag im Audit-Log vermerkt, statt das Erstellen von Inseraten komplett zu blockieren (siehe NFA-06).
 
 ### 3. Echtzeit-Nachrichtenzustellung
 
-Der Chat basiert auf Socket.io. Eingehende Nachrichten werden über eine bidirektionale Verbindung ereignisgesteuert an die beteiligten Nutzer zugestellt und gleichzeitig persistiert. So bleiben Nachrichten auch nach dem Neuladen der Seite verfügbar. Bei einem Verbindungsabbruch versucht das System, die Verbindung automatisch wiederherzustellen.
+Der Chat (UC07) basiert auf Socket.io. Eine gesendete Nachricht wird zunächst in der Datenbank gespeichert und anschließend über eine ereignisgesteuerte Verbindung an den Empfänger zugestellt. Ist der Empfänger die Konversation gerade nicht geöffnet, springt sie in seiner Konversationsliste nach oben, ist er offline, sieht er die Nachricht beim nächsten Öffnen der Konversation. Bei einem Verbindungsabbruch versucht das System automatisch, die Verbindung wiederherzustellen.
 
 ### 4. Sitzungs- und Zugriffsverwaltung
 
-Nach dem Login wird eine Sitzung verwaltet, die die Zugriffsrechte des Nutzers bestimmt. Geschützte Bereiche (Marktplatz, Chat, Adminbereich) sind nur für angemeldete bzw. berechtigte Nutzer erreichbar.
+Nach dem Login (UC02) wird ein Zugriffstoken ausgestellt, das Identität und Rolle des Nutzers trägt. Anhand der Rolle entscheidet das Frontend, ob der Marktplatz oder der Admin-Bereich angezeigt wird, und das Backend, welche Endpunkte erreichbar sind. Geschützte Bereiche sind ohne gültiges Token nicht erreichbar.
 
 ### 5. Automatischer Beschreibungsvorschlag
 
-Bei der Erstellung eines Inserats kann auf Basis der hochgeladenen Bilder automatisch ein Vorschlag für Titel, Beschreibung und Kategorie erzeugt werden (siehe Nachbarsystem in S1). Der Vorschlag wird dem Nutzer zur Bearbeitung angezeigt und muss nicht unverändert übernommen werden. Ist der externe Dienst nicht erreichbar, bleibt die manuelle Eingabe aller Felder weiterhin möglich.
+Beim Erstellen eines Inserats (UC04) kann auf Basis der hochgeladenen Fotos sowie Titel/Kategorie/optionalem Hinweis ein Beschreibungsvorschlag über Gemini erzeugt werden. Der Vorschlag wird dem Nutzer zur Bearbeitung angezeigt und muss nicht unverändert übernommen werden. Schlägt die Anfrage fehl, bleibt die manuelle Eingabe uneingeschränkt möglich.
 
 ### 6. Mock-Kauf und Guthaben-Verwaltung
 
-Beim Abschluss eines Kaufs wählt der Käufer einen Zahlungsmodus: entweder eine reine Simulation ohne Geldfluss oder die Verrechnung über ein In-App-Guthaben. In beiden Fällen wird der Kauf als Transaktion gespeichert und das Inserat als verkauft markiert. Bei Nutzung des In-App-Guthabens wird der entsprechende Betrag dem Guthaben des Verkäufers gutgeschrieben. Eine echte Zahlungsabwicklung findet nicht statt.
+Beim Kaufabschluss (UC08) wählt der Käufer zwischen zwei simulierten Zahlungsmodi: Simulation (feste Testkartennummern, kein Geldfluss) oder In-App-Guthaben. In beiden Fällen wird das Inserat als verkauft markiert und beim Guthaben-Modus wird der Betrag vom Käufer abgebucht und dem Verkäufer gutgeschrieben. Aufladen und Auszahlen (UC09, UC10) folgen demselben Simulationsprinzip. Eine echte Zahlungsabwicklung findet zu keinem Zeitpunkt statt.
