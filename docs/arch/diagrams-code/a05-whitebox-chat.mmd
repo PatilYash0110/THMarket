@@ -1,0 +1,16 @@
+flowchart TB
+  subgraph CHTWB["Whitebox Chat · Verfeinerungsebene 2"]
+    direction TB
+    CONV["Konversationen (ChatController · REST)"]:::sub
+    GW["Chat-Gateway (Socket.io)"]:::sub
+    MSG["Nachrichten-Persistenz"]:::sub
+  end
+  AUTHX["Auth (JWT-Prüfung)"]:::core
+  DBX[("Datenbank")]:::db
+  GW -->|prüft JWT über| AUTHX
+  GW -->|speichert, dann sendet| MSG
+  CONV --> DBX
+  MSG --> DBX
+  classDef sub fill:#e7f5ff,stroke:#4dabf7,color:#0b3a66
+  classDef core fill:#d0ebff,stroke:#1971c2,color:#0b3a66
+  classDef db fill:#1d2b53,stroke:#101a3a,color:#ffffff
