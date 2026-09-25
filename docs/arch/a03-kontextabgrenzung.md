@@ -2,7 +2,7 @@
 THMarket wird in diesem Kapitel als Blackbox betrachtet. Die Kontextabgrenzung zeigt seine Beziehungen zu Nutzern, Administratoren und externen technischen Diensten. Die internen Bausteine des Systems werden erst in den späteren Architekturkapiteln beschrieben
 
 ## 3.1 Fachlicher Kontext
-![Fachlicher Kontext der THMarket-Anwendung](diagram_images/a03-fachlicher-kontext.png)
+![Fachlicher Kontext der THMarket-Anwendung](diagram_images/01-fachlicher-kontext.png)
 
 THMarket interagiert fachlich hauptsächlich mit zwei Rollen:
 

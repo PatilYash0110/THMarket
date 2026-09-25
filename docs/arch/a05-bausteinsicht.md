@@ -112,7 +112,7 @@ Im Guthaben-Modus ruft die Mock Zahlung die Guthaben Verwaltung auf, damit diese
 Unabhängig vom gewählten Modus setzt die Mock Zahlung außerdem das betroffene Inserat in der Datenbank auf den Status VERKAUFT.
 Guthaben Verwaltung und Bewertungen greifen jeweils eigenständig auf die Datenbank zu.
  
-![Whitebox Transaktion Management](diagram_images/a05-bausteinsicht_whitebox_transaktion_management.png)
+
  
 *(Quelltext: `diagrams-code/a05-bausteinsicht_whitebox_transaktion_management.plantuml`)*
  
