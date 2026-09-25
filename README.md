@@ -189,9 +189,9 @@ Bei der Entwicklung von THMarket wurden KI-Werkzeuge eingesetzt:
 
 | Werkzeug | Eingesetzt für |
 |----------|----------------|
-| Claude (Claude Code) | Code-Vervollständigung im Backend, Entwürfe für Dokumentationstexte und ADRs, Repository- und Commit-Verwaltung |
-| Google Gemini | Code-Vervollständigung, Recherche zu Technologiealternativen, Formulierungsvorschläge |
-| ChatGPT | Formulierungsvorschläge, Gegenlesen einzelner Kapitel |
+| Claude (Claude Code) | Code-Vervollständigung und Generierung für Backend und Frontend Teil, Entwürfe für Dokumentationstexte, Repository- und Commit-Verwaltung, Diagramm Code Erstellung für die Dokumente, Gegenlesen einzelner Kapitel |
+| Google Gemini | Code-Vervollständigung und Code Check, Recherche zu Technologiealternativen, Formulierungsvorschläge für die Dokumente,Gegenlesen einzelner Kapitel, Bild Generierung |
+| ChatGPT | Formulierungsvorschläge für die Dokumente, Gegenlesen einzelner Kapitel |
 
 Die fachlichen und architektonischen Entscheidungen wurden in der Gruppe getroffen. Generierte Vorschläge wurden vor der Übernahme geprüft und überarbeitet; Vorschläge, die nicht zum tatsächlichen Stand des Projekts passten, wurden verworfen.
 
