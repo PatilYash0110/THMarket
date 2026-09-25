@@ -1,4 +1,6 @@
-# 1.1 Projektziel und Rahmenbedingungen
+# P1  Ziele und Rahmenbedingungen
+
+## P1.1 Projektziel
 
 THMarket ist ein Campus-Marktplatz, der ausschließlich für verifizierte Studierende der Technischen Hochschule Mittelhessen (THM) offensteht. Ziel ist es, den informellen Second-Hand-Handel unter Studierenden (Bücher, Elektronik, Möbel, Fahrräder, Kleidung u. Ä.), der bisher über verstreute WhatsApp-Gruppen läuft, auf einer eigenen, geschlossenen Plattform zu bündeln.
 
@@ -9,7 +11,7 @@ THMarket ist ein Campus-Marktplatz, der ausschließlich für verifizierte Studie
 - **Direkter Kontakt:** Ein eingebauter Echtzeit-Chat ersetzt den Umweg über externe Messenger.
 - **Moderierbarkeit:** Nutzer können Inserate und andere Nutzer melden, ein Admin-Bereich erlaubt es, Meldungen zu bearbeiten und im Bedarfsfall Inserate zu löschen oder Konten zu verwarnen bzw. zu löschen.
 
-# 1.2 Stakeholder
+## P1.2 Stakeholder
 
 ### Nutzende Stakeholder
 
@@ -27,7 +29,7 @@ THMarket ist ein Campus-Marktplatz, der ausschließlich für verifizierte Studie
 | Entwickler | Wartung und Erweiterung | klar getrennte Module, verständliche APIs, nachvollziehbarer Entwicklungsworkflow |
 | Lehrende / Prüfer | Bewertung | nachvollziehbare Anforderungen, messbare Ziele, verständliche Dokumentation |
 
-# 1.3 Nicht-Projektziele
+## P1.3 Nicht-Projektziele
 
 Folgende Punkte sind bewusst **nicht** Bestandteil von THMarket:
 
