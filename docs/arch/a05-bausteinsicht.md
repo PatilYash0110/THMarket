@@ -89,7 +89,7 @@ Bild Upload liefert der Inserat Verwaltung die Bild-URLs, KI Beschreibung liefer
 Bild Upload spricht dafür mit Cloudinary (dabei werden EXIF-Metadaten, u. a. GPS-Standortdaten, aus den Bildern entfernt), KI Beschreibung mit der Google Gemini API.
 Inserat Verwaltung, Suche & Filter und Favoriten greifen jeweils direkt auf die Datenbank zu.
  
-![Whitebox Inserat Management](diagram_images/a05-bausteinsicht_whitebox_inserat_management.png)
+![Whitebox Inserat Management](diagram_images/09-ebene2-whitebox-listings.png)
  
 *(Quelltext: `diagrams-code/a05-bausteinsicht_whitebox_inserat_management.plantuml`)*
  
